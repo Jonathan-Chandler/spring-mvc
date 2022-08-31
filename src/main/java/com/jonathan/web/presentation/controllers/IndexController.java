@@ -1,6 +1,7 @@
 package com.jonathan.web.presentation.controllers;
 
 import java.util.List;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -15,7 +16,7 @@ public class IndexController
   @RequestMapping(value = "/")
   public String displayIndex(Model model)
   {
-    model.addAttribute("test123");
+    model.addAttribute("thymeDate", new java.util.Date());
     return "indexpage";
   }
 }

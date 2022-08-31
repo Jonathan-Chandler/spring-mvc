@@ -1,11 +1,12 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <meta charset = "ISO-8859-1" />
-    <link href = "css/styles.css" rel = "stylesheet"/>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap-theme.min.css}" />
     <title>head</title>
   </head>
   <body>
+    <p th:text="'this is the thymeleaf indexpage.html date: ' + ${thymeDate}" class="testCss" />
     <p>this is the index2page.html</p>
   </body>
 </html>
