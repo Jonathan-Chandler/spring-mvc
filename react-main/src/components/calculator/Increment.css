@@ -1,0 +1,24 @@
+.inc-button {
+  font-size : 100px;
+  text-align: center;
+}
+
+.inc-total {
+  font-size : 100px;
+  text-align: center;
+}
+
+.btn-group-wrap {
+    text-align: center;
+}
+
+div.btn-group {
+    margin: 0 auto; 
+    text-align: center;
+    width: inherit;
+    display: inline-block;
+}
+
+a {
+    float: left;   
+}
