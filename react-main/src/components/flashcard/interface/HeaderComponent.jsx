@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
-import {BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom'
+import {BrowserRouter as Routes, Link} from 'react-router-dom'
 import AuthenticationService from '../decorators/AuthenticationService.jsx'
-//import AuthenticationService, {isUserLoggedIn} from './decorators/AuthenticationService.jsx'
-
-import withNavigation from '../decorators/WithNavigation.jsx'
-
 
 class HeaderComponent extends Component
 {
