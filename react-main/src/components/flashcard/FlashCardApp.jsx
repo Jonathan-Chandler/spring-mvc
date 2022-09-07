@@ -13,9 +13,6 @@ import LogoutComponent from './authentication/LogoutComponent.jsx'
 import ListTodosComponent from './pages/ListTodosComponent.jsx'
 import ErrorComponent from './pages/ErrorComponent.jsx'
 
-//import PropTypes from 'prop-types'
-//import {BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom'
-//import AuthenticationService from './decorators/AuthenticationService.jsx'
 export class FlashCardApp extends Component 
 {
   render() 
