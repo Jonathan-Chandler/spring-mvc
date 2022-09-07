@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import FlashCardApp from './components/flashcard/FlashCardApp';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.css';
 
 class App extends Component 
 {

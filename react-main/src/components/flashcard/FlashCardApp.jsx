@@ -1,87 +1,59 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
-import withNavigation from './WithNavigation.jsx'
+import {BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom'
+
+import withNavigation from './decorators/WithNavigation.jsx'
+import withParams from './decorators/WithParams.jsx'
+import AuthenticationService from './decorators/AuthenticationService.jsx'
+import AuthenticatedRoute from './decorators/AuthenticatedRoute.jsx'
+
+import HeaderComponent from './interface/HeaderComponent.jsx'
+import FooterComponent from './interface/FooterComponent.jsx'
+import WelcomeComponent from './pages/WelcomeComponent.jsx'
+import LoginComponent from './authentication/LoginComponent.jsx'
+import LogoutComponent from './authentication/LogoutComponent.jsx'
+import ListTodosComponent from './pages/ListTodosComponent.jsx'
+import ErrorComponent from './pages/ErrorComponent.jsx'
 
 export class FlashCardApp extends Component 
 {
   render() 
   {
     const LoginComponentWithNavigation = withNavigation(LoginComponent);
+    const HeaderComponentWithNavigation = withNavigation(HeaderComponent);
+    const WelcomeComponentWithParams = withParams(WelcomeComponent);
     return (
       <div className="flashCardApp">
-        <h1>Flash Card Application</h1>
         <Router>
+          <HeaderComponentWithNavigation/>
           <Routes>
             <Route path="/" element={<LoginComponentWithNavigation />} />
             <Route path="/login" element={<LoginComponentWithNavigation />} />
-            <Route path="/welcome" element={<WelcomeComponent />} />
+            <Route path="/logout" element={<LogoutComponent />} />
+            <Route path="/welcome/:username" element={
+              <AuthenticatedRoute> 
+                <WelcomeComponentWithParams />
+              </AuthenticatedRoute> 
+              } />
+            <Route path="/welcome/:username" element={
+              <AuthenticatedRoute> 
+                <WelcomeComponentWithParams />
+              </AuthenticatedRoute> 
+              } />
+            <Route path="/todo" element={
+              <AuthenticatedRoute> 
+                <ListTodosComponent />
+              </AuthenticatedRoute> 
+              } />
+            <Route path="*" element={<ErrorComponent />} />
           </Routes>
+          <FooterComponent/>
         </Router>
       </div>
     );
   }
 }
 
-class WelcomeComponent extends Component
-{
-  render() {
-    return (
-      <div>
-        Welcome
-      </div>
-    );
-  }
-}
-
-class LoginComponent extends Component
-{
-  constructor(props) {
-    super(props);
-    this.state = {
-      username : 'username',
-      password : '',
-      hasLoginFailed : false,
-    }
-
-    this.handleChange = this.handleChange.bind(this)
-    this.loginClicked = this.loginClicked.bind(this)
-  }
-
-  handleChange(event) {
-    //console.log(event.target.value)
-    //console.log(this.state)
-    this.setState(
-      {
-        [event.target.name] : event.target.value
-      }
-    )
-  }
-
-  loginClicked() {
-    //console.log(this.state)
-    if (this.state.username==='username' && this.state.password==='a')
-    {
-      console.log("login")
-      this.props.navigate(`welcome`)
-    }
-    else
-    {
-      this.setState({hasLoginFailed : true})
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        User Name: <input type="text" name="username" value={this.state.username} onChange={this.handleChange}/>
-        Password: <input type="password" name="password" value={this.state.password} onChange={this.handleChange}/>
-        <button onClick={this.loginClicked}>Login</button>
-        {this.state.hasLoginFailed && <div>Invalid Login</div>}
-      </div>
-    )
-  }
-}
 
 
 //function ShowLoginSuccessful(props){

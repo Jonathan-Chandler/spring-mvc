@@ -4,4 +4,4 @@ function withNavigation(Component) {
   return props => <Component {...props} navigate={useNavigate()} />;
 }
 
-export default withNavigation
+export default withNavigation;
