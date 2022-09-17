@@ -52,18 +52,4 @@ export class FlashCardApp extends Component
   }
 }
 
-
-
-//function ShowLoginSuccessful(props){
-//  if (props.showLoginSuccess){
-//    return <div>Login Successful</div>
-//  }
-//}
-//
-//function ShowInvalidCredentials(props){
-//  if (props.hasLoginFailed){
-//    return <div>Invalid Login</div>
-//  }
-//}
-
 export default FlashCardApp;
