@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import FlashCardApp from './components/flashcard/FlashCardApp';
+//import FlashCardApp from './components/flashcard/FlashCardApp';
+import TodoApp from './components/todo/TodoApp';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -40,7 +41,8 @@ class App extends Component
         </div>
 
         {/*<CalculatorComponent/>*/}
-        <FlashCardApp/>
+        {/*<FlashCardApp/>*/}
+        <TodoApp/>
       </div>
     );
   }

@@ -33,10 +33,6 @@
       <groupId>org.springframework.session</groupId>
       <artifactId>spring-session-core</artifactId>
     </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
 
     <!-- javax parameter validation -->
     <dependency>
@@ -45,6 +41,19 @@
         <version>2.0.1.Final</version>
     </dependency>
 
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.24</version>
+        <scope>provided</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
+    <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>1.70</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
