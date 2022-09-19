@@ -31,3 +31,103 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# React
+.DS_STORE
+node_modules
+scripts/flow/*/.flowconfig
+.flowconfig
+*~
+*.pyc
+.grunt
+_SpecRunner.html
+__benchmarks__
+build/
+remote-repo/
+coverage/
+.module-cache
+fixtures/dom/public/react-dom.js
+fixtures/dom/public/react.js
+test/the-files-to-test.generated.js
+*.log*
+chrome-user-data
+*.sublime-project
+*.sublime-workspace
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+
+packages/react-devtools-core/dist
+packages/react-devtools-extensions/chrome/build
+packages/react-devtools-extensions/chrome/*.crx
+packages/react-devtools-extensions/chrome/*.pem
+packages/react-devtools-extensions/firefox/build
+packages/react-devtools-extensions/firefox/*.xpi
+packages/react-devtools-extensions/firefox/*.pem
+packages/react-devtools-extensions/shared/build
+packages/react-devtools-extensions/.tempUserDataDir
+packages/react-devtools-inline/dist
+packages/react-devtools-shell/dist
+packages/react-devtools-timeline/dist
+
+# Angular
+.DS_STORE
+
+/dist/
+/bazel-out
+/integration/bazel/bazel-*
+*.log
+node_modules
+
+# CircleCI temporary file for cache key computation.
+# See `save_month_to_file` in `.circleci/config.yml`.
+month.txt
+
+# Include when developing application packages.
+pubspec.lock
+.c9
+.idea/
+.devcontainer/*
+!.devcontainer/README.md
+!.devcontainer/recommended-devcontainer.json
+!.devcontainer/recommended-Dockerfile
+.settings/
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
+*.swo
+*.swp
+modules/.settings
+modules/.vscode
+.vimrc
+.nvimrc
+
+# Don't check in secret files
+*secret.js
+
+# Ignore npm/yarn debug log
+npm-debug.log
+yarn-error.log
+
+# build-analytics
+.build-analytics
+
+# rollup-test output
+/modules/rollup-test/dist/
+
+# User specific bazel settings
+.bazelrc.user
+
+# User specific ng-dev settings
+.ng-dev.user*
+
+.notes.md
+baseline.json
+
+# Ignore .history for the xyz.local-history VSCode extension
+.history
+
+# Husky
+.husky/_
