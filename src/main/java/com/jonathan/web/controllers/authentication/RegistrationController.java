@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-
 
 import com.jonathan.web.dao.UserRepository;
-import com.jonathan.web.entities.User;
-import com.jonathan.web.resources.UserCredentialsDto;
+import com.jonathan.web.entities.UserData;
+import com.jonathan.web.resources.UserRegistrationDto;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -29,29 +27,28 @@ public class RegistrationController
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  //public RegistrationController(UserRepository userRepository) {
-  public RegistrationController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+  public RegistrationController(UserRepository userRepository, PasswordEncoder passwordEncoder) 
+  {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
-  
-  @PostMapping("/registration")
+  @PostMapping("/register")
   @ResponseStatus(code = HttpStatus.CREATED)
-  public void register(@RequestBody UserCredentialsDto userCredentialsDto) {
-    //Instant start = Instant.now();  // start timer
-    User user = User.builder()
-      .id(0)
-      .name(userCredentialsDto.getName())
-      .email(userCredentialsDto.getEmail())
-      .password(passwordEncoder.encode(userCredentialsDto.getPassword()))
+  public void register(@RequestBody UserRegistrationDto newUserRequest) {
+    Instant start = Instant.now();
+    UserData user = UserData.builder()
+      .username(newUserRequest.getUsername())
+      .email(newUserRequest.getEmail())
+      .password(passwordEncoder.encode(newUserRequest.getPassword()))
+      .enabled(true)
       .build();
-    //Instant end = Instant.now();    // end timer
+    Instant end = Instant.now();
 
-    //System.out.println(String.format(
-    //        "Hashing took %s ms",
-    //        ChronoUnit.MILLIS.between(start, end)
-    //));
+    System.out.println(String.format(
+            "Hashing took %s ms",
+            ChronoUnit.MILLIS.between(start, end)
+    ));
     userRepository.save(user);
   }
 }
