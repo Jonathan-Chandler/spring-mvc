@@ -39,7 +39,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collection;
 
 import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
+import com.jonathan.web.resources.UserRegistrationDto;
 //import org.springframework.context.annotation.Lazy;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class UserServiceImpl implements UserService
@@ -107,8 +110,30 @@ public class UserServiceImpl implements UserService
     }
   }
 
-  public String register(UserData user)
+  //public String register(UserData user)
+  @Override
+  public String register(UserRegistrationDto newUserRequest)
   {
+    Instant start = Instant.now();
+    UserData user = UserData.builder()
+      .username(newUserRequest.getUsername())
+      .email(newUserRequest.getEmail())
+      .password(passwordEncoder.encode(newUserRequest.getPassword()))
+      .enabled(true)
+      .build();
+    Instant end = Instant.now();
+
+    System.out.println(String.format(
+            "Hashing took %s ms",
+            ChronoUnit.MILLIS.between(start, end)
+    ));
+
+    userRepository.save(user);
+    return "";
+
+    //  return jwtTokenProvider.createToken(appUser.getUsername(), appUser.getAppUserRoles());
+
+    //userRepository.save(user);
     //if (!userRepository.existsByUsername(appUser.getUsername())) 
     //{
     //  appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
@@ -117,7 +142,7 @@ public class UserServiceImpl implements UserService
     //} else {
     //  throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
     //}
-    return "";
+    //return "";
   }
 
   public void deleteById(String id)

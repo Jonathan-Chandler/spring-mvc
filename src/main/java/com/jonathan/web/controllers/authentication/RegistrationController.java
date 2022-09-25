@@ -13,42 +13,45 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.jonathan.web.service.UserService;
 
 import com.jonathan.web.dao.UserRepository;
-import com.jonathan.web.entities.UserData;
 import com.jonathan.web.resources.UserRegistrationDto;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @RestController
 public class RegistrationController
 {
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
+  //private final UserRepository userRepository;
+  //private final PasswordEncoder passwordEncoder;
+  @Autowired
+  private UserService userService;
 
-  public RegistrationController(UserRepository userRepository, PasswordEncoder passwordEncoder) 
-  {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
-  }
+  //public RegistrationController(UserRepository userRepository, PasswordEncoder passwordEncoder) 
+  //{
+  //  this.userRepository = userRepository;
+  //  this.passwordEncoder = passwordEncoder;
+  //}
 
   @PostMapping("/register")
   @ResponseStatus(code = HttpStatus.CREATED)
-  public void register(@RequestBody UserRegistrationDto newUserRequest) {
-    Instant start = Instant.now();
-    UserData user = UserData.builder()
-      .username(newUserRequest.getUsername())
-      .email(newUserRequest.getEmail())
-      .password(passwordEncoder.encode(newUserRequest.getPassword()))
-      .enabled(true)
-      .build();
-    Instant end = Instant.now();
+  public void register(@RequestBody UserRegistrationDto newUserRequest) 
+  {
+    userService.register(newUserRequest);
+    //userService.register(userLogin.getUsername(), userLogin.getPassword());
+    //Instant start = Instant.now();
+    //UserData user = UserData.builder()
+    //  .username(newUserRequest.getUsername())
+    //  .email(newUserRequest.getEmail())
+    //  .password(passwordEncoder.encode(newUserRequest.getPassword()))
+    //  .enabled(true)
+    //  .build();
+    //Instant end = Instant.now();
 
-    System.out.println(String.format(
-            "Hashing took %s ms",
-            ChronoUnit.MILLIS.between(start, end)
-    ));
-    userRepository.save(user);
+    //System.out.println(String.format(
+    //        "Hashing took %s ms",
+    //        ChronoUnit.MILLIS.between(start, end)
+    //));
+    //userRepository.save(user);
   }
 }

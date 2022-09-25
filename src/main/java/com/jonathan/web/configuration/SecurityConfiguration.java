@@ -65,7 +65,8 @@ public class SecurityConfiguration
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
       // Spring Security should completely ignore URLs starting with /resources/
-      .antMatchers("/login/**");
+      .antMatchers("/login/**")
+      .antMatchers("/register/**");
   }
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
