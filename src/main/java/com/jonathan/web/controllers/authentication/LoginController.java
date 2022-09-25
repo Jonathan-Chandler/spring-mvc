@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 public class LoginController 
@@ -56,12 +57,16 @@ public class LoginController
 
   //  return jwsTest.serialize();
   //}
-  private final UserService userService;
 
-  LoginController(UserService userService)
-  {
-    this.userService = userService;
-  }
+  @Autowired
+  private UserService userService;
+
+  //private final UserService userService;
+
+  //LoginController(UserService userService)
+  //{
+  //  this.userService = userService;
+  //}
 
 	@PostMapping("/login")
   //public String signin(String username, String password) {
@@ -72,8 +77,8 @@ public class LoginController
     produces = "application/json",
     consumes = "application/json"
   )
-  @ResponseBody
   //public String signin(@ResponseBody UserLoginDto userLogin) {
+  @ResponseBody
   public String signin(@RequestBody UserLoginDto userLogin) {
     String loginJwt;
     System.out.println("requestbody username: " + userLogin.getUsername());

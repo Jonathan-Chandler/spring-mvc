@@ -27,36 +27,78 @@ import org.springframework.security.core.AuthenticationException;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.jonathan.web.configuration.SecurityConfiguration;
+import org.springframework.context.annotation.Bean;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.Collection;
+
+import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
+//import org.springframework.context.annotation.Lazy;
+
 @Service
 public class UserServiceImpl implements UserService
 {
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtTokenService jwtTokenService;
-  private final AuthenticationProvider authenticationProvider;
+  @Autowired
+  UserRepository userRepository;
 
-  public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService, AuthenticationProvider authenticationProvider)
+  @Autowired
+  AuthenticationProvider authenticationProvider;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  private final JwtTokenService jwtTokenService;
+
+  public UserServiceImpl(
+      JwtTokenService jwtTokenService)
   {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
     this.jwtTokenService = jwtTokenService;
-    this.authenticationProvider = authenticationProvider;
-    this.AuthenticationManager = AuthenticationManager;
   }
+  //private final JwtTokenService jwtTokenService;
+  //private final CustomAuthenticationProvider customAuthenticationProvider;
+
+  //public UserServiceImpl(
+  //    //PasswordEncoder passwordEncoder, 
+  //    JwtTokenService jwtTokenService, 
+  //    CustomAuthenticationProvider customAuthenticationProvider)
+  //{
+  //  //this.passwordEncoder = passwordEncoder;
+  //  this.jwtTokenService = jwtTokenService;
+  //  this.customAuthenticationProvider = customAuthenticationProvider;
+  //  //this.AuthenticationManager = AuthenticationManager;
+  //}
 
   public String login(String username, String password) throws JOSEException
   {
     try {
+      //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+      //context.scan("com.jonathan.web.configuration");
+      //context.refresh();
+          
       //String encodedPassword = passwordEncoder.encode(password);
       System.out.println("username: " + username);
       //System.out.println("encoded pass: " + encodedPassword);
+      ////GrantedAuthority testAuth = new SimpleGrantedAuthority("User");
+      ////List<GrantedAuthority> testAuthList = new ArrayList<>();
+      ////testAuthList.add(testAuth);
+
       List<String> roles = Arrays.asList(new String[] {""});
+      authenticationProvider.authenticate(new 
+          UsernamePasswordAuthenticationToken(username, passwordEncoder.encode(password)));
+
       //authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+      //testAuth.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+      //authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
       System.out.println("successfully authenticated - getting token");
+      //customAuthenticationProvider.authenticate(new 
+      //    UsernamePasswordAuthenticationToken(username, password));
       return jwtTokenService.createToken(username, roles);
-      //return jwtTokenService.createToken(username, new List<String> Arrays.asList(""));
-      //return jwtTokenService.createToken(username, userRepository.findByUsername(username).getAppUserRoles());
     }
     catch(AuthenticationException e)
     {

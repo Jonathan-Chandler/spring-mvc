@@ -1,6 +1,8 @@
 package com.jonathan.web.dao;
 
 import java.util.List;
+import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +17,6 @@ import com.jonathan.web.resources.UserLoginDto;
 @Service
 public interface UserRepository extends JpaRepository<UserData, String>
 {
-  UserLoginDto findByUsername(String username);
+  Optional<UserLoginDto> findOneByUsername(String username);
 }
 

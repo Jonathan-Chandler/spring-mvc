@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jonathan.web.dao.UserRepository;
 import com.jonathan.web.controllers.authentication.UserDetailsMapper;
 import com.jonathan.web.resources.UserLoginDto;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -28,14 +29,13 @@ public class AuthorizationUserDetails implements UserDetailsService
           throws UsernameNotFoundException 
   {
     //UserLoginCredentialsDto userCredentials = userRepository.findById(username).orElse(null);
-    UserLoginDto loginData = userRepository.findByUsername(username);
+    UserLoginDto loginData = userRepository.findOneByUsername(username).orElse(null);
     if (loginData == null)
     {
-      System.out.println("could not find user: " + username);
       throw new UsernameNotFoundException("User not found with username " + username);
     }
+    //System.out.println("looked up user: " + returnName + " with password: " + returnPassword);
 
-    System.out.println("looked up user: " + loginData.getUsername());
     return userDetailsMapper.toUserDetails(loginData);
   }
 }
@@ -46,4 +46,14 @@ public class AuthorizationUserDetails implements UserDetailsService
 //    userCredentials.setPassword(newPassword);
 //    return userDetailsMapper.toUserDetails(userCredentials);
 //  }
+
+    //Optional<UserLoginDto> loginData = userRepository.findOneByUsername(username);
+
+    //String returnName = loginData.isPresent() ? loginData.get().getUsername() : "";
+    //String returnPassword = loginData.isPresent() ? loginData.get().getPassword() : "";
+    //if (returnName == "")
+    //{
+    //  System.out.println("could not find user: " + username);
+    //  throw new UsernameNotFoundException("User not found with username " + username);
+    //}
 
