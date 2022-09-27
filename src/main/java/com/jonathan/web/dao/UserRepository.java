@@ -19,8 +19,6 @@ import com.jonathan.web.resources.UserLoginDto;
 //public interface UserRepository extends JpaRepository<UserData, String>
 public interface UserRepository extends JpaRepository<User, String>
 {
-  //User findOneByUsername(String username);
   Optional<User> findOneByUsername(String username);
-  //User loadUserByUsername(String username);
 }
 

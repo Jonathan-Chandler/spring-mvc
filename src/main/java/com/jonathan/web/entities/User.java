@@ -77,15 +77,6 @@ public class User implements UserDetails
     return true;
   }
 
-  //@Column(name = "authority")
-  //private Set<String> roles;
-
-  //@Id 
-  //private String username;
-
-  //private String password;
-
-
   //@ElementCollection
   //@JoinTable(
   //    name = "authorities",

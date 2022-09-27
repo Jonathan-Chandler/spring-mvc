@@ -150,6 +150,7 @@ public class JwtTokenService
       return "";
     }
   }
+}
 
   //public Boolean validateJwtToken(String token, UserDetails userDetails) 
   //public Boolean validateJwtToken(String token, String username) 
@@ -198,7 +199,6 @@ public class JwtTokenService
 //        .signWith(SignatureAlgorithm.HS256, secretKey)//
 //        .compact();
 //  }
-}
 //  OAuth2AccessToken(
 //  OAuth2AccessToken.TokenType tokenType, // Bearer
 //  java.lang.String tokenValue, 
