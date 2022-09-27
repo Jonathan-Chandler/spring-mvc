@@ -23,14 +23,14 @@ public class UserDetailsServiceImpl implements UserDetailsService
   {
     UserDetails returnDetails = userRepository.findOneByUsername(username).orElse(null);
 
-    if (returnDetails != null)
+    if (returnDetails == null)
     {
-      logger.info("Returned UserDetails username: " + returnDetails.getUsername());
-      //logger.info("returned UserDetails password: " + returnDetails.getPassword());
+      logger.info("Returned null for username " + username);
     }
     else
     {
-      logger.info("Returned null");
+      //logger.info("Returned UserDetails username: " + returnDetails.getUsername());
+      //logger.info("returned UserDetails password: " + returnDetails.getPassword());
     }
 
     return returnDetails;

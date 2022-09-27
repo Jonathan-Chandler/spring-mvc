@@ -9,14 +9,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-//import com.jonathan.web.entities.UserData;
 import com.jonathan.web.entities.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.jonathan.web.resources.UserLoginDto;
 
 @Service
-//public interface UserRepository extends JpaRepository<UserData, String>
 public interface UserRepository extends JpaRepository<User, String>
 {
   Optional<User> findOneByUsername(String username);

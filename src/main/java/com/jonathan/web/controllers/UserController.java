@@ -8,10 +8,6 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-//import org.springframework.security.oauth2.jwt.JwtEncoder;
-//import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-
 import java.security.SecureRandom;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
@@ -23,13 +19,6 @@ import com.jonathan.web.service.UserService;
 import org.springframework.security.core.AuthenticationException;
 import com.jonathan.web.resources.UserLoginDto;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-////import com.auth0.jwt.algorithms.Algorithm;
-////import com.auth0.jwt.JWT;
-////import com.auth0.jwt.exceptions.JWTCreationException;
-////import com.auth0.jwt.interfaces.Claim;
-////import com.auth0.jwt.interfaces.DecodedJWT;
-////import com.auth0.jwt.interfaces.JWTVerifier;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -61,10 +50,6 @@ public class UserController
   @Autowired
   Logger logger;
 
-  //@PostMapping("/login")
-  //public String signin(String username, String password) {
-  //public String signin(@ResponseBody UserLoginDto userLogin) {
-  // UserLoginDto
   @RequestMapping(
     value = {"/login"},
     method = RequestMethod.POST,

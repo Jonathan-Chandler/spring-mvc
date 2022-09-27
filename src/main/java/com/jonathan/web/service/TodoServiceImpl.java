@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 import com.jonathan.web.service.TodoService;
 import com.jonathan.web.dao.TodoRepository;
 import com.jonathan.web.entities.Todo;
+import org.slf4j.Logger;
 
 @Service
 public class TodoServiceImpl implements TodoService
 {
   private TodoRepository todoRepository;
+
+  @Autowired
+  private Logger logger;
 
   @Autowired
   public TodoServiceImpl(TodoRepository todoRepository)
@@ -26,7 +30,6 @@ public class TodoServiceImpl implements TodoService
   public List<Todo> findAll()
   {
     List<Todo> todos = todoRepository.findAll();
-    System.out.println("todos: " + todos);
     return todos;
   }
 

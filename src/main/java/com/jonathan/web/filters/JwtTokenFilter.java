@@ -19,6 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.jonathan.web.service.JwtTokenService;
 import com.jonathan.web.entities.User;
 import com.jonathan.web.dao.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter 
@@ -28,6 +30,8 @@ public class JwtTokenFilter extends OncePerRequestFilter
 
   @Autowired
   private UserRepository userRepository;
+
+  private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
@@ -48,7 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter
     }
 
     setAuthenticationContext(token, request);
-    System.out.println("FilterChain dofilter for request/response");
+    logger.info("FilterChain dofilter for request/response");
     filterChain.doFilter(request, response);
   }
 
@@ -57,30 +61,30 @@ public class JwtTokenFilter extends OncePerRequestFilter
     String header = request.getHeader("Authorization");
     if (ObjectUtils.isEmpty(header) || !header.startsWith("Bearer")) 
     {
-      System.out.println("Failed to get Authorization Bearer header: " + header);
+      logger.info("Failed to get Authorization Bearer header: " + header);
       return false;
     }
 
-    System.out.println("Successfully get Authorization Bearer header: " + header);
+    logger.info("Successfully get Authorization Bearer header: " + header);
     return true;
   }
 
   private String getAccessToken(HttpServletRequest request) {
     String header = request.getHeader("Authorization");
     String token = header.split(" ")[1].trim();
-    System.out.println("Return token: " + token);
+    logger.info("Return token: " + token);
     return token;
   }
 
   private void setAuthenticationContext(String token, HttpServletRequest request) 
   {
-    System.out.println("setAuthenticationContext token: " + token);
+    logger.info("setAuthenticationContext token: " + token);
     UserDetails userDetails = getUserDetails(token);
 
     UsernamePasswordAuthenticationToken
       authentication = new UsernamePasswordAuthenticationToken(userDetails, null, null);
 
-    System.out.println("UsernamePasswordAuthenticationToken: " + authentication);
+    logger.info("UsernamePasswordAuthenticationToken: " + authentication);
 
     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
@@ -90,12 +94,12 @@ public class JwtTokenFilter extends OncePerRequestFilter
   private UserDetails getUserDetails(String token) 
   {
     String username = jwtTokenService.getUsernameFromToken(token);
-    System.out.println("Return username from token: " + username);
+    logger.info("Return username from token: " + username);
 
     User userDetails = userRepository.findOneByUsername(username).orElse(null);
     if (userDetails == null)
     {
-      System.out.println("userDetails returns null");
+      logger.info("userDetails returns null");
     }
 
     return userDetails;

@@ -45,7 +45,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import org.springframework.security.core.Authentication;
 import org.slf4j.Logger;
-//import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import com.jonathan.web.service.UserDetailsServiceImpl;
@@ -71,67 +70,28 @@ public class UserServiceImpl implements UserService
   @Autowired
   JwtTokenService jwtTokenService;
 
-  //private final JwtTokenService jwtTokenService;
-
-  /////public UserServiceImpl(
-  /////    JwtTokenService jwtTokenService)
-  /////{
-  /////  this.jwtTokenService = jwtTokenService;
-  /////}
-  //private final JwtTokenService jwtTokenService;
-  //private final CustomAuthenticationProvider customAuthenticationProvider;
-
-  //public UserServiceImpl(
-  //    //PasswordEncoder passwordEncoder, 
-  //    JwtTokenService jwtTokenService, 
-  //    CustomAuthenticationProvider customAuthenticationProvider)
-  //{
-  //  //this.passwordEncoder = passwordEncoder;
-  //  this.jwtTokenService = jwtTokenService;
-  //  this.customAuthenticationProvider = customAuthenticationProvider;
-  //  //this.AuthenticationManager = AuthenticationManager;
-  //}
-
   public String login(String username, String password) throws JOSEException
   {
     try 
     {
-      //String encodedPassword = passwordEncoder.encode(password);
-      logger.info("username: " + username);
-      logger.info("password: " + password);
-      //System.out.println("encoded pass: " + encodedPassword);
-      ////GrantedAuthority testAuth = new SimpleGrantedAuthority("User");
-      ////List<GrantedAuthority> testAuthList = new ArrayList<>();
-      ////testAuthList.add(testAuth);
-
       UserDetails testDetails = userDetailsService.loadUserByUsername(username);
-      logger.info("Username: " + testDetails.getUsername());
-      logger.info("Password: " + testDetails.getPassword());
-      logger.info("authorities: " + testDetails.getAuthorities());
-      logger.info("isAccountNonExpired: " + testDetails.isAccountNonExpired());
-      logger.info("isAccountNonLocked: " + testDetails.isAccountNonLocked());
-      logger.info("isCredentialsNonExpired: " + testDetails.isCredentialsNonExpired());
-      logger.info("isEnabled: " + testDetails.isEnabled());
-
 
       List<String> roles = Arrays.asList(new String[] {""});
       Authentication upAuthToken = authenticationProvider.authenticate(
           new UsernamePasswordAuthenticationToken(testDetails, password));
-          //new UsernamePasswordAuthenticationToken(username, password));
       if (upAuthToken == null)
       {
-        logger.info("Failed to authenticate");
+        logger.info("Failed to authenticate user " + username);
         return "";
       }
-      logger.info("UsernamePasswordAuthenticationToken success - return: " + upAuthToken);
 
       String generatedToken = jwtTokenService.generateJwtToken(username);
       if (generatedToken == "")
       {
-        logger.info("Failed to generate token");
+        logger.info("Failed to generate token for user " + username);
       }
-      //return jwtTokenService.createToken(username, roles);
-      logger.info("Created token: " + generatedToken + " for user " + username);
+
+      //logger.info("Created token: " + generatedToken + " for user " + username);
       return generatedToken;
     }
     catch(AuthenticationException e)
@@ -145,35 +105,22 @@ public class UserServiceImpl implements UserService
   @Override
   public String register(UserRegistrationDto newUserRequest)
   {
-    Instant start = Instant.now();
+    //Instant start = Instant.now();
     User user = User.builder()
       .username(newUserRequest.getUsername())
       .email(newUserRequest.getEmail())
       .password(passwordEncoder.encode(newUserRequest.getPassword()))
       .enabled(true)
       .build();
-    Instant end = Instant.now();
+    //Instant end = Instant.now();
 
-    logger.info(String.format(
-            "Hashing took %s ms",
-            ChronoUnit.MILLIS.between(start, end)
-    ));
+    //logger.info(String.format(
+    //        "Hashing took %s ms",
+    //        ChronoUnit.MILLIS.between(start, end)
+    //));
 
     userRepository.save(user);
     return "";
-
-    //  return jwtTokenProvider.createToken(appUser.getUsername(), appUser.getAppUserRoles());
-
-    //userRepository.save(user);
-    //if (!userRepository.existsByUsername(appUser.getUsername())) 
-    //{
-    //  appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
-    //  userRepository.save(appUser);
-    //  return jwtTokenProvider.createToken(appUser.getUsername(), appUser.getAppUserRoles());
-    //} else {
-    //  throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
-    //}
-    //return "";
   }
 
   public void deleteById(String id)
@@ -181,52 +128,4 @@ public class UserServiceImpl implements UserService
     userRepository.deleteById(id);
   }
 }
-//
-////@Service
-////public class UserServiceImpl implements UserService
-////{
-////  private UserRepository userRepository;
-////
-////  public UserServiceImpl(UserRepository userRepository)
-////  {
-////    this.userRepository = userRepository;
-////  }
-////
-////  @Override
-////  public List<UserData> findAll()
-////  {
-////    return userRepository.findAll();
-////  }
-////
-////  @Override
-////  public UserData findById(String id)
-////  {
-////    Optional<UserData> result = userRepository.findById(id);
-////    UserData user = null;
-////
-////    if (result.isPresent())
-////    {
-////      user = result.get();
-////    }
-////    else
-////    {
-////      throw new RuntimeException("Fail to find username: " + id);
-////    }
-////
-////    return user;
-////  }
-////
-////  @Override
-////  public void save(UserData user)
-////  {
-////    userRepository.save(user);
-////  }
-////
-////  @Override
-////  public void deleteById(String id)
-////  {
-////    userRepository.deleteById(id);
-////  }
-////}
-////
-////
+
