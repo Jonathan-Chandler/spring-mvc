@@ -2,6 +2,8 @@ package com.jonathan.web.controller.authentication;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -79,7 +81,9 @@ public class LoginController
   )
   //public String signin(@ResponseBody UserLoginDto userLogin) {
   @ResponseBody
-  public String signin(@RequestBody UserLoginDto userLogin) {
+  public Map<String, String> signin(@RequestBody UserLoginDto userLogin) 
+  {
+    HashMap<String, String> responseJson = new HashMap<>();
     String loginJwt;
     System.out.println("requestbody username: " + userLogin.getUsername());
     System.out.println("requestbody pass: " + userLogin.getPassword());
@@ -89,7 +93,8 @@ public class LoginController
     } catch (Exception e) 
     {
       System.out.println("failed jwt");
-      return "Failed";
+      responseJson.put("jwt_response", "");
+      return responseJson;
     }
     //try {
     //  authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -98,7 +103,10 @@ public class LoginController
     //  throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
     //}
     System.out.println("Returned jwt: " + loginJwt);
-    return loginJwt;
+
+    responseJson.put("jwt_response", loginJwt);
+    return responseJson;
+    //return "{'jwt_response':'" + loginJwt + "'}";
   }
 
 //	@Autowired

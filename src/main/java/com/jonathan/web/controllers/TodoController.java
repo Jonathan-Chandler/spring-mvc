@@ -20,17 +20,13 @@ import com.jonathan.web.service.TodoService;
 @CrossOrigin(origins="http://localhost:3000")
 public class TodoController
 {
-  private TodoService todoService;
-
   @Autowired
-  TodoController(TodoService todoService)
-  {
-    this.todoService = todoService;
-  }
+  private TodoService todoService;
 
   @GetMapping("/todos")
   public List<Todo> findAll()
   {
+    System.out.println("Todos - find all");
     return todoService.findAll();
   }
 

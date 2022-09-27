@@ -1,89 +1,194 @@
 package com.jonathan.web.controllers.authentication;
-//
+ 
 import java.io.IOException;
-//
+ 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.stereotype.Component;
+ 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.jonathan.web.service.UserService;
-import com.jonathan.web.service.JwtTokenService;
-
-import com.jonathan.web.dao.UserRepository;
-import com.jonathan.web.entities.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.core.context.SecurityContextHolder;
-
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+ 
+import com.jonathan.web.service.JwtTokenService;
+import com.jonathan.web.entities.User;
+import com.jonathan.web.dao.UserRepository;
+ 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter 
 {
   @Autowired
-  private UserService userService;
+  private JwtTokenService jwtTokenService;
 
   @Autowired
   private UserRepository userRepository;
 
-  @Autowired
-  private JwtTokenService jwtTokenService;
-  //private final UserRepo userRepo;
-
-  //private boolean isEmpty(String value)
-  //{
-  //  if (
-  //}
-
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain chain)
+  protected void doFilterInternal(HttpServletRequest request,
+      HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException 
   {
-    // Get authorization header and validate
-    final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if (header == null || !header.startsWith("Bearer ")) 
+    if (!hasAuthorizationBearer(request)) 
     {
-      chain.doFilter(request, response);
+      filterChain.doFilter(request, response);
       return;
     }
 
-    // Get jwt token and validate
-    final String token = header.split(" ")[1].trim();
+    String token = getAccessToken(request);
     if (!jwtTokenService.validateJwtToken(token)) 
     {
-      chain.doFilter(request, response);
+      filterChain.doFilter(request, response);
       return;
     }
 
-    // Get user identity and set it on the spring security context
-    User user = userRepository
-      .findOneByUsername(jwtTokenService.getUsernameFromToken(token))
-      .orElse(null);
+    setAuthenticationContext(token, request);
+    System.out.println("FilterChain dofilter for request/response");
+    filterChain.doFilter(request, response);
+  }
 
-    if (user == null)
+  private boolean hasAuthorizationBearer(HttpServletRequest request) 
+  {
+    String header = request.getHeader("Authorization");
+    if (ObjectUtils.isEmpty(header) || !header.startsWith("Bearer")) 
     {
-      
+      System.out.println("Failed to get Authorization Bearer header: " + header);
+      return false;
     }
 
-    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, user.getAuthorities());
+    System.out.println("Successfully get Authorization Bearer header: " + header);
+    return true;
+  }
 
-    authentication.setDetails(
-        new WebAuthenticationDetailsSource().buildDetails(request)
-        );
+  private String getAccessToken(HttpServletRequest request) {
+    String header = request.getHeader("Authorization");
+    String token = header.split(" ")[1].trim();
+    System.out.println("Return token: " + token);
+    return token;
+  }
+
+  private void setAuthenticationContext(String token, HttpServletRequest request) 
+  {
+    System.out.println("setAuthenticationContext token: " + token);
+    UserDetails userDetails = getUserDetails(token);
+
+    UsernamePasswordAuthenticationToken
+      authentication = new UsernamePasswordAuthenticationToken(userDetails, null, null);
+
+    System.out.println("UsernamePasswordAuthenticationToken: " + authentication);
+
+    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    chain.doFilter(request, response);
+  }
+
+  private UserDetails getUserDetails(String token) 
+  {
+    // jwtTokenService.getSubject(token).split(",");
+    String username = jwtTokenService.getUsernameFromToken(token);
+    System.out.println("Return username from token: " + username);
+
+    User userDetails = userRepository.findOneByUsername(username).orElse(null);
+    if (userDetails == null)
+    {
+      System.out.println("userDetails returns null");
+    }
+
+    //userDetails.setUsername(username);
+    //userDetails.setEmail(jwtSubject[1]);
+
+    //User userDetails = User.UserBuilder()
+    //  .username(username)
+    //  .password("")
+    //  .roles("User")
+    //  .build();
+    return userDetails;
   }
 }
+//////
+////import java.io.IOException;
+//////
+////import javax.servlet.FilterChain;
+////import javax.servlet.ServletException;
+////import javax.servlet.ServletRequest;
+////import javax.servlet.ServletResponse;
+////import javax.servlet.http.HttpServletRequest;
+////import javax.servlet.http.HttpServletResponse;
+////
+////import org.springframework.http.HttpHeaders;
+////import org.springframework.web.filter.OncePerRequestFilter;
+////import org.springframework.stereotype.Component;
+////import org.springframework.beans.factory.annotation.Autowired;
+////
+////import com.jonathan.web.service.UserService;
+////import com.jonathan.web.service.JwtTokenService;
+////
+////import com.jonathan.web.dao.UserRepository;
+////import com.jonathan.web.entities.User;
+////import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+////import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+////import org.springframework.security.core.context.SecurityContextHolder;
+////
+////@Component
+////public class JwtTokenFilter extends OncePerRequestFilter 
+////{
+////  @Autowired
+////  private UserService userService;
+////
+////  @Autowired
+////  private UserRepository userRepository;
+////
+////  @Autowired
+////  private JwtTokenService jwtTokenService;
+////
+////  @Override
+////  protected void doFilterInternal(
+////      HttpServletRequest request,
+////      HttpServletResponse response,
+////      FilterChain chain)
+////    throws ServletException, IOException 
+////  {
+////    // Get authorization header and validate
+////    final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+////    if (header == null || !header.startsWith("Bearer ")) 
+////    {
+////      chain.doFilter(request, response);
+////      return;
+////    }
+////
+////    // Get jwt token and validate
+////    final String token = header.split(" ")[1].trim();
+////    if (!jwtTokenService.validateJwtToken(token)) 
+////    {
+////      chain.doFilter(request, response);
+////      return;
+////    }
+////
+////    // Get user identity and set it on the spring security context
+////    User user = userRepository
+////      .findOneByUsername(jwtTokenService.getUsernameFromToken(token))
+////      .orElse(null);
+////
+////    if (user == null)
+////    {
+////      
+////    }
+////
+////    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, user.getAuthorities());
+////
+////    authentication.setDetails(
+////        new WebAuthenticationDetailsSource().buildDetails(request)
+////        );
+////
+////    SecurityContextHolder.getContext().setAuthentication(authentication);
+////    chain.doFilter(request, response);
+////  }
+////}
 
 //
 //import org.springframework.security.core.Authentication;

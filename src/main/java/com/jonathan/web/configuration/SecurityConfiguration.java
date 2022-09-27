@@ -50,88 +50,99 @@ import org.springframework.security.authentication.AuthenticationManager;
 //import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 //import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 //import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.authentication.ProviderManager;
 //import org.springframework.context.annotation.Lazy;
 import com.jonathan.web.dao.UserRepository;
 
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import java.security.SecureRandom;
+import com.jonathan.web.controllers.authentication.JwtTokenFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import javax.servlet.Filter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration
 {
+  @Autowired
+  private Filter jwtTokenFilter;
+
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
       // Spring Security should completely ignore URLs starting with /resources/
       .antMatchers("/login/**")
+//      .antMatchers("/todos/**")
       .antMatchers("/register/**");
   }
+
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.authorizeRequests().antMatchers("/public/**").permitAll().anyRequest()
-      .hasRole("USER").and()
-      // Possibly more configuration ...
-      .formLogin() // enable form based log in
-                   // set permitAll for all URLs associated with Form Login
-      .permitAll();
+  public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    http.csrf().disable();
+    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+    http.authorizeRequests()
+      .antMatchers("/auth/login", "/docs/**", "/users").permitAll()
+      .anyRequest().authenticated();
+
+    http.exceptionHandling()
+      .authenticationEntryPoint(
+          (request, response, ex) -> {
+            response.sendError(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                ex.getMessage()
+                );
+          }
+          );
+
+    http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
     return http.build();
   }
+  //  @Bean
+  //  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  //    http.authorizeRequests().antMatchers("/public/**").permitAll().anyRequest()
+  //      .hasRole("USER").and()
+  //      // Possibly more configuration ...
+  //      .formLogin() // enable form based log in
+  //                   // set permitAll for all URLs associated with Form Login
+  //      .permitAll();
+  //    return http.build();
+  //  }
 
-	// using bcrypt password encoder for all authentication (recommended over argon2 for webapps with ~1 sec auth)
-	@Bean
+  // using bcrypt password encoder for all authentication (recommended over argon2 for webapps with ~1 sec auth)
+  @Bean
   public PasswordEncoder passwordEncoder() {
     // default is strength=10; range 4-31
     return new BCryptPasswordEncoder(14);
   }
-////  @Override
-////  protected void configure(HttpSecurity http) throws Exception {
-////    http.cors().and().authorizeRequests()
-////      .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
-////      .anyRequest().authenticated()
-////      .and()
-////      .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-////      .addFilter(new JWTAuthorizationFilter(authenticationManager()))
-////      // this disables session creation on Spring Security
-////      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-////  }
-//	// require authentication for all pages except registration and login
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//		http
-//			.authorizeHttpRequests((authz) -> authz
-//					.mvcMatchers("/registration").permitAll()
-//					.mvcMatchers("/login").permitAll()
-//					.anyRequest().authenticated()
-//					)
-//			.httpBasic(withDefaults());
-//		return http.build();
-//	}
-//    @Bean
-//    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-//        http.csrf().disable();
-//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//         
-//        http.authorizeRequests()
-//                .antMatchers("/auth/login", "/docs/**", "/users").permitAll()
-//                .anyRequest().authenticated();
-//         
-//            http.exceptionHandling()
-//                    .authenticationEntryPoint(
-//                        (request, response, ex) -> {
-//                            response.sendError(
-//                                HttpServletResponse.SC_UNAUTHORIZED,
-//                                ex.getMessage()
-//                            );
-//                        }
-//                );
-//         
-//        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-//         
-//        return http.build();
-//    }   
+  ////  @Override
+  ////  protected void configure(HttpSecurity http) throws Exception {
+  ////    http.cors().and().authorizeRequests()
+  ////      .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+  ////      .anyRequest().authenticated()
+  ////      .and()
+  ////      .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+  ////      .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+  ////      // this disables session creation on Spring Security
+  ////      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+  ////  }
+  //	// require authentication for all pages except registration and login
+  //	@Bean
+  //	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  //		http
+  //			.authorizeHttpRequests((authz) -> authz
+  //					.mvcMatchers("/registration").permitAll()
+  //					.mvcMatchers("/login").permitAll()
+  //					.anyRequest().authenticated()
+  //					)
+  //			.httpBasic(withDefaults());
+  //		return http.build();
+  //	}
 }
 
 

@@ -25,7 +25,9 @@ public class TodoServiceImpl implements TodoService
   @Override
   public List<Todo> findAll()
   {
-    return todoRepository.findAll();
+    List<Todo> todos = todoRepository.findAll();
+    System.out.println("todos: " + todos);
+    return todos;
   }
 
   @Override
