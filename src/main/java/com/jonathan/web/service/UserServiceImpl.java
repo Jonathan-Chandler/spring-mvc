@@ -39,16 +39,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collection;
 
-import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
 import com.jonathan.web.resources.UserRegistrationDto;
 //import org.springframework.context.annotation.Lazy;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import org.springframework.security.core.Authentication;
+import org.slf4j.Logger;
+//import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import com.jonathan.web.service.UserDetailsServiceImpl;
 
 @Service
 public class UserServiceImpl implements UserService
 {
+  @Autowired
+  Logger logger;
+
   @Autowired
   UserRepository userRepository;
 
@@ -56,15 +63,21 @@ public class UserServiceImpl implements UserService
   AuthenticationProvider authenticationProvider;
 
   @Autowired
-  private PasswordEncoder passwordEncoder;
+  UserDetailsServiceImpl userDetailsService;
 
-  private final JwtTokenService jwtTokenService;
+  @Autowired
+  PasswordEncoder passwordEncoder;
 
-  public UserServiceImpl(
-      JwtTokenService jwtTokenService)
-  {
-    this.jwtTokenService = jwtTokenService;
-  }
+  @Autowired
+  JwtTokenService jwtTokenService;
+
+  //private final JwtTokenService jwtTokenService;
+
+  /////public UserServiceImpl(
+  /////    JwtTokenService jwtTokenService)
+  /////{
+  /////  this.jwtTokenService = jwtTokenService;
+  /////}
   //private final JwtTokenService jwtTokenService;
   //private final CustomAuthenticationProvider customAuthenticationProvider;
 
@@ -84,33 +97,46 @@ public class UserServiceImpl implements UserService
     try 
     {
       //String encodedPassword = passwordEncoder.encode(password);
-      System.out.println("username: " + username);
+      logger.info("username: " + username);
+      logger.info("password: " + password);
       //System.out.println("encoded pass: " + encodedPassword);
       ////GrantedAuthority testAuth = new SimpleGrantedAuthority("User");
       ////List<GrantedAuthority> testAuthList = new ArrayList<>();
       ////testAuthList.add(testAuth);
 
+      UserDetails testDetails = userDetailsService.loadUserByUsername(username);
+      logger.info("Username: " + testDetails.getUsername());
+      logger.info("Password: " + testDetails.getPassword());
+      logger.info("authorities: " + testDetails.getAuthorities());
+      logger.info("isAccountNonExpired: " + testDetails.isAccountNonExpired());
+      logger.info("isAccountNonLocked: " + testDetails.isAccountNonLocked());
+      logger.info("isCredentialsNonExpired: " + testDetails.isCredentialsNonExpired());
+      logger.info("isEnabled: " + testDetails.isEnabled());
+
+
       List<String> roles = Arrays.asList(new String[] {""});
       Authentication upAuthToken = authenticationProvider.authenticate(
-          new UsernamePasswordAuthenticationToken(username, password));
+          new UsernamePasswordAuthenticationToken(testDetails, password));
+          //new UsernamePasswordAuthenticationToken(username, password));
       if (upAuthToken == null)
       {
-        System.out.println("Failed to authenticate");
+        logger.info("Failed to authenticate");
         return "";
       }
-      System.out.println("UsernamePasswordAuthenticationToken success - return: " + upAuthToken);
+      logger.info("UsernamePasswordAuthenticationToken success - return: " + upAuthToken);
 
       String generatedToken = jwtTokenService.generateJwtToken(username);
       if (generatedToken == "")
       {
-        System.out.println("Failed to generate token");
+        logger.info("Failed to generate token");
       }
       //return jwtTokenService.createToken(username, roles);
-      return jwtTokenService.generateJwtToken(username);
+      logger.info("Created token: " + generatedToken + " for user " + username);
+      return generatedToken;
     }
     catch(AuthenticationException e)
     {
-      System.out.println("Failed in login service");
+      logger.info("Failed in login service: " + e);
       throw e;
     }
   }
@@ -128,7 +154,7 @@ public class UserServiceImpl implements UserService
       .build();
     Instant end = Instant.now();
 
-    System.out.println(String.format(
+    logger.info(String.format(
             "Hashing took %s ms",
             ChronoUnit.MILLIS.between(start, end)
     ));

@@ -40,7 +40,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 //import com.jonathan.web.controllers.authentication.AuthorizationUserDetails;
 //import com.jonathan.web.controllers.authentication.AuthorizationPasswordService;
-import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
 
@@ -63,6 +62,13 @@ import com.jonathan.web.controllers.authentication.JwtTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import javax.servlet.Filter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.beans.factory.InjectionPoint;
+import com.jonathan.web.service.UserDetailsServiceImpl;
+//import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
+//import com.jonathan.web.service.UserDetailsPasswordServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -71,6 +77,16 @@ public class SecurityConfiguration
   @Autowired
   private Filter jwtTokenFilter;
 
+  @Autowired
+  private UserDetailsService userDetailsService;
+
+  @Bean
+  @Scope("prototype")
+  public Logger produceLogger(InjectionPoint injectionPoint) {
+      Class<?> classOnWired = injectionPoint.getMember().getDeclaringClass();
+      return LoggerFactory.getLogger(classOnWired);
+  }
+
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
     return (web) -> web.ignoring()
@@ -78,6 +94,20 @@ public class SecurityConfiguration
       .antMatchers("/login/**")
 //      .antMatchers("/todos/**")
       .antMatchers("/register/**");
+  }
+
+  @Bean
+  public AuthenticationProvider daoAuthenticationProvider() throws Exception 
+  {
+    DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+    //UserDetailsService userDetailsService = new UserDetailsServiceImpl();
+    //UserDetailsPasswordService userDetailsPasswordService = new UserDetailsPasswordServiceImpl();
+    daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+    //daoAuthenticationProvider.setUserDetailsPasswordService(userDetailsPasswordService);
+    daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+    return daoAuthenticationProvider;
+    //return new DaoAuthenticationProvider();
+    //daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
   }
 
   @Bean
