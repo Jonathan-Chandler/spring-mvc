@@ -38,8 +38,8 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
-import com.jonathan.web.controllers.authentication.AuthorizationUserDetails;
-import com.jonathan.web.controllers.authentication.AuthorizationPasswordService;
+//import com.jonathan.web.controllers.authentication.AuthorizationUserDetails;
+//import com.jonathan.web.controllers.authentication.AuthorizationPasswordService;
 import com.jonathan.web.controllers.authentication.CustomAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,6 +56,7 @@ import org.springframework.security.authentication.ProviderManager;
 import com.jonathan.web.dao.UserRepository;
 
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import java.security.SecureRandom;
 
 @Configuration
 @EnableWebSecurity
@@ -79,17 +80,71 @@ public class SecurityConfiguration
     return http.build();
   }
 
-	// using argon2 password encoder for all authentication
+	// using bcrypt password encoder for all authentication (recommended over argon2 for webapps with ~1 sec auth)
 	@Bean
-	public PasswordEncoder passwordEncoder() {
-		// .949 seconds (second recommended config + 2 iterations)
-		// 32 byte(128-bit) salt, 64 byte(256-bit) hash, 4 = degree of parallelism, 64Mb memory (in kibibytes), 5 iterations
-		//encoders.put(encodingId, new Argon2PasswordEncoder(32, 64, 4, 65536, 5));
-		return new Argon2PasswordEncoder(32, 64, 4, 65536, 5);
+  public PasswordEncoder passwordEncoder() {
+    // default is strength=10; range 4-31
+    return new BCryptPasswordEncoder(14);
+  }
+////  @Override
+////  protected void configure(HttpSecurity http) throws Exception {
+////    http.cors().and().authorizeRequests()
+////      .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+////      .anyRequest().authenticated()
+////      .and()
+////      .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+////      .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+////      // this disables session creation on Spring Security
+////      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+////  }
+//	// require authentication for all pages except registration and login
+//	@Bean
+//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//		http
+//			.authorizeHttpRequests((authz) -> authz
+//					.mvcMatchers("/registration").permitAll()
+//					.mvcMatchers("/login").permitAll()
+//					.anyRequest().authenticated()
+//					)
+//			.httpBasic(withDefaults());
+//		return http.build();
+//	}
+//    @Bean
+//    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+//        http.csrf().disable();
+//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//         
+//        http.authorizeRequests()
+//                .antMatchers("/auth/login", "/docs/**", "/users").permitAll()
+//                .anyRequest().authenticated();
+//         
+//            http.exceptionHandling()
+//                    .authenticationEntryPoint(
+//                        (request, response, ex) -> {
+//                            response.sendError(
+//                                HttpServletResponse.SC_UNAUTHORIZED,
+//                                ex.getMessage()
+//                            );
+//                        }
+//                );
+//         
+//        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+//         
+//        return http.build();
+//    }   
+}
 
-		//return new DelegatingPasswordEncoder(encodingId, encoders);
-	}
 
+  // encrypt with argon2
+	//@Bean
+  //public PasswordEncoder passwordEncoder() {
+  //  // from RFC 9106: t=1 and 2 GiB memory is the FIRST RECOMMENDED
+  //  //// 32 byte(128-bit) salt, 32 byte(128-bit) hash, 8 = degree of parallelism, 1Gb memory (in kibibytes), 1 iterations
+  //  //return new Argon2PasswordEncoder(32, 32, 8, 2097152, 1);
+  //  // from RFC 9106: t=1 and 2 GiB memory is the SECOND RECOMMENDED
+  //  // 32 byte(128-bit) salt, 32 byte(128-bit) hash, 8 = degree of parallelism, 64mb memory (in kibibytes), 3 iterations
+  //  return new Argon2PasswordEncoder(32, 32, 8, 65536, 3);
+  //}
   //@Bean
   //public AuthenticationProvider customAuthenticationProvider()
   //{
@@ -107,8 +162,6 @@ public class SecurityConfiguration
   //    //auth.authenticationProvider(customProviderTwo);
   //    //auth.authenticationProvider(customProviderThree);
   //}
-
-}
 
 ////@EnableWebSecurity
 //@Configuration

@@ -97,7 +97,7 @@ public class LoginController
     //} catch (AuthenticationException e) {
     //  throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
     //}
-    System.out.println("jwt: " + loginJwt);
+    System.out.println("Returned jwt: " + loginJwt);
     return loginJwt;
   }
 

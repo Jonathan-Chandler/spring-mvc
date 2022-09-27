@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.jonathan.web.service.UserService;
 import com.jonathan.web.dao.UserRepository;
-import com.jonathan.web.entities.UserData;
+//import com.jonathan.web.entities.UserData;
+import com.jonathan.web.entities.User;
 
 import java.util.List;
 
-import com.jonathan.web.entities.UserData;
+//import com.jonathan.web.entities.UserData;
 import com.jonathan.web.service.JwtTokenService;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,6 +44,7 @@ import com.jonathan.web.resources.UserRegistrationDto;
 //import org.springframework.context.annotation.Lazy;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import org.springframework.security.core.Authentication;
 
 @Service
 public class UserServiceImpl implements UserService
@@ -79,11 +81,8 @@ public class UserServiceImpl implements UserService
 
   public String login(String username, String password) throws JOSEException
   {
-    try {
-      //AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-      //context.scan("com.jonathan.web.configuration");
-      //context.refresh();
-          
+    try 
+    {
       //String encodedPassword = passwordEncoder.encode(password);
       System.out.println("username: " + username);
       //System.out.println("encoded pass: " + encodedPassword);
@@ -92,16 +91,22 @@ public class UserServiceImpl implements UserService
       ////testAuthList.add(testAuth);
 
       List<String> roles = Arrays.asList(new String[] {""});
-      authenticationProvider.authenticate(new 
-          UsernamePasswordAuthenticationToken(username, passwordEncoder.encode(password)));
+      Authentication upAuthToken = authenticationProvider.authenticate(
+          new UsernamePasswordAuthenticationToken(username, password));
+      if (upAuthToken == null)
+      {
+        System.out.println("Failed to authenticate");
+        return "";
+      }
+      System.out.println("UsernamePasswordAuthenticationToken success - return: " + upAuthToken);
 
-      //authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      //testAuth.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      //authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      System.out.println("successfully authenticated - getting token");
-      //customAuthenticationProvider.authenticate(new 
-      //    UsernamePasswordAuthenticationToken(username, password));
-      return jwtTokenService.createToken(username, roles);
+      String generatedToken = jwtTokenService.generateJwtToken(username);
+      if (generatedToken == "")
+      {
+        System.out.println("Failed to generate token");
+      }
+      //return jwtTokenService.createToken(username, roles);
+      return jwtTokenService.generateJwtToken(username);
     }
     catch(AuthenticationException e)
     {
@@ -115,7 +120,7 @@ public class UserServiceImpl implements UserService
   public String register(UserRegistrationDto newUserRequest)
   {
     Instant start = Instant.now();
-    UserData user = UserData.builder()
+    User user = User.builder()
       .username(newUserRequest.getUsername())
       .email(newUserRequest.getEmail())
       .password(passwordEncoder.encode(newUserRequest.getPassword()))

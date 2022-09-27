@@ -19,8 +19,6 @@ public class UserLoginDto
   private String username;
 
   @NotEmpty
-  @Size(min=8, max=50)
   private String password;
-
 }
 
