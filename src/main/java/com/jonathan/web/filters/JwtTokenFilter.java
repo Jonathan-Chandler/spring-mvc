@@ -1,4 +1,4 @@
-package com.jonathan.web.controllers.authentication;
+package com.jonathan.web.filters;
  
 import java.io.IOException;
  
@@ -31,6 +31,7 @@ public class JwtTokenFilter extends OncePerRequestFilter
   @Autowired
   private UserRepository userRepository;
 
+  // don't autowire because of cyclic dependency
   private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
   @Override
@@ -38,22 +39,56 @@ public class JwtTokenFilter extends OncePerRequestFilter
       HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException 
   {
-    if (!hasAuthorizationBearer(request)) 
+    try
     {
+      // check if header has bearer token
+      if (!hasAuthorizationBearer(request)) 
+      {
+        filterChain.doFilter(request, response);
+        return;
+      }
+
+      // read JWT from header
+      String token = getRequestHeaderJwt(request);
+      if (!jwtTokenService.validateJwtToken(token)) 
+      {
+        filterChain.doFilter(request, response);
+        return;
+      }
+
+      // get JWT from 
+      String username = jwtTokenService.getUsernameFromToken(token);
+      if (username == null)
+      {
+        logger.info("Failed to get username from token");
+        filterChain.doFilter(request, response);
+        return;
+      }
+
+      // generate refresh JWT from username in current JWT
+      String refreshToken = jwtTokenService.generateJwtToken(username);
+      if (refreshToken == null)
+      {
+        logger.error("Failed to refresh token");
+      }
+      else
+      {
+        response.addHeader("Authorization", refreshToken);
+      }
+
+      // authenticate the request for filter
+      setAuthenticationContext(token, request);
+
+      // continue to authenticated page or username/password authentication
+      logger.info("Success filterChain dofilter for request/response");
+      filterChain.doFilter(request, response);
+    }
+    catch (Exception e)
+    {
+      logger.info("JWT authorization failed");
       filterChain.doFilter(request, response);
       return;
     }
-
-    String token = getAccessToken(request);
-    if (!jwtTokenService.validateJwtToken(token)) 
-    {
-      filterChain.doFilter(request, response);
-      return;
-    }
-
-    setAuthenticationContext(token, request);
-    logger.info("FilterChain dofilter for request/response");
-    filterChain.doFilter(request, response);
   }
 
   private boolean hasAuthorizationBearer(HttpServletRequest request) 
@@ -69,16 +104,21 @@ public class JwtTokenFilter extends OncePerRequestFilter
     return true;
   }
 
-  private String getAccessToken(HttpServletRequest request) {
+  private String getRequestHeaderJwt(HttpServletRequest request) {
     String header = request.getHeader("Authorization");
     String token = header.split(" ")[1].trim();
-    logger.info("Return token: " + token);
+    //UserDetails userDetails = getUserDetails(token);
+    //if (userDetails == null)
+    //{
+    //  logger.error("Failed to get user details from header");
+    //  return "";
+    //}
+    //logger.info("User " + userDetails.getUsername() + " accessing with token: " + token);
     return token;
   }
 
   private void setAuthenticationContext(String token, HttpServletRequest request) 
   {
-    logger.info("setAuthenticationContext token: " + token);
     UserDetails userDetails = getUserDetails(token);
 
     UsernamePasswordAuthenticationToken

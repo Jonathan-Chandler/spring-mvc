@@ -57,13 +57,13 @@ public class JwtTokenService
       String token = signedJWT.serialize();
 
       // check that valid token is returned
-      if (!validateJwtToken(token) || !validateJwtTokenUsername(token, username))
+      if (!validateJwtToken(token))
       {
         logger.info("Failed to validate generated token for user " + username);
         return "";
       }
 
-      return token;
+      return "Bearer " + token;
     }
     catch(Exception e)
     {
@@ -75,14 +75,21 @@ public class JwtTokenService
   public Boolean validateJwtToken(String token) 
   {
     try {
-      SignedJWT signedJWT = SignedJWT.parse(token);
+      // token is not empty
+      if (token == null || token.isEmpty())
+      {
+        return false;
+      }
 
+      // expiration time is in the future
+      SignedJWT signedJWT = SignedJWT.parse(token);
       if (!signedJWT.verify(verifier))
       {
         logger.info("Failed to validate token");
         return false;
       }
 
+      // token was issued by this service
       if (!(signedJWT.getJWTClaimsSet().getIssuer().equals(this.issuer))
           || !(new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime())))
       {

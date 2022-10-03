@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import TodoDataService from '../../api/todo/TodoDataService.js'
-import AuthenticationService from './AuthenticationService.js'
+import TodoDataService from '../../../api/todo/TodoDataService.js'
+import AuthenticationService from '../../authentication/AuthenticationService.js'
 import moment from 'moment'
 
 class ListTodosComponent extends Component {
@@ -12,7 +12,7 @@ class ListTodosComponent extends Component {
             message: null
         }
         //this.deleteTodoClicked = this.deleteTodoClicked.bind(this)
-        //this.updateTodoClicked = this.updateTodoClicked.bind(this)
+        this.updateTodoClicked = this.updateTodoClicked.bind(this)
         //this.addTodoClicked = this.addTodoClicked.bind(this)
         this.refreshTodos = this.refreshTodos.bind(this)
     }
@@ -35,48 +35,26 @@ class ListTodosComponent extends Component {
     }
 
     refreshTodos() {
-        let username = AuthenticationService.getLoggedInUserName()
         TodoDataService.retrieveAllTodos()
             .then(
                 response => {
-                    //console.log(response);
+                    console.log(response);
                     this.setState({ todos: response.data })
                 }
             )
+        .catch(err => {
+            console.error(err)
+        })
     }
 
-    //deleteTodoClicked(id) {
-    //    let username = AuthenticationService.getLoggedInUserName()
-    //    //console.log(id + " " + username);
-    //    TodoDataService.deleteTodo(username, id)
-    //        .then(
-    //            response => {
-    //                this.setState({ message: `Delete of todo ${id} Successful` })
-    //                this.refreshTodos()
-    //            }
-    //        )
+    addTodoClicked() {
+        this.props.history.push(`/todos/-1`)
+    }
 
-    //}
-
-    //addTodoClicked() {
-    //    this.props.history.push(`/todos/-1`)
-    //}
-
-    //updateTodoClicked(id) {
-    //    console.log('update ' + id)
-    //    this.props.navigate(`/todos/${id}`)//REACT-6
-    //    // /todos/${id}
-    //    // let username = AuthenticationService.getLoggedInUserName()
-    //    // //console.log(id + " " + username);
-    //    // TodoDataService.deleteTodo(username, id)
-    //    //  .then (
-    //    //      response => {
-    //    //         this.setState({message : `Delete of todo ${id} Successful`})
-    //    //         this.refreshTodos()
-    //    //      }
-    //    //  )
-
-    //}
+    updateTodoClicked() {
+        console.log('update ')
+        this.props.navigate(`/todos`)//REACT-6
+    }
 
     render() {
         console.log('render')
@@ -120,3 +98,4 @@ class ListTodosComponent extends Component {
 }
 
 export default ListTodosComponent
+

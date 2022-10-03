@@ -17,7 +17,7 @@ import com.jonathan.web.entities.Todo;
 import com.jonathan.web.service.TodoService;
 
 @RestController
-@CrossOrigin(origins="http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000/todos")
 public class TodoController
 {
   @Autowired
