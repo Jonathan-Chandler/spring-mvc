@@ -48,6 +48,7 @@ import com.jonathan.web.dao.UserRepository;
 import com.jonathan.web.resources.UserRegistrationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
+//import javax.json.JsonObject;
 //import org.springframework.http.
 import org.slf4j.Logger;
 
@@ -106,17 +107,23 @@ public class UserController
 
     HttpHeaders responseHeader = new HttpHeaders();
     responseHeader.add("Authorization", loginJwt);
+
     //ResponseEntity responseHeaders = new HttpHeaders();
     //responseHeaders.set("Authorization", loginJwt);
 
+    //System.out.println(new JSONObject(map));
+
+    responseJson.put("Auth", loginJwt);
+
+    System.out.println(responseJson);
     return ResponseEntity.ok()
       .headers(responseHeader)
-      .body("{}");
+      .body("{\"Authorization\": \"" + loginJwt + "\"}");
+
     //  .body("Response with header using ResponseEntity");
     ////return ResponseEntity.ok()
     ////  .headers(responseHeader)
     ////  .body("Response with header using ResponseEntity");
-    //responseJson.put("jwt", "Bearer " + loginJwt);
     //ResponseEntity<String> jwtResponse = ResponseEntity.header("Authorization", loginJwt);
     //RequestEntity.HeadersBuilder<?> head(String uriTemplate, Object... uriVariables);
     //return new ResponseEntity<>(HttpStatus.OK);

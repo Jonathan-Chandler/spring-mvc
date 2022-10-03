@@ -60,6 +60,8 @@ import org.springframework.beans.factory.InjectionPoint;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import com.jonathan.web.service.UserDetailsServiceImpl;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -97,6 +99,28 @@ public class SecurityConfiguration
     return daoAuthenticationProvider;
   }
 
+  //@Bean
+  //CorsConfigurationSource corsConfigurationSource() {
+  //  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  //  source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+  //  return source;
+  //}
+
+  //@Bean
+  //public CorsFilter corsFilter() {
+  //    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  //    CorsConfiguration config = new CorsConfiguration();
+  //    config.setAllowCredentials(true);
+  //    config.addAllowedOrigin("*");
+  //    config.addAllowedHeader("*");
+  //    config.addAllowedMethod("OPTIONS");
+  //    config.addAllowedMethod("GET");
+  //    config.addAllowedMethod("POST");
+  //    config.addAllowedMethod("PUT");
+  //    config.addAllowedMethod("DELETE");
+  //    source.registerCorsConfiguration("/**", config);
+  //    return new CorsFilter(source);
+  //}
 	//@Bean
 	//public WebMvcConfigurer corsConfigurer() {
 	//	return new WebMvcConfigurer() {
@@ -108,9 +132,26 @@ public class SecurityConfiguration
 	//	};
 	//}
 
+  //@Bean
+	//public WebMvcConfigurer corsConfigurer() {
+	//	return new WebMvcConfigurer() {
+	//		@Override
+	//		public void addCorsMappings(CorsRegistry registry) {
+	//			registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+	//		}
+	//	};
+	//}
+
   @Bean
   public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-    http.csrf().disable();
+    CorsConfiguration corsConfiguration = new CorsConfiguration();
+    corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+    corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://localhost:3000/*"));
+    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
+    corsConfiguration.setAllowCredentials(true);
+    corsConfiguration.setExposedHeaders(List.of("Authorization"));
+
+    http.csrf().disable().cors().configurationSource(request -> corsConfiguration);
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
     //  .antMatchers("/auth/login", "/docs/**", "/users").permitAll()

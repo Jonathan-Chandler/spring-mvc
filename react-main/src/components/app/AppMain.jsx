@@ -16,7 +16,7 @@ import ListTodosComponent from './userpages/ListTodosComponent.jsx'
 
 class AppMain extends Component {
     render() {
-    	const LoginComponentWithNavigation = withNavigation(LoginComponent);
+    	//const LoginComponentWithNavigation = withNavigation(LoginComponent);
     	const HeaderComponentWithNavigation = withNavigation(HeaderComponent);
     	const WelcomeComponentWithParams = withParams(WelcomeComponent);
     	const ListTodosComponentWithParams = withParams(ListTodosComponent);
@@ -26,8 +26,8 @@ class AppMain extends Component {
             	<Router>
             		<HeaderComponentWithNavigation/>
             		<Routes>
-		            	<Route path="/" element={<LoginComponentWithNavigation />} />
-		            	<Route path="/login" element={<LoginComponentWithNavigation />} />
+		            	<Route path="/" element={<LoginComponent />} />
+		            	<Route path="/login" element={<LoginComponent />} />
 		            	<Route path="/welcome/:name" element={
 		            		<AuthenticatedRoute>
 		            			<WelcomeComponentWithParams />
@@ -54,3 +54,5 @@ class AppMain extends Component {
 
 export default AppMain
 
+//		            	<Route path="/" element={<LoginComponentWithNavigation />} />
+//		            	<Route path="/login" element={<LoginComponentWithNavigation />} />

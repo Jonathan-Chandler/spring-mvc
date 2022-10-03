@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 
 import { Link } from 'react-router-dom'
 
-import AuthenticationService from '../authentication/AuthenticationService.js'
+import AuthenticationService from '../authentication/AuthenticationService.jsx'
 
 class HeaderComponent extends Component {
     render() {

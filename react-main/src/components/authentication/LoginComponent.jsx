@@ -1,109 +1,73 @@
-import React, { Component } from 'react'
-import AuthenticationService from './AuthenticationService.js'
+import React, {useState, useEffect} from 'react'
+import AuthenticationService from '../authentication/AuthenticationService.jsx'
+import { useNavigate } from "react-router-dom";
 
-class LoginComponent extends Component {
+function LoginComponent(props) {
+    const navigate = useNavigate();
 
-    constructor(props) {
-        super(props)
+    // username/password form data
+    const [data, setData] = useState({
+      username: "test_user1",
+      password: "password3",
+    });
 
-        this.state = {
-            username: 'test_user1',
-            password: 'password3',
-            loginFailed: false,
+    // set to true if user entered wrong username/password
+    const [loginFailed, setLoginFailed] = useState(0);
+
+    // set to true if user entered correct login, causes redirect
+    const [loginSuccess, setLoginSuccess] = useState(0);
+
+    // attempt login on submit
+    const handleSubmit = async () => {
+
+        // must force synchronous login to check if login was successful
+        await AuthenticationService.login(data.username, data.password);
+
+        // trigger redirect if auth was successful
+        setLoginSuccess(AuthenticationService.isUserLoggedIn())
+
+        // display failed message if login not successful
+        setLoginFailed(loginSuccess ? false : true)
+    }
+    
+    // on page load: reset failed status and redirect if already authenticated
+    useEffect(() => {
+        // remove failed login warning
+        setLoginFailed(false);
+
+        // update login successful state and redirect if already logged in
+        setLoginSuccess(AuthenticationService.isUserLoggedIn())
+    }, []);
+
+    // do redirect and reset login failed if login is valid
+    useEffect(() => {
+        if (loginSuccess)
+        {
+            setLoginFailed(false);
+            navigate("/welcome/" + data.username);
         }
-        this.handleChange = this.handleChange.bind(this)
-        this.loginClicked = this.loginClicked.bind(this)
+    }, [data.username, navigate, loginSuccess]);
+
+    // handle login form data update
+    const handleLoginDataChange = (event) => {
+        const value = event.target.value
+        setData({
+            ...data,
+            [event.target.name]: value
+        });
     }
 
-    handleChange(event) {
-        this.setState(
-            {
-                [event.target.name]
-                    : event.target.value
-            }
-        )
-    }
-
-//    useEffect(() => {
-//      //Runs on every render
-//    });
-
-//    useEffect(() => {
-//      //Runs only on the first render
-//    }, []);
-
-//  useEffect(() => {
-//    setCalculation(() => count * 2);
-//  }, [count]); // <- add the count variable here
-
-//    componentDidMount() {
-//        ChatAPI.subscribeToFriendStatus(
-//            this.props.friend.id,
-//            this.handleStatusChange
-//        );
-//    }
-//
-//    componentDidUpdate(prevProps) {
-//        // Unsubscribe from the previous friend.id    
-//        ChatAPI.unsubscribeFromFriendStatus(
-//            prevProps.friend.id,
-//            this.handleStatusChange    
-//        );    
-//        // Subscribe to the next friend.id    
-//        ChatAPI.subscribeToFriendStatus(
-//            this.props.friend.id,
-//            this.handleStatusChange
-//        );  
-//    }
-//
-//    componentWillUnmount() {
-//        ChatAPI.unsubscribeFromFriendStatus(
-//            this.props.friend.id,
-//            this.handleStatusChange
-//        );
-//    }
-
-    loginClicked() {
-        //AuthenticationService
-        if (AuthenticationService.getJwtLoginPromise(this.state.username, this.state.password)) {
-            this.props.navigate(`/welcome/${this.state.username}`)
-        } else {
-            this.setState(this.setState({loginFailed: true}))
-        }
-        
-
-        //AuthenticationService
-        //    .executeJwtAuthenticationService(this.state.username, this.state.password)
-        //    .then((response) => {
-        //        console.log("receive response.header (string): " + String(response.headers));
-        //        console.log("receive response.header: " + JSON.stringify(response.headers));
-        //        console.log("receive response.header.Authorization: " + response.headers.Authorization);
-        //        console.log("receive response.body (string): " + String(response.body));
-        //        console.log("receive response.body: " + JSON.stringify(response.body));
-        //        console.log("receive response.body.Authorization: " + response.body.Authorization);
-        //        AuthenticationService.registerSuccessfulLoginForJwt(response.headers.Authorization)
-        //        this.props.navigate(`/welcome/${this.state.username}`)
-        //    }).catch(() => {
-        //        console.log("Error from auth service");
-        //        this.setState({ loginFailed: true })
-        //    })
-
-    }
-
-    render() {
-        return (
-            <div>
-                <h1>Login</h1>
-                <div className="container">
-                    {/*<ShowInvalidCredentials loginFailed={this.state.loginFailed}/>*/}
-                    {this.state.loginFailed && <div className="alert alert-warning">Invalid Credentials</div>}
-                    User Name: <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
-                    Password: <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
-                    <button className="btn btn-success" onClick={this.loginClicked}>Login</button>
-                </div>
+    return (
+        <div>
+            <h1>Login</h1>
+            <div className="container">
+                {loginFailed && <div className="alert alert-warning">Invalid Credentials</div>}
+                User Name: <input type="text" name="username" value={data.username} onChange={handleLoginDataChange} />
+                Password: <input type="password" name="password" value={data.password} onChange={handleLoginDataChange} />
+                <button className="btn btn-success" onClick={handleSubmit}>Login</button>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default LoginComponent

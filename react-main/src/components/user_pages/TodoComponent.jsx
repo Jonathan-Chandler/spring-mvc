@@ -46,7 +46,6 @@ class TodoComponent extends Component {
         }
 
         return errors
-
     }
 
     onSubmit(values) {
