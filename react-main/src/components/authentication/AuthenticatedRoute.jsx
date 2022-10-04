@@ -6,13 +6,13 @@ class AuthenticatedRoute extends Component
 {
 	render() 
 	{
-		return {...this.props.children}
-		//if (AuthenticationService.isUserLoggedIn()) 
-		//{
-		//	return {...this.props.children}
-		//} else {
-		//	return <Navigate to="/login" />
-		//}
+		//return {...this.props.children}
+		if (AuthenticationService.isUserLoggedIn()) 
+		{
+			return {...this.props.children}
+		} else {
+			return <Navigate to="/login" />
+		}
 	}
 }
 
