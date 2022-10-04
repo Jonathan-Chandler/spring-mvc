@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import TodoDataService from '../../../api/todo/TodoDataService.js'
+import TodoDataService from './TodoDataService.js'
 import AuthenticationService from '../../authentication/AuthenticationService.jsx'
 import moment from 'moment'
 
@@ -38,13 +38,19 @@ class ListTodosComponent extends Component {
         TodoDataService.retrieveAllTodos()
             .then(
                 response => {
-                    console.log(response);
+                    //console.log("response:");
+                    //console.log(response.headers);
+                    //console.log("<end response");
+                    //console.log("headers:");
+                    //console.log(response.headers.authorization);
+                    //console.log("end headers:");
+                    //AuthenticationService.validateHeader(response);
                     this.setState({ todos: response.data })
                 }
             )
-        .catch(err => {
-            console.error(err)
-        })
+            .catch(err => {
+                console.error(err)
+            })
     }
 
     addTodoClicked() {
