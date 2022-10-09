@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import moment from 'moment'
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import TodoDataService from '../../api/todo/TodoDataService.js'
+import {RetrieveAllTodos} from '../../api/todo/TodoDataService.js'
 import AuthenticationService from './AuthenticationService.js'
 
 class TodoComponent extends Component {
@@ -26,7 +26,7 @@ class TodoComponent extends Component {
 
         let username = AuthenticationService.getLoggedInUserName()
 
-        TodoDataService.retrieveTodo(username, this.state.id)
+        RetrieveAllTodos(username, this.state.id)
             .then(response => this.setState({
                 description: response.data.description,
                 targetDate: moment(response.data.targetDate).format('YYYY-MM-DD')
@@ -48,25 +48,25 @@ class TodoComponent extends Component {
         return errors
     }
 
-    onSubmit(values) {
-        let username = AuthenticationService.getLoggedInUserName()
+    //onSubmit(values) {
+    //    let username = AuthenticationService.getLoggedInUserName()
 
-        let todo = {
-            id: this.state.id,
-            description: values.description,
-            targetDate: values.targetDate
-        }
+    //    let todo = {
+    //        id: this.state.id,
+    //        description: values.description,
+    //        targetDate: values.targetDate
+    //    }
 
-        if (this.state.id === -1) {
-            TodoDataService.createTodo(username, todo)
-                .then(() => this.props.navigate('/todos')) //REACT6
-        } else {
-            TodoDataService.updateTodo(username, this.state.id, todo)
-                .then(() => this.props.navigate('/todos'))//REACT6
-        }
+    //    if (this.state.id === -1) {
+    //        TodoDataService.createTodo(username, todo)
+    //            .then(() => this.props.navigate('/todos')) //REACT6
+    //    } else {
+    //        TodoDataService.updateTodo(username, this.state.id, todo)
+    //            .then(() => this.props.navigate('/todos'))//REACT6
+    //    }
 
-        console.log(values);
-    }
+    //    console.log(values);
+    //}
 
     render() {
 

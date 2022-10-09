@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import AppMain from './components/app/AppMain';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import { AuthProvider } from './components/authentication/AuthProvider.tsx'
 
 class App extends Component 
 {
@@ -42,7 +43,9 @@ class App extends Component
 
         {/*<CalculatorComponent/>*/}
         {/*<FlashCardApp/>*/}
+        <AuthProvider>
         <AppMain/>
+        </AuthProvider>
       </div>
     );
   }

@@ -30,7 +30,7 @@ class AuthenticationService {
         return this.service
     }
 
-    // update token from response headers with updated auth tokens
+    // update token from response headers with new auth tokens
     handleResponseHeaders = (response) => {
         if (response.headers.authorization)
         {

@@ -1,8 +1,14 @@
 import React, {useState, useEffect} from 'react'
-import AuthenticationService from '../authentication/AuthenticationService.jsx'
+//import AuthenticationService from '../authentication/AuthenticationService.jsx'
 import { useNavigate } from "react-router-dom";
+//import UseAuth, {useAuthDispatch} from './AuthContext.jsx'
+//import {AUTH_ACTIONS} from './AuthReducer.jsx'
+import useAuth from "./AuthProvider.tsx";
 
-function LoginComponent(props) {
+export default function LoginComponent(...props) {
+    //const auth = UseAuth();
+    //const authDispatch = useAuthDispatch();
+    const { username, token, apiSession, loading, error, login, signUp, logout } = useAuth();
     const navigate = useNavigate();
 
     // username/password form data
@@ -15,19 +21,27 @@ function LoginComponent(props) {
     const [loginFailed, setLoginFailed] = useState(0);
 
     // set to true if user entered correct login, causes redirect
-    const [loginSuccess, setLoginSuccess] = useState(0);
+    const [loginSuccess, setLoginSuccess] = useState(false);
 
     // attempt login on submit
     const handleSubmit = async () => {
 
+        //login({username: data.username, password: data.password});
+        login(data.username, data.password);
         // must force synchronous login to check if login was successful
-        await AuthenticationService.login(data.username, data.password);
+        //await AuthenticationService.login(data.username, data.password);
+
+        //authDispatch({
+        //    type: AUTH_ACTIONS.REQUEST_LOGIN, 
+        //    payload:{username: data.username, password: data.password}
+        //})
 
         // trigger redirect if auth was successful
-        setLoginSuccess(AuthenticationService.isUserLoggedIn())
+        //setLoginSuccess(AuthenticationService.isUserLoggedIn())
 
         // display failed message if login not successful
-        setLoginFailed(loginSuccess ? false : true)
+        //setLoginFailed(loginSuccess ? false : true)
+        //console.log("handleSubmit: auth.token = " + auth.token)
     }
     
     // on page load: reset failed status and redirect if already authenticated
@@ -36,17 +50,49 @@ function LoginComponent(props) {
         setLoginFailed(false);
 
         // update login successful state and redirect if already logged in
-        setLoginSuccess(AuthenticationService.isUserLoggedIn())
+        //setLoginSuccess(AuthenticationService.isUserLoggedIn())
     }, []);
 
     // do redirect and reset login failed if login is valid
+    //useEffect(() => {
+    //    if (loginSuccess)
+    //    {
+    //        setLoginFailed(false);
+    //        navigate("/welcome/" + data.username);
+    //    }
+    //}, [data.username, navigate, loginSuccess]);
+
     useEffect(() => {
-        if (loginSuccess)
+        if (!loading && token && token !== "")
         {
+            console.log("token = " + token)
             setLoginFailed(false);
             navigate("/welcome/" + data.username);
         }
-    }, [data.username, navigate, loginSuccess]);
+    }, [data.username, navigate, loading, token]);
+
+    // do redirect and reset login failed if login is valid
+    //useEffect(() => {
+    //    if (loginSuccess)
+    //    {
+    //        setLoginFailed(false);
+    //        navigate("/welcome/" + data.username);
+    //    }
+    //}, [data.username, navigate, loginSuccess]);
+
+    //useEffect(() => {
+    //    //console.log("auth.token = " + auth.token)
+    //    //if (!auth.loading)
+    //    //{
+    //    //    if (auth.token && auth.token !== "")
+    //    //    {
+    //    //        console.log("notnull auth.token = " + auth.token)
+    //    //        setLoginFailed(false);
+    //    //        navigate("/welcome/" + auth.username);
+    //    //    }
+    //    //}
+    //}, [navigate]);
+    //}, [auth.loading, auth.username, auth.token, navigate]);
 
     // handle login form data update
     const handleLoginDataChange = (event) => {
@@ -70,4 +116,3 @@ function LoginComponent(props) {
     )
 }
 
-export default LoginComponent
