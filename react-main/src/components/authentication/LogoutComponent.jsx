@@ -1,24 +1,12 @@
 import React, {useState, useEffect} from 'react'
-import UseAuth, {useAuthDispatch} from './AuthContext.jsx'
-import {AUTH_ACTIONS} from './AuthReducer.jsx'
+import useAuth from "./AuthProvider.tsx";
 
-function LogoutComponent(...props) {
-    //AuthenticationService.logout();
-    const auth = UseAuth();
-    const authDispatch = useAuthDispatch();
+export default function LogoutComponent(...props) {
+    const { username, token, apiSession, loading, error, login, signUp, logout } = useAuth();
 
     useEffect(() => {
-        if (auth.username || auth.token)
-        {
-            // remove failed login warning
-            authDispatch({
-                type: AUTH_ACTIONS.LOGOUT
-            })
-        }
-
-        // update login successful state and redirect if already logged in
-        //setLoginSuccess(AuthenticationService.isUserLoggedIn())
-    }, [auth.username, auth.token]);
+        logout();
+    }, []);
 
     return (
         <>
@@ -30,4 +18,3 @@ function LogoutComponent(...props) {
     )
 }
 
-export default LogoutComponent
