@@ -1,12 +1,11 @@
-import React, { ReactNode, useState, useEffect, useMemo, createContext, useContext } from 'react';
-import axios, { AxiosDefaults, Axios, AxiosRequestHeaders, AxiosRequestConfig, AxiosInstance, AxiosError, AxiosStatic, AxiosResponse } from 'axios'
+import React, { ReactNode, useCallback, useState, useEffect, useMemo, createContext, useContext } from 'react';
+import axios, { Axios, AxiosError } from 'axios'
 import { LOGIN_API_URL } from '../../Constants'
 
 // atuh context vars/functions
 interface AuthContextType {
   username: string;
   token: string;
-  apiSession: AxiosDefaults;
   loading: boolean;
   error?: any;
   login: (username: string, password: string) => void;
@@ -28,7 +27,6 @@ export function AuthProvider({
 }): JSX.Element {
   const [username, setUsername] = useState<string>(sessionStorage.getItem("username"));
   const [token, setToken] = useState<string>(sessionStorage.getItem("Authorization"));
-  const [apiSession, setApiSession] = useState<AxiosDefaults>(axios.defaults);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
@@ -38,26 +36,12 @@ export function AuthProvider({
     //setToken("");
     //setUsername("");
 
-    let newApiSession = axios.create();
-
-    // axios defaults
-    setApiSession(axios.defaults)
-
     // initialize done
     setLoadingInitial(false)
   }, []);
 
-  useEffect(() => {
-    console.log("Update token");
-    let currentSession = axios.create();
-
-    // use auth token for all future headers
-    setApiSession(axios.defaults);
-
-  }, [token]);
-
   // send login request
-  async function login(username: string, password: string) {
+  const login = useCallback(async (username: string, password: string) => {
     setLoading(true);
     const userData = {username: username, password: password};
 
@@ -68,13 +52,14 @@ export function AuthProvider({
         // if returned valid auth token then update context with new token/username
         if (response.data.Authorization)
         {
-          console.log("success login; token=" + token)
+          console.log("success login; token=" + response.data.Authorization)
           setToken(response.data.Authorization)
 
           // set username and login success
           setUsername(username)
-          sessionStorage.setItem("Authorization", token);
+          sessionStorage.setItem("Authorization", response.data.Authorization);
           sessionStorage.setItem("username", username);
+          setError("");
           setLoading(false);
         }
       })
@@ -99,33 +84,47 @@ export function AuthProvider({
         setError(errorMessage);
         setLoading(false);
       });
-  }
+  }, []);
 
-  // new user
-  function signUp(username: string, password: string) {
-    setLoading(true);
-  }
-
-  // logout and remove username/token
-  function logout() {
+  // create new user
+  const signUp = useCallback((username: string, password: string) => {
     setUsername("");
     setToken("");
-  }
+  }, []);
 
-  const HandleResponseHeaders = (response) => 
+  // logout and remove username/token
+  const logout = useCallback(() => {
+    setUsername("");
+    setToken("");
+  }, []);
+
+  // interceptor updates token from response header
+  const handleResponseHeaders = (response) => 
   {
     // update token if exists in response header
     if (response.headers.authorization)
     {
+      //console.log("set response header: " + response.headers.authorization);
+
+      // update token for session and local storage
+      sessionStorage.setItem("Authorization", response.data.Authorization);
       setToken(response.headers.authorization);
     }
 
+    // return intercepted response to caller
     return response;
   }
   
-  // handle failed authentication
-  const HandleResponseAuthFailure = (error: AxiosResponse) => 
+  // interceptor forces logout if backend returns authentication failure
+  const handleResponseAuthFailure = useCallback((error: AxiosError) => 
   {
+      console.log("Auth Failure: " + error);
+      if (error.response.status === 401)
+      {
+        console.log("error code Failure: " + error);
+        logout();
+      }
+
       // remove token from session if auth rejected
       if (String(error).indexOf("401") !== -1)
       {
@@ -136,29 +135,31 @@ export function AuthProvider({
         logout();
       }
 
+      // return intercepted error to caller
       return Promise.reject(error);
-  }
+  }, [logout]);
 
-  // return session with response handlers and auth token
-  function getSession()
+  // get session with response handlers and auth token header
+  const getSession = useCallback(() =>
   {
     let axiosSession = axios.create()
 
-    // update headers with auth token
+    // add auth token header
     axiosSession.defaults.headers.common['Authorization'] = token;
 
     // update token from response headers with updated auth tokens and handle failed authentication
-    axiosSession.interceptors.response.use(HandleResponseHeaders, HandleResponseAuthFailure);
+    axiosSession.interceptors.response.use(handleResponseHeaders, handleResponseAuthFailure);
+
+    console.log("using auth header token: " + token)
 
     return axiosSession;
-  }
+  }, [handleResponseAuthFailure, token]);
 
-  // use memo for AuthContext
+  // use memo for AuthContext to reduce rendering
   const memoedValue = useMemo(
     () => ({
       username,
       token,
-      apiSession,
       loading,
       error,
       login,
@@ -166,7 +167,7 @@ export function AuthProvider({
       logout,
       getSession,
     }),
-    [ username, token, apiSession, loading, error, login, signUp, logout, getSession ]
+    [ username, token, loading, error, login, signUp, logout, getSession ]
   );
 
   // render components after initialization

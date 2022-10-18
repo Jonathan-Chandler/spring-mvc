@@ -94,10 +94,6 @@ public class JwtTokenService
           || !(new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime())))
       {
         logger.info("Token fields did not match expected for user " + signedJWT.getJWTClaimsSet().getSubject());
-        //logger.info("subject: " + signedJWT.getJWTClaimsSet().getSubject());
-        //logger.info("issuer: " + signedJWT.getJWTClaimsSet().getIssuer());
-        //logger.info("expires: " + signedJWT.getJWTClaimsSet().getExpirationTime());
-        //logger.info("Date(): " + new Date());
         return false;
       }
     }

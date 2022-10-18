@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react'
+import React, {useEffect} from 'react'
 import useAuth from "./AuthProvider.tsx";
 
 export default function LogoutComponent(...props) {
-    const { username, token, apiSession, loading, error, login, signUp, logout } = useAuth();
+    const { logout } = useAuth();
 
     useEffect(() => {
         logout();
-    }, []);
+    }, [logout]);
 
     return (
         <>

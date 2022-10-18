@@ -5,7 +5,7 @@ import useAuth from "../authentication/AuthProvider.tsx";
 
 export default function WelcomeComponent(...props)
 {
-    const { username, token, apiSession, loading, error, login, signUp, logout } = useAuth();
+    const { username, token, loading, error, login, signUp, logout } = useAuth();
     const navigate = useNavigate();
 
     if (username!==null && username !== "")

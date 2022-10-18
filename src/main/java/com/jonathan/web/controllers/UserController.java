@@ -62,14 +62,14 @@ public class UserController
   @Autowired
   Logger logger;
 
-  //@RequestMapping(
-  //  value = {"/login"},
-  //  method = RequestMethod.POST,
-  //  produces = "application/json",
-  //  consumes = "application/json"
-  //)
 
-  @PostMapping("/login")
+  //@PostMapping("/login")
+  @RequestMapping(
+    value = {"/login"},
+    method = RequestMethod.POST,
+    produces = "application/json",
+    consumes = "application/json"
+  )
   @ResponseBody
   //public Map<String, String> login(@RequestBody @Valid UserLoginDto userLogin) 
   //public ResponseEntity<String> login(@RequestBody Map<String, String> credentials) 

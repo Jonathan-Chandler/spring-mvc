@@ -1,11 +1,11 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import useAuth from "../authentication/AuthProvider.tsx";
 
 export default function HeaderComponent(...params) {
-    const { username, token, apiSession, loading, error, login, signUp, logout } = useAuth();
+    const { token } = useAuth();
 
-    if (username!==null && username !== "")
+    if (token && token !== "")
     {
         return (
             <header>
@@ -14,6 +14,7 @@ export default function HeaderComponent(...params) {
                     <ul className="navbar-nav">
                         {<li><NavLink className="nav-link" to="/welcome">Home</NavLink></li>}
                         {<li><NavLink className="nav-link" to="/todos">Todos</NavLink></li>}
+                        {<li><NavLink className="nav-link" to="/tictactoe">TicTacToe</NavLink></li>}
                         {<li><NavLink className="nav-link" to="/logout">Logout</NavLink></li>}
                     </ul>
                 </nav>
@@ -28,6 +29,7 @@ export default function HeaderComponent(...params) {
                     <div><Link to="/" className="navbar-brand">Something</Link></div>
                     <ul className="navbar-nav">
                         {<li><NavLink className="nav-link" to="/welcome">Home</NavLink></li>}
+                        {<li><NavLink className="nav-link" to="/tictactoe">TicTacToe</NavLink></li>}
                         {<li><NavLink className="nav-link" to="/login">Login</NavLink></li>}
                     </ul>
                 </nav>

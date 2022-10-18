@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "./AuthProvider.tsx";
 
 export default function LoginComponent(...props) {
-    const { username, token, apiSession, loading, error, login, signUp, logout } = useAuth();
+    const { token, loading, login } = useAuth();
     const navigate = useNavigate();
 
     // username/password form data
@@ -20,6 +20,7 @@ export default function LoginComponent(...props) {
     // attempt login on submit
     const handleSubmit = async () => 
     {
+        console.log("handle submit");
         login(data.username, data.password);
         setLoginAttempted(true)
     }

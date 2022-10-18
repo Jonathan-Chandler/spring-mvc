@@ -1,5 +1,5 @@
 import moment from 'moment'
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from '../authentication/AuthProvider.tsx';
 import { TODOS_API_URL } from '../../Constants';
@@ -7,50 +7,57 @@ import { TODOS_API_URL } from '../../Constants';
 export default function ListTodosComponent(...props)
 {
     const navigate = useNavigate();
-    const { username, token, apiSession, loading, error, login, signUp, logout, getSession } = useAuth();
+    const { token, logout, getSession } = useAuth();
     const [state, setState] = useState({
       todos: [],
       message: "",
+      loadedTodos: false,
     });
 
-
-    async function getTodos()
+    const getTodos = useCallback(async () =>
     {
-        let axiosSession = getSession()
-
-        if (axiosSession)
+        let axiosSession = getSession();
+        const data = await axiosSession.get(TODOS_API_URL)
+        .then( response => 
         {
-            console.log("have apiSession");
-            await axiosSession.get(TODOS_API_URL).then(
-                    response => {
-                        console.log("TODOS:")
-                        console.log(response.data)
-                        setState({todos: response.data});
-                    }
-                )
-                .catch(err => {
-                    console.log(err)
-                })
-
+            return response.data;
         }
-        else
+        )
+        .catch(err => {
+            console.log(err)
+            return null
+        })
+
+        if (data !== null)
         {
-            console.log("no apiSession");
+            setState({todos: data});
         }
-    }
+    }, [getSession]);
 
-    // on page load: reset failed status and redirect if already authenticated
+    // on page load
     useEffect(() => 
     {
+        // check if auth
         if (!token || token === "")
         {
             logout();
             navigate("/login");
+        }
+    }, [logout, navigate, token]);
 
+    // on page load
+    useEffect(() => 
+    {
+        // empty todos
+        if (state.loadedTodos === false)
+        {
+            console.log("useEffect(getTodos)")
+            // async update todos list
+            getTodos();
+            setState({...state, loadedTodos: true});
         }
 
-        getTodos();
-    }, []);
+    }, [getTodos, getSession, state]);
 
     if (state.todos)
     {
@@ -92,7 +99,7 @@ export default function ListTodosComponent(...props)
         return (
             <>
                 <div className="container">
-                    No todos returned {username}
+                    No todos returned
                 </div>
             </>
         )        
