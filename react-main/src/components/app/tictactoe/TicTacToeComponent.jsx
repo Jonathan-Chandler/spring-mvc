@@ -9,66 +9,9 @@ export default function TicTacToeComponent () {
   const [moveCount, setMoveCount] = useState(0)
   const [remainingMoves, setRemainingMoves] = useState(Array(9).fill('_'));
 
-  // for (let i = array.length - 1; i > 0; i--) {
-  //   const j = math.floor(Math.random() * (i + 1))
-  //   [array[i], array[j]] = [array[j], array[i]]
-  // }
-
-//  const displaySquare = (index) => {
-//    return (
-//      <button type="button" 
-//              className="btn btn-lg btn-outline-primary" 
-//              onClick={() => handleClick(index)}
-//      >
-//        <u>_{boardSquares[index]}_</u>
-//      </button>
-//    )
-//  }
-
-  //const displaySquare = (index) => {
-  //  return (
-  //    <button type="button" 
-  //            className="btn btn-lg btn-outline-primary" 
-  //            onClick={() => handleClick(index)}
-  //    >
-  //      <u>_{boardSquares[index]}_</u>
-  //    </button>
-  //  )
-  //}
-//          <td className="square h"></td>
-//          <td className="square v h"></td>
-//          <td className="square h"></td>
-//        </tr>
-//        <tr id="row3">
-//          <td className="square"></td>
-//          <td className="square v"></td>
-//          <td className="square"></td>
-// 1 = v
-// 3,4,5 = h
-// 4 = v
-// 7 = v
-// 2 5 8
-//
   const displaySquare = (index) => {
-    let classname = <div className="col-4 tic-box" onClick={() => handleClick(index)}>{boardSquares[index]}</div>;
-    //let classname = <div className="col-4 tic-box" onClick={() => handleClick(index)}><u>_{boardSquares[index]}_</u></div>;
-
-
-    //if (index === 1)
-    //  classname = <div className="col-4 tic-box" onClick={() => handleClick(index)}><u>_{boardSquares[index]}_</u></div>;
-    //else if (index === 3 || index === 5)
-    //  classname = <div className="col-4 tic-box" onClick={() => handleClick(index)}><u>_{boardSquares[index]}_</u></div>;
-    //else if (index === 4)
-    //  classname = <div className="col-4 " onClick={() => handleClick(index)}><u>_{boardSquares[index]}_</u></div>;
-    //else if (index === 7)
-    //  classname = <div className="col-4 v" onClick={() => handleClick(index)}><u>_{boardSquares[index]}_</u></div>;
-
-    //if (index == 1)
-    //{
-    //}
-    return classname;
+    return (<div className="col-4 tic-box" onClick={() => handleClick(index)}>{boardSquares[index]}</div>);
   }
-//        <u>_{boardSquares[index]}_</u>
 
   // reset game state
   const handleRestart = () => {
@@ -83,7 +26,8 @@ export default function TicTacToeComponent () {
   const updateWinner = (currentBoard) =>
   {
     let moveCount = 0;
-    // columns
+
+    // check 3 columns to see if either player won
     for (let i = 0; i < 3; i++)
     {
       if (currentBoard[i] !== '_'
@@ -95,6 +39,7 @@ export default function TicTacToeComponent () {
         return
       }
 
+      // add 3 if all spaces aren't empty (to check if game is a draw)
       if (currentBoard[i] !== '_'
           && currentBoard[i+3] !== '_'
           && currentBoard[i+6] !== '_'
@@ -102,7 +47,7 @@ export default function TicTacToeComponent () {
          moveCount += 3
     }
 
-    // rows
+    // player won by filling entire row
     for (let i = 0; i <= 6; i+=3)
     {
       if (currentBoard[i] !== '_'
@@ -115,7 +60,7 @@ export default function TicTacToeComponent () {
       }
     }
 
-    // diagonals
+    // player won diagonally
     if (currentBoard[0] !== '_'
         && currentBoard[0] === currentBoard[4]
         && currentBoard[0] === currentBoard[8]
@@ -133,10 +78,12 @@ export default function TicTacToeComponent () {
        return;
     }
 
+    // board is full then neither player won
     if (moveCount === 9)
         setWinner("None")
   }
 
+  // add player's move and check if won
   const handleClick = (index) => {
       const currentBoard = [...boardSquares]
       if (currentBoard[index] !== '_' || winner)
@@ -169,21 +116,21 @@ export default function TicTacToeComponent () {
 
   return (
       <div className="container-fluid">
-        <div class="justify-content-center row">
-          <div class="col-12 col-sm-6 content">
+        <div className="justify-content-center row">
+          <div className="col-12 col-sm-6 content">
           <h1>Tic-Tac-Toe</h1>
-            <div class="container-fluid tic-container">
-              <div class="row tic-row">
+            <div className="container-fluid tic-container">
+              <div className="row tic-row">
                 {displaySquare(0)}
                 {displaySquare(1)}
                 {displaySquare(2)}
               </div>
-              <div class="row tic-row">
+              <div className="row tic-row">
                 {displaySquare(3)}
                 {displaySquare(4)}
                 {displaySquare(5)}
               </div>
-              <div class="row tic-row">
+              <div className="row tic-row">
                 {displaySquare(6)}
                 {displaySquare(7)}
                 {displaySquare(8)}
@@ -196,27 +143,4 @@ export default function TicTacToeComponent () {
         </div>
       </div>
   );
-//  return (
-//    <div className="board">
-//      <h1>Tic-Tac-Toe</h1>
-//      <div className="board-row">
-//        {displaySquare(0)}
-//        {displaySquare(1)}
-//        {displaySquare(2)}
-//      </div>
-//      <div className="board-row">
-//        {displaySquare(3)}
-//        {displaySquare(4)}
-//        {displaySquare(5)}
-//      </div>
-//      <div className="board-row">
-//        {displaySquare(6)}
-//        {displaySquare(7)}
-//        {displaySquare(8)}
-//      </div>
-//      <div className="status">Current Player: {currentPlayer}</div>
-//      <div className="Winner">Winning Player: {winner}</div>
-//      <button className="restart" onClick={handleRestart}>Restart Game</button>
-//    </div>
-//  )
 }
