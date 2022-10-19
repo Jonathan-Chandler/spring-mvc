@@ -22,65 +22,65 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "tictactoe")
-public class TicTacToe implements UserDetails
-{
-  @Id
-  @NotEmpty
-  @Column(unique=true, name="username", length=50)
-  @Size(min=8, max=50)
-  private String username;
-
-  @NotEmpty
-  @Column(unique=true, name="email", length=100)
-  @Size(min=10, max=100)
-  private String email;
-
-  @NotEmpty
-  @Column(name="password")
-  private String password;
-
-  @Column(name="active")
-  boolean enabled;
-
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    Collection<GrantedAuthority> authorities = new HashSet<>();
-    SimpleGrantedAuthority userAuth = new SimpleGrantedAuthority("User");
-    authorities.add(userAuth);
-
-    return authorities;
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
-
-  //@ElementCollection
-  //@JoinTable(
-  //    name = "authorities",
-  //    joinColumns = {@JoinColumn(name = "username")})
-  //@Column(name = "authority")
-  //private Set<String> roles;
-}
+//@Entity
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Builder
+//@Table(name = "tictactoe")
+//public class TicTacToe implements UserDetails
+//{
+//  @Id
+//  @NotEmpty
+//  @Column(unique=true, name="username", length=50)
+//  @Size(min=8, max=50)
+//  private String username;
+//
+//  @NotEmpty
+//  @Column(unique=true, name="email", length=100)
+//  @Size(min=10, max=100)
+//  private String email;
+//
+//  @NotEmpty
+//  @Column(name="password")
+//  private String password;
+//
+//  @Column(name="active")
+//  boolean enabled;
+//
+//  @Override
+//  public Collection<? extends GrantedAuthority> getAuthorities() {
+//    Collection<GrantedAuthority> authorities = new HashSet<>();
+//    SimpleGrantedAuthority userAuth = new SimpleGrantedAuthority("User");
+//    authorities.add(userAuth);
+//
+//    return authorities;
+//  }
+//
+//  @Override
+//  public boolean isAccountNonExpired() {
+//    return true;
+//  }
+//
+//  @Override
+//  public boolean isAccountNonLocked() {
+//    return true;
+//  }
+//
+//  @Override
+//  public boolean isCredentialsNonExpired() {
+//    return true;
+//  }
+//
+//  @Override
+//  public boolean isEnabled() {
+//    return true;
+//  }
+//
+//  //@ElementCollection
+//  //@JoinTable(
+//  //    name = "authorities",
+//  //    joinColumns = {@JoinColumn(name = "username")})
+//  //@Column(name = "authority")
+//  //private Set<String> roles;
+//}
