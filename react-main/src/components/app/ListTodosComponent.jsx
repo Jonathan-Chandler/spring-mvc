@@ -7,7 +7,7 @@ import { TODOS_API_URL } from '../../Constants';
 export default function ListTodosComponent(...props)
 {
     const navigate = useNavigate();
-    const { token, logout, getSession } = useAuth();
+    const { isAuthenticated, getSession } = useAuth();
     const [state, setState] = useState({
       todos: [],
       message: "",
@@ -34,16 +34,14 @@ export default function ListTodosComponent(...props)
         }
     }, [getSession]);
 
-    // on page load
     useEffect(() => 
     {
         // check if auth
-        if (!token || token === "")
+        if (!isAuthenticated())
         {
-            logout();
             navigate("/login");
         }
-    }, [logout, navigate, token]);
+    }, [navigate, isAuthenticated]);
 
     // on page load
     useEffect(() => 

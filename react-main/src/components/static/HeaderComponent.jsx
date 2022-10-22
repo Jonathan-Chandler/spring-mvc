@@ -3,9 +3,9 @@ import { NavLink, Link } from 'react-router-dom'
 import useAuth from "../authentication/AuthProvider.tsx";
 
 export default function HeaderComponent(...params) {
-    const { token } = useAuth();
+    const { isAuthenticated } = useAuth();
 
-    if (token && token !== "")
+    if (isAuthenticated())
     {
         return (
             <header>
@@ -29,8 +29,9 @@ export default function HeaderComponent(...params) {
                     <div><Link to="/" className="navbar-brand">Something</Link></div>
                     <ul className="navbar-nav">
                         {<li><NavLink className="nav-link" to="/welcome">Home</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/tictactoe">TicTacToe</NavLink></li>}
+                        {<li><NavLink className="nav-link" to="/register">Register</NavLink></li>}
                         {<li><NavLink className="nav-link" to="/login">Login</NavLink></li>}
+                        {<li><NavLink className="nav-link" to="/tictactoe">TicTacToe</NavLink></li>}
                     </ul>
                 </nav>
             </header>

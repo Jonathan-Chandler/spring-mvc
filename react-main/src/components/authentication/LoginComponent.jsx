@@ -3,66 +3,72 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "./AuthProvider.tsx";
 
 export default function LoginComponent(...props) {
-    const { token, loading, login } = useAuth();
+    const { isAuthenticated, loading, login } = useAuth();
     const navigate = useNavigate();
 
     // username/password form data
     const [data, setData] = useState(
     {
-      username: "test_user1",
-      password: "password3",
+      username: "test_user123",
+      password: "password123",
     });
 
     // set to true if user entered wrong username/password
     const [loginAttempted, setLoginAttempted] = useState(false);
     const [loginFailed, setLoginFailed] = useState(false);
 
-    // attempt login on submit
-    const handleSubmit = async () => 
+    // do redirect and reset login failed status if login is valid
+    useEffect(() => 
     {
-        console.log("handle submit");
+		// auth is done loading
+        if (!loading)
+		{
+			// already authenticated
+			if (isAuthenticated())
+			{
+				navigate("/welcome");
+			}
+			else if (loginAttempted)
+			{
+				// set login
+				setLoginFailed(true);
+			}
+		}
+    }, [data.username, navigate, loading, loginAttempted, isAuthenticated]);
+
+    // attempt login on submit
+	const handleLogin = async (e) => 
+    {
+		e.preventDefault();
         login(data.username, data.password);
         setLoginAttempted(true)
     }
     
-    // do redirect and reset login failed status if login is valid
-    useEffect(() => 
-    {
-        // already authenticated
-        if (!loading && token && token !== "")
-        {
-            //console.log("token: " + token)
-            navigate("/welcome");
-        }
-
-        // tried login and no longer loading
-        if (loginAttempted && !loading && (!token || token !== ""))
-        {
-            // set login
-            setLoginFailed(true);
-        }
-    }, [data.username, navigate, loading, token, loginAttempted]);
-
     // handle login form data update
-    const handleLoginDataChange = (event) => 
+    const handleLoginDataChange = (e) => 
     {
-        const value = event.target.value
+		e.preventDefault();
+
+        const value = e.target.value
         setData({
             ...data,
-            [event.target.name]: value
+            [e.target.name]: value
         });
     }
 
-    return (
-        <div>
-            <h1>Login</h1>
-            <div className="container">
-                {loginFailed && <div className="alert alert-warning">Invalid Credentials</div>}
-                User Name: <input type="text" name="username" value={data.username} onChange={handleLoginDataChange} />
-                Password: <input type="password" name="password" value={data.password} onChange={handleLoginDataChange} />
-                <button className="btn btn-success" onClick={handleSubmit}>Login</button>
-            </div>
-        </div>
-    )
+	return (
+		<div>
+			<h1>Login</h1>
+			<div className="container">
+				<form>
+					User Name: <input type="text" name="username" value={data.username} onChange={handleLoginDataChange} />
+					Password: <input type="password" name="password" value={data.password} onChange={handleLoginDataChange} />
+					<button className="btn btn-success" onClick={handleLogin}>Login</button>
+					{!loading && loginFailed && <div className="alert alert-warning">Invalid Credentials</div>}
+					{loading && <div className="alert alert-warning">Loading...</div>}
+				</form>
+			</div>
+		</div>
+	)
 }
 

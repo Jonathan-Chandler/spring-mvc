@@ -30,57 +30,62 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Table(name = "user")
 public class User implements UserDetails
 {
-  @Id
-  @NotEmpty
-  @Column(unique=true, name="username", length=50)
-  @Size(min=8, max=50)
-  private String username;
+	@Id
+	@NotEmpty
+	@Column(unique=true, name="id")
+	@Size(min=8, max=50)
+	private int id;
 
-  @NotEmpty
-  @Column(unique=true, name="email", length=100)
-  @Size(min=10, max=100)
-  private String email;
+	@NotEmpty
+	@Column(unique=true, name="username", length=50)
+	@Size(min=8, max=50)
+	private String username;
 
-  @NotEmpty
-  @Column(name="password")
-  private String password;
+	@NotEmpty
+	@Column(unique=true, name="email", length=100)
+	@Size(min=10, max=100)
+	private String email;
 
-  @Column(name="active")
-  boolean enabled;
+	@NotEmpty
+	@Column(name="password")
+	private String password;
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    Collection<GrantedAuthority> authorities = new HashSet<>();
-    SimpleGrantedAuthority userAuth = new SimpleGrantedAuthority("User");
-    authorities.add(userAuth);
+	@Column(name="active")
+	private boolean enabled;
 
-    return authorities;
-  }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		Collection<GrantedAuthority> authorities = new HashSet<>();
+		SimpleGrantedAuthority userAuth = new SimpleGrantedAuthority("User");
+		authorities.add(userAuth);
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
+		return authorities;
+	}
 
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
 
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
 
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
 
-  //@ElementCollection
-  //@JoinTable(
-  //    name = "authorities",
-  //    joinColumns = {@JoinColumn(name = "username")})
-  //@Column(name = "authority")
-  //private Set<String> roles;
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
+
+	//@ElementCollection
+	//@JoinTable(
+	//    name = "authorities",
+	//    joinColumns = {@JoinColumn(name = "username")})
+	//@Column(name = "authority")
+	//private Set<String> roles;
 }

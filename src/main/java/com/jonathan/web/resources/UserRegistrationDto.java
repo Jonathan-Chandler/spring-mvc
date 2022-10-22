@@ -20,12 +20,11 @@ public class UserRegistrationDto
   private String username;
 
   @NotEmpty
-  @Size(min=10, max=50)
-  private String password;
-
-  @NotEmpty
   @Size(min=10, max=100)
   private String email;
+
+  @NotEmpty
+  private String password;
 }
 
 

@@ -48,84 +48,87 @@ import org.slf4j.Logger;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import com.jonathan.web.service.UserDetailsServiceImpl;
+import com.jonathan.web.resources.UserLoginDto;
 
 @Service
 public class UserServiceImpl implements UserService
 {
-  @Autowired
-  Logger logger;
+	@Autowired
+	Logger logger;
 
-  @Autowired
-  UserRepository userRepository;
+	@Autowired
+	UserRepository userRepository;
 
-  @Autowired
-  AuthenticationProvider authenticationProvider;
+	@Autowired
+	AuthenticationProvider authenticationProvider;
 
-  @Autowired
-  UserDetailsServiceImpl userDetailsService;
+	@Autowired
+	UserDetailsServiceImpl userDetailsService;
 
-  @Autowired
-  PasswordEncoder passwordEncoder;
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
-  @Autowired
-  JwtTokenService jwtTokenService;
+	@Autowired
+	JwtTokenService jwtTokenService;
 
-  public String login(String username, String password) throws JOSEException
-  {
-    try 
-    {
-      UserDetails testDetails = userDetailsService.loadUserByUsername(username);
+	public String login(UserLoginDto userLogin) throws JOSEException, RuntimeException
+	{
+		UserDetails testDetails = userDetailsService.loadUserByUsername(userLogin.getUsername());
 
-      List<String> roles = Arrays.asList(new String[] {""});
-      Authentication upAuthToken = authenticationProvider.authenticate(
-          new UsernamePasswordAuthenticationToken(testDetails, password));
-      if (upAuthToken == null)
-      {
-        logger.info("Failed to authenticate user " + username);
-        return "";
-      }
+		//List<String> roles = Arrays.asList(new String[] {""});
+		Authentication upAuthToken = authenticationProvider.authenticate(
+				new UsernamePasswordAuthenticationToken(testDetails, userLogin.getPassword()));
+		if (upAuthToken == null)
+		{
+			logger.info("Failed to authenticate user " + userLogin.getUsername());
+			throw new RuntimeException("Bad login credentials");
+		}
 
-      String generatedToken = jwtTokenService.generateJwtToken(username);
-      if (generatedToken == "")
-      {
-        logger.info("Failed to generate token for user " + username);
-      }
+		String generatedToken = jwtTokenService.generateJwtToken(userLogin.getUsername());
+		if (generatedToken == "")
+		{
+			logger.info("Failed to generate token for user " + userLogin.getUsername());
+			throw new RuntimeException("Failed to create JWT");
+		}
 
-      //logger.info("Created token: " + generatedToken + " for user " + username);
-      return generatedToken;
-    }
-    catch(AuthenticationException e)
-    {
-      logger.info("Failed in login service: " + e);
-      throw e;
-    }
-  }
+		//logger.info("Created token: " + generatedToken + " for user " + userLogin.getUsername());
+		return generatedToken;
+	}
 
-  //public String register(UserData user)
-  @Override
-  public String register(UserRegistrationDto newUserRequest)
-  {
-    //Instant start = Instant.now();
-    User user = User.builder()
-      .username(newUserRequest.getUsername())
-      .email(newUserRequest.getEmail())
-      .password(passwordEncoder.encode(newUserRequest.getPassword()))
-      .enabled(true)
-      .build();
-    //Instant end = Instant.now();
+	@Override
+	public String register(UserRegistrationDto newUserRequest) throws RuntimeException
+	{
+		System.out.println("newUserRequest: " + newUserRequest.getUsername());
 
-    //logger.info(String.format(
-    //        "Hashing took %s ms",
-    //        ChronoUnit.MILLIS.between(start, end)
-    //));
+		// username exists in db
+		if (userRepository.findOneByUsername(newUserRequest.getUsername()).orElse(null) != null)
+		{
+			System.out.println("Attempted registration for " + newUserRequest.getUsername() + " failed - name taken");
+      throw new RuntimeException("User exists");
+		}
 
-    userRepository.save(user);
-    return "";
-  }
+		// add user to db
+		User user = User.builder()
+			.username(newUserRequest.getUsername())
+			.email(newUserRequest.getEmail())
+			.password(passwordEncoder.encode(newUserRequest.getPassword()))
+			.enabled(true)
+			.build();
+		userRepository.save(user);
 
-  public void deleteById(String id)
-  {
-    userRepository.deleteById(id);
-  }
+		return "Success";
+
+		//Instant end = Instant.now();
+
+		//logger.info(String.format(
+		//        "Hashing took %s ms",
+		//        ChronoUnit.MILLIS.between(start, end)
+		//));
+	}
+
+	public void deleteById(String id)
+	{
+		userRepository.deleteById(id);
+	}
 }
 

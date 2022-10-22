@@ -54,121 +54,100 @@ import org.slf4j.Logger;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-public class UserController 
+public class TictactoeController 
 {
-  @Autowired
-  private UserService userService;
-
-  @Autowired
-  Logger logger;
-
-  @RequestMapping(
-    value = {"/login"},
-    method = RequestMethod.POST,
-    produces = "application/json",
-    consumes = "application/json"
-  )
-  @ResponseBody
-  public ResponseEntity<String> login(@RequestBody UserLoginDto userLogin) 
-  {
-    HashMap<String, String> responseJson = new HashMap<>();
-    String loginJwt;
-
-    try 
-    {
-      loginJwt = userService.login(userLogin);
-    } catch (Exception e) 
-    {
-      logger.info("Failed jwt login for username: " + userLogin.getUsername());
-
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    HttpHeaders responseHeader = new HttpHeaders();
-    responseHeader.add("Authorization", loginJwt);
-
-    responseJson.put("Auth", loginJwt);
-    System.out.println(responseJson);
-
-    return ResponseEntity.ok()
-      .headers(responseHeader)
-      .body("{\"Authorization\": \"" + loginJwt + "\"}");
-  }
-
-  @RequestMapping(
-    value = {"/register"},
-    method = RequestMethod.POST,
-    produces = "application/json",
-    consumes = "application/json"
-  )
-  @ResponseBody
-  public ResponseEntity<String> register(@RequestBody UserRegistrationDto registrationRequest) 
-  {
-    System.out.println(registrationRequest);
-
-    try {
-      String response = userService.register(registrationRequest);
-      HttpHeaders responseHeader = new HttpHeaders();
-      return new ResponseEntity<>(HttpStatus.OK);
-    }
-    catch (Exception e)
-    {
-			logger.info("Failed in register service: " + e);
-
-      HttpHeaders responseHeader = new HttpHeaders();
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-  }
-
+//  @Autowired
+//  private UserService userService;
+//
+//  @Autowired
+//  private TictactoeService tictactoeService;
+//
+//  @Autowired
+//  Logger logger;
+//
+//
+//  @RequestMapping(
+//    value = {"/login"},
+//    method = RequestMethod.POST,
+//    produces = "application/json",
+//    consumes = "application/json"
+//  )
+//  @ResponseBody
+//  public ResponseEntity<String> login(@RequestBody UserLoginDto userLogin) 
 //  {
-//    System.out.println(registrationRequest);
-//    //System.out.println(registrationRequest);
-//    //HashMap<String, String> responseJson = new HashMap<>();
-//    //String loginJwt;
+//    System.out.println(userLogin);
+//    HashMap<String, String> responseJson = new HashMap<>();
+//    String loginJwt;
 //
-//    //// read post
-//    //String username = registrationRequest.getUsername();
-//    //String email = registrationRequest.getEmail();
-//    //String password = registrationRequest.getPassword();
-//    //System.out.println("username: " + username);
+//    // read post
+//    String username = userLogin.getUsername();
+//    String password = userLogin.getPassword();
+//    System.out.println("username: " + username);
 //
-//    //try 
-//    //{
-//    //  loginJwt = userService.register(username, email, password);
-//    //} catch (Exception e) 
-//    //{
-//    //  logger.info("Failed jwt login for username: " + registrationRequest.getUsername());
-//
-//    //  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//    //}
-//    //logger.info("Returned jwt: '" + loginJwt + "' for user " + username);
-//
-//    //responseHeader.add("Authorization", loginJwt);
-//
-//    //responseJson.put("Auth", loginJwt);
-//
-//    //System.out.println(responseJson);
-//    try {
-//      String response = userService.register(registrationRequest);
-//      HttpHeaders responseHeader = new HttpHeaders();
-//      return new ResponseEntity<>(HttpStatus.OK);
-//      //return ResponseEntity.ok()
-//      //  .headers(null)
-//      //  .body("{}");
-//    }
-//    catch (Exception e)
+//    try 
 //    {
-//			logger.info("Failed in register service: " + e);
+//      loginJwt = userService.login(username, password);
+//    } catch (Exception e) 
+//    {
+//      logger.info("Failed jwt login for username: " + userLogin.getUsername());
 //
-//      HttpHeaders responseHeader = new HttpHeaders();
 //      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //    }
+//    logger.info("Returned jwt: '" + loginJwt + "' for user " + username);
 //
-//    //return ResponseEntity.ok()
-//    //  .headers(responseHeader)
-//    //  .body("{}");
+//    HttpHeaders responseHeader = new HttpHeaders();
+//    responseHeader.add("Authorization", loginJwt);
+//
+//    responseJson.put("Auth", loginJwt);
+//
+//    System.out.println(responseJson);
+//    return ResponseEntity.ok()
+//      .headers(responseHeader)
+//      .body("{\"Authorization\": \"" + loginJwt + "\"}");
 //  }
-
+//
+//  @RequestMapping(
+//    value = {"/register"},
+//    method = RequestMethod.POST,
+//    produces = "application/json",
+//    consumes = "application/json"
+//  )
+//
+//  @ResponseBody
+//  public ResponseEntity<String> register(@RequestBody UserRegistrationDto registrationRequest) 
+//  {
+//    System.out.println(registrationRequest);
+//    HashMap<String, String> responseJson = new HashMap<>();
+//    String loginJwt;
+//
+//    // read post
+//    String username = registrationRequest.getUsername();
+//    String email = registrationRequest.getEmail();
+//    String password = registrationRequest.getPassword();
+//    System.out.println("username: " + username);
+//
+//    try 
+//    {
+//      loginJwt = userService.register(username, email, password);
+//    } catch (Exception e) 
+//    {
+//      logger.info("Failed jwt login for username: " + registrationRequest.getUsername());
+//
+//      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//    }
+//    logger.info("Returned jwt: '" + loginJwt + "' for user " + username);
+//
+//    HttpHeaders responseHeader = new HttpHeaders();
+//    responseHeader.add("Authorization", loginJwt);
+//
+//    responseJson.put("Auth", loginJwt);
+//
+//    System.out.println(responseJson);
+//    return ResponseEntity.ok()
+//      .headers(responseHeader)
+//      .body("{\"Authorization\": \"" + loginJwt + "\"}");
+//  }
+//
 //  @PostMapping("/register")
 //  @ResponseStatus(code = HttpStatus.CREATED)
 //  public void register(@RequestBody UserRegistrationDto newUserRequest) 
