@@ -19,18 +19,13 @@ public class UserDetailsServiceImpl implements UserDetailsService
 
   private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
-  public UserDetails loadUserByUsername(String username)
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
   {
     UserDetails returnDetails = userRepository.findOneByUsername(username).orElse(null);
 
     if (returnDetails == null)
     {
-      logger.info("Returned null for username " + username);
-    }
-    else
-    {
-      //logger.info("Returned UserDetails username: " + returnDetails.getUsername());
-      //logger.info("returned UserDetails password: " + returnDetails.getPassword());
+      throw new UsernameNotFoundException("User did not exist");
     }
 
     return returnDetails;

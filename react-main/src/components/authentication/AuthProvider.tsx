@@ -39,9 +39,7 @@ export function AuthProvider({
 
 	// check if user is logged in
 	const isAuthenticated = useCallback( () => {
-		if (username && username !== "" && token && token !== "")
-			return true;
-		return false;
+		return (username && username !== "" && token && token !== "");
 	}, [username, token]);
 
 	// send login request
@@ -68,10 +66,6 @@ export function AuthProvider({
 					}
 				})
 				.catch((error) => {
-					// log out and set error response message
-					setUsername("");
-					setToken("");
-
 					// update error from axios
 					let errorMessage = "";
 					if (error.response) {

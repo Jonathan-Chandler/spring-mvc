@@ -79,9 +79,7 @@ public class UserController
       loginJwt = userService.login(userLogin);
     } catch (Exception e) 
     {
-      logger.info("Failed jwt login for username: " + userLogin.getUsername());
-
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>("Failed to login: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     HttpHeaders responseHeader = new HttpHeaders();
@@ -108,15 +106,13 @@ public class UserController
 
     try {
       String response = userService.register(registrationRequest);
-      HttpHeaders responseHeader = new HttpHeaders();
       return new ResponseEntity<>(HttpStatus.OK);
     }
     catch (Exception e)
     {
-			logger.info("Failed in register service: " + e);
+			logger.info("Failed to register: " + e.getMessage());
 
-      HttpHeaders responseHeader = new HttpHeaders();
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>("Failed to register: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 

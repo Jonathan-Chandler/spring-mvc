@@ -6,36 +6,68 @@ export default function HeaderComponent(...params) {
     const { isAuthenticated } = useAuth();
 
     if (isAuthenticated())
-    {
-        return (
-            <header>
-                <nav className="navbar navbar-expand-md navbar-dark bg-dark">
-                    <div><Link to="/" className="navbar-brand">Something</Link></div>
-                    <ul className="navbar-nav">
-                        {<li><NavLink className="nav-link" to="/welcome">Home</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/todos">Todos</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/tictactoe">TicTacToe</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/logout">Logout</NavLink></li>}
-                    </ul>
-                </nav>
-            </header>
-        )        
-    }
-    else
-    {
-        return (
-            <header>
-                <nav className="navbar navbar-expand-md navbar-dark bg-dark">
-                    <div><Link to="/" className="navbar-brand">Something</Link></div>
-                    <ul className="navbar-nav">
-                        {<li><NavLink className="nav-link" to="/welcome">Home</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/register">Register</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/login">Login</NavLink></li>}
-                        {<li><NavLink className="nav-link" to="/tictactoe">TicTacToe</NavLink></li>}
-                    </ul>
-                </nav>
-            </header>
-        )        
-    }
+	{
+		return (
+			<header>
+				<nav className="navbar navbar-expand-md navbar-dark bg-dark">
+					<div className="collapse navbar-collapse">
+						<ul className="navbar-nav mr-auto">
+							<li className="nav-item active">
+								<NavLink className="nav-link" href="/welcome">Something</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/welcome">Home</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/tictactoe">Tic-Tac-Toe</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/todos">Todos</NavLink>
+							</li>
+						</ul>
+					</div>
+					<div className="collapse navbar-collapse justify-content-end">
+						<ul className="navbar-nav ml-auto">
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/logout">Logout</NavLink>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</header>
+		)
+	}
+	else
+	{
+		return (
+			<header>
+				<nav className="navbar navbar-expand-md navbar-dark bg-dark">
+					<div className="collapse navbar-collapse">
+						<ul className="navbar-nav mr-auto">
+							<li className="nav-item active">
+								<NavLink className="nav-link" href="/welcome">Something</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/welcome">Home</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/tictactoe">Tic-Tac-Toe</NavLink>
+							</li>
+						</ul>
+					</div>
+					<div className="collapse navbar-collapse justify-content-end">
+						<ul className="navbar-nav ml-auto">
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/register">Register</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/login">Login</NavLink>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</header>
+		)
+	}
 }
 

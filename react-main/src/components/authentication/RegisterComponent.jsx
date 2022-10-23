@@ -25,7 +25,7 @@ export default function RegisterComponent(...props) {
 		setRegisterAttempted(true);
 	}
 
-	// navigate to welcome if already have login
+	// navigate to welcome if already authorized
 	useEffect(() => 
 	{
         if (isAuthenticated())
@@ -65,9 +65,9 @@ export default function RegisterComponent(...props) {
 		});
 	}
 
-	if (!loading && registerAttempted)
+	if (!loading && registerAttempted && !registerFailed)
 	{
-		// registration was accepted
+		// new user registration was accepted
 		return (
 			<div>
 				<h1>Register</h1>
@@ -79,7 +79,7 @@ export default function RegisterComponent(...props) {
 	}
 	else
 	{
-		// display registration form and failure message if attempted to register
+		// display registration form and failure message if attempted to register and done loading
 		return (
 			<div>
 				<h1>Register</h1>

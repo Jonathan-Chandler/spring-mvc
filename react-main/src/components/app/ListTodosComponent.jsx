@@ -43,7 +43,6 @@ export default function ListTodosComponent(...props)
         }
     }, [navigate, isAuthenticated]);
 
-    // on page load
     useEffect(() => 
     {
         // empty todos

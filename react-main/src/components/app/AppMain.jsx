@@ -6,7 +6,9 @@ import LoginComponent from '../authentication/LoginComponent.jsx'
 import LogoutComponent from '../authentication/LogoutComponent.jsx'
 import ListTodosComponent from './ListTodosComponent.jsx'
 import WelcomeComponent from './WelcomeComponent.jsx'
-import TicTacToeComponent from './tictactoe/TicTacToeComponent.jsx'
+import TictactoeGameSelect from './tictactoe/TictactoeGameSelect.jsx'
+import LocalGame from './tictactoe/game/LocalGame.jsx'
+import AiGame from './tictactoe/game/AiGame.jsx'
 import RegisterComponent from '../authentication/RegisterComponent.jsx'
 import { AuthProvider } from '../authentication/AuthProvider.tsx'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -22,7 +24,9 @@ export default function AppMain(...props)
           <Routes>
             <Route exact path="/" element={<Navigate to="/welcome" />} />
             <Route exact path="/welcome" element={<WelcomeComponent />} />
-            <Route exact path="/tictactoe" element={<TicTacToeComponent />} />
+            <Route exact path="/tictactoe" element={<TictactoeGameSelect />} />
+            <Route exact path="/tictactoe/game/local" element={<LocalGame />} />
+            <Route exact path="/tictactoe/game/ai" element={<AiGame />} />
             <Route exact path="/register" element={<RegisterComponent />} />
             <Route exact path="/login" element={<LoginComponent />} />
             <Route exact path="/logout" element={<LogoutComponent />} />

@@ -24,6 +24,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.crypto.password.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
@@ -40,7 +41,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collection;
 
 import com.jonathan.web.resources.UserRegistrationDto;
-//import org.springframework.context.annotation.Lazy;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import org.springframework.security.core.Authentication;
@@ -71,40 +71,69 @@ public class UserServiceImpl implements UserService
 	@Autowired
 	JwtTokenService jwtTokenService;
 
-	public String login(UserLoginDto userLogin) throws JOSEException, RuntimeException
+	public String login(UserLoginDto loginCredentials) throws JOSEException, RuntimeException
 	{
-		UserDetails testDetails = userDetailsService.loadUserByUsername(userLogin.getUsername());
+		UserDetails daoUserDetails;
+		Authentication upAuthToken;
 
-		//List<String> roles = Arrays.asList(new String[] {""});
-		Authentication upAuthToken = authenticationProvider.authenticate(
-				new UsernamePasswordAuthenticationToken(testDetails, userLogin.getPassword()));
-		if (upAuthToken == null)
+		try
 		{
-			logger.info("Failed to authenticate user " + userLogin.getUsername());
+			daoUserDetails = userDetailsService.loadUserByUsername(loginCredentials.getUsername());
+			upAuthToken = authenticationProvider.authenticate(
+					new UsernamePasswordAuthenticationToken(daoUserDetails, loginCredentials.getPassword()));
+		}
+		catch (UsernameNotFoundException e)
+		{
+			logger.info("Failed to find user " + loginCredentials.getUsername() + ": " + e.getMessage());
+			throw new RuntimeException("Bad login credentials");
+		}
+		catch (AuthenticationException e)
+		{
+			logger.info("Failed to auth user " + loginCredentials.getUsername() + ": " + e.getMessage());
+			throw new RuntimeException("Bad login credentials");
+		}
+		catch (Exception e)
+		{
+			logger.info("Unknown error while trying to auth user " + loginCredentials.getUsername() + ": " + e.getMessage());
 			throw new RuntimeException("Bad login credentials");
 		}
 
-		String generatedToken = jwtTokenService.generateJwtToken(userLogin.getUsername());
-		if (generatedToken == "")
+		if (upAuthToken == null)
 		{
-			logger.info("Failed to generate token for user " + userLogin.getUsername());
+			logger.info("Returned null auth token when authenticating user " + loginCredentials.getUsername());
+			throw new RuntimeException("Bad authentication token");
+		}
+
+		String generatedToken = jwtTokenService.generateJwtToken(loginCredentials.getUsername());
+		if (generatedToken == null || generatedToken == "")
+		{
+			logger.info("Failed to generate token for user " + loginCredentials.getUsername());
 			throw new RuntimeException("Failed to create JWT");
 		}
 
-		//logger.info("Created token: " + generatedToken + " for user " + userLogin.getUsername());
+		//logger.info("Created token: " + generatedToken + " for user " + loginCredentials.getUsername());
 		return generatedToken;
 	}
 
 	@Override
 	public String register(UserRegistrationDto newUserRequest) throws RuntimeException
 	{
-		System.out.println("newUserRequest: " + newUserRequest.getUsername());
+		User daoUserInfo = null;
 
-		// username exists in db
-		if (userRepository.findOneByUsername(newUserRequest.getUsername()).orElse(null) != null)
+		try 
+		{
+			daoUserInfo = userRepository.findOneByUsername(newUserRequest.getUsername()).orElse(null);
+		}
+		catch (UsernameNotFoundException e)
+		{
+			// exception is expected for new users
+		}
+
+		// user exists
+		if (daoUserInfo != null)
 		{
 			System.out.println("Attempted registration for " + newUserRequest.getUsername() + " failed - name taken");
-      throw new RuntimeException("User exists");
+			throw new RuntimeException("User exists");
 		}
 
 		// add user to db
@@ -116,14 +145,14 @@ public class UserServiceImpl implements UserService
 			.build();
 		userRepository.save(user);
 
-		return "Success";
-
+		//Instant start = Instant.now();
 		//Instant end = Instant.now();
 
 		//logger.info(String.format(
 		//        "Hashing took %s ms",
 		//        ChronoUnit.MILLIS.between(start, end)
 		//));
+		return "Success";
 	}
 
 	public void deleteById(String id)

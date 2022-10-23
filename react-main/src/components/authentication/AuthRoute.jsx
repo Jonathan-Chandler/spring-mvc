@@ -3,7 +3,8 @@ import { Navigate } from "react-router-dom";
 import useAuth from "./AuthProvider.tsx";
 
 export const AuthRoute = ( {children} ) => {
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
+  //const { token } = useAuth();
 
-  return token ? children : <Navigate to="/login" />;
+  return isAuthenticated() ? children : <Navigate to="/login" />;
 }
