@@ -18,5 +18,6 @@ import com.jonathan.web.resources.UserLoginDto;
 public interface UserRepository extends JpaRepository<User, String>
 {
 	Optional<User> findOneByUsername(String username);
+	List<User> findAllByEnabled(boolean enabled);
 }
 

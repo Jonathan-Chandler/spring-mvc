@@ -27,8 +27,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "tictactoe_game")
-public class Tictactoe
+@Table(name = "tictactoe_request")
+public class TictactoeRequest
 {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -57,3 +57,4 @@ public class Tictactoe
 	@Size(min=9, max=9)
 	private String board;
 }
+

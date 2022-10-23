@@ -14,21 +14,21 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class TictactoeRequestDto 
 {
-	private int game_id;
-
 	// username of player doing tictactoe_action
 	private String player_username;
 
-	// possible user actions
-	enum tictactoe_action
-	{
-		ENTER_GAME,
-		LEAVE_GAME,
-		MOVE,
-	};
+	//// possible user actions
+	//enum tictactoe_action
+	//{
+	//	ENTER_GAME,
+	//	LEAVE_GAME,
+	//	LIST_GAMES,
+	//	MOVE,
+	//};
+	//private int action;
 
-	// index to add X/O if action is MOVE
-	private int move_index;
+	//// index to add X/O if action is MOVE
+	//private int move_index;
 
 	//// if action was ENTER_GAME and game should be real time
 	//private boolean realtime_game;

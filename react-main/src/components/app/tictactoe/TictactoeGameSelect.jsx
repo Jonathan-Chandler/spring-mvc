@@ -17,7 +17,7 @@ export default function TictactoeGameSelect(...params) {
 		// only redirect if user has valid login
         if (isAuthenticated())
 		{
-			navigate("/tictactoe/game/online");
+			navigate("/tictactoe/playerlist");
 		}
 		else
 		{

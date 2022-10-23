@@ -16,6 +16,7 @@ import com.jonathan.web.dao.UserRepository;
 import com.jonathan.web.entities.User;
 
 import java.util.List;
+import java.util.ArrayList;
 
 //import com.jonathan.web.entities.UserData;
 import com.jonathan.web.service.JwtTokenService;
@@ -49,6 +50,7 @@ import org.slf4j.Logger;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.jonathan.web.service.UserDetailsServiceImpl;
 import com.jonathan.web.resources.UserLoginDto;
+import com.jonathan.web.resources.OnlineUserDto;
 
 @Service
 public class UserServiceImpl implements UserService
@@ -158,6 +160,23 @@ public class UserServiceImpl implements UserService
 	public void deleteById(String id)
 	{
 		userRepository.deleteById(id);
+	}
+
+	public List<OnlineUserDto> getOnlineUsers()
+	{
+		List<User> userList = userRepository.findAllByEnabled(true);
+		List<OnlineUserDto> onlineUsers = new ArrayList<OnlineUserDto>();
+		if (userList.size() == 0)
+		{
+			logger.info("Returned null userList");
+		}
+		else
+		{
+			for (int i = 0; i < userList.size(); i++) {
+				onlineUsers.add(new OnlineUserDto(userList.get(i).getUsername()));
+			}
+		}
+		return onlineUsers;
 	}
 }
 

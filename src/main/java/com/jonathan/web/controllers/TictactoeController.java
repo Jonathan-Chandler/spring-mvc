@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestHeader;
 //import org.springframework.web.bind.annotation.Produces;
 //import org.springframework.web.bind.annotation.Path;
 //import org.springframework.web.bind.annotation.Consumes;
@@ -41,21 +42,73 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.jonathan.web.service.UserService;
+import com.jonathan.web.service.TictactoeService;
 import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
 import com.jonathan.web.dao.UserRepository;
-import com.jonathan.web.resources.UserRegistrationDto;
+import com.jonathan.web.resources.TictactoeRequestDto;
+import com.jonathan.web.resources.TictactoePlayerListDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
+import java.util.List;
+import java.util.ArrayList;
+
 //import javax.json.JsonObject;
 //import org.springframework.http.
 import org.slf4j.Logger;
 
+//@CrossOrigin(origins = "http://localhost:3000/tictactoe/playerlist")
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class TictactoeController 
 {
+  @Autowired
+  private TictactoeService tictactoeService;
+
+  @Autowired
+  Logger logger;
+
+  //@RequestMapping(
+  //  value = {"/tictactoe/playerlist"},
+  //  method = RequestMethod.GET,
+  //  produces = "application/json",
+  //  consumes = "application/json"
+  //)
+  //@ResponseBody
+  @GetMapping("/tictactoe/playerlist")
+  public List<TictactoePlayerListDto> login(@RequestHeader(value="Authorization") String authHeader)
+  {
+    logger.info("get auth header: " + authHeader);
+    
+
+    
+    //HashMap<String, String> responseJson = new HashMap<>();
+    //String loginJwt;
+
+    //try 
+    //{
+    //  loginJwt = userService.login(userLogin);
+    //} catch (Exception e) 
+    //{
+    //  return new ResponseEntity<>("Failed to get player list: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+    //}
+
+    //HttpHeaders responseHeader = new HttpHeaders();
+    //responseHeader.add("Authorization", loginJwt);
+
+    //responseJson.put("Auth", loginJwt);
+    //System.out.println(responseJson);
+    
+    List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+    //TictactoePlayerListDto player = new TictactoePlayerListDto("username", true, true);
+    //List<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
+
+    return playerList;
+    // return ResponseEntity.ok()
+    //   .headers(responseHeader)
+    //   .body(playerList.toString());
+  }
 //  @Autowired
 //  private UserService userService;
 //

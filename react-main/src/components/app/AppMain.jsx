@@ -9,6 +9,8 @@ import WelcomeComponent from './WelcomeComponent.jsx'
 import TictactoeGameSelect from './tictactoe/TictactoeGameSelect.jsx'
 import LocalGame from './tictactoe/game/LocalGame.jsx'
 import AiGame from './tictactoe/game/AiGame.jsx'
+import OnlineGame from './tictactoe/game/OnlineGame.jsx'
+import TictactoePlayerList from './tictactoe/TictactoePlayerList.jsx'
 import RegisterComponent from '../authentication/RegisterComponent.jsx'
 import { AuthProvider } from '../authentication/AuthProvider.tsx'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -27,6 +29,8 @@ export default function AppMain(...props)
             <Route exact path="/tictactoe" element={<TictactoeGameSelect />} />
             <Route exact path="/tictactoe/game/local" element={<LocalGame />} />
             <Route exact path="/tictactoe/game/ai" element={<AiGame />} />
+            <Route exact path="/tictactoe/game/online" element={<OnlineGame />} />
+            <Route exact path="/tictactoe/playerlist" element={<TictactoePlayerList />} />
             <Route exact path="/register" element={<RegisterComponent />} />
             <Route exact path="/login" element={<LoginComponent />} />
             <Route exact path="/logout" element={<LogoutComponent />} />

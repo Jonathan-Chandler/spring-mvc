@@ -86,6 +86,8 @@ public class SecurityConfiguration
 //      .antMatchers("/todos/**")
       // don't filter login or register api
       .antMatchers("/login")
+      .antMatchers("/tictactoe/*")
+      .antMatchers("/tictactoe/playerlist")
       .antMatchers("/register");
   }
 

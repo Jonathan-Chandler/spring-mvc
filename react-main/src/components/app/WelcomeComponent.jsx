@@ -23,6 +23,8 @@ export default function WelcomeComponent(...props)
 								{<NavLink className="nav-link" to="/todos">Todos</NavLink>}
 								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
 								{<NavLink className="nav-link" to="/login">Login</NavLink>}
+								{<NavLink className="nav-link" to="/tictactoe/playerlist">tictactoeplayers</NavLink>}
+							
 						</div>
 					</div>
 				</>
