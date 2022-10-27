@@ -1,11 +1,15 @@
 package com.jonathan.web.configuration;
 
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+//import java.nio.file.attribute.UserPrincipal;
 
 
 @Configuration
@@ -14,6 +18,9 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 //public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer 
 {
+	@Autowired
+	Logger logger;
+
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) 
 	{
@@ -42,6 +49,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
 			//.withSockJS();
 		// var socket = new SockJS('portfolio');
 	}
+
+	//@Override
+	//public void configureClientInboundChannel(ChannelRegistration registration)
+	//{
+	//}
+
 
 	// authorize stomp headers for socket connection
 	//@Override

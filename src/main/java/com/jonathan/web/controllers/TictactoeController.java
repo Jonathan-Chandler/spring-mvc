@@ -66,8 +66,14 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import com.jonathan.web.resources.TestDto;
 import org.springframework.stereotype.Controller;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.simp.user.SimpUser;
+import java.security.Principal;
 
 //@CrossOrigin(origins = "http://localhost:3000/tictactoe/playerlist")
 @Controller
@@ -78,6 +84,9 @@ public class TictactoeController
   @Autowired
   private TictactoeService tictactoeService;
 
+  @Autowired
+  private SimpUserRegistry simpUserRegistry;
+
   private final SimpMessagingTemplate simpMessagingTemplate;
 
   @Autowired
@@ -87,12 +96,12 @@ public class TictactoeController
   {
     this.simpMessagingTemplate = simpMessagingTemplate;
   }
-
-  // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
-  @MessageMapping("/greetings")
   // send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
   //@SendTo("/topic/messages")
   //public List<TictactoePlayerListDto> getMessages(String clientMessage)
+
+  // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
+  @MessageMapping("/greetings")
   public void getMessages(String greeting)
   {
 	  logger.info("client message");
@@ -107,15 +116,57 @@ public class TictactoeController
 	  //return playerList;
   }
 
+	@EventListener
+	public void handleSessionSubscribeEvent(SessionSubscribeEvent event)
+	{
+		logger.info("sessionsubscribeevent: ");
+		GenericMessage message = (GenericMessage) event.getMessage();
+		String simpDestination = (String) message.getHeaders().get("simpDestination");
+		String authHeader = (String) message.getHeaders().get("Authorization");
+		logger.info("allHeaders: " + message.getHeaders().toString());
+		logger.info("simpDestination: " + simpDestination);
+		logger.info("authHeader: " + authHeader);
+
+		if (simpDestination.startsWith("/topic/playerList"))
+		{
+			// read user name
+			Principal userPrincipal = event.getUser();
+			if (userPrincipal != null)
+				logger.info("userPrincipal: " + userPrincipal.toString());
+			else
+				logger.info("userPrincipal: null");
+		}
+
+		//userPrincipal.getName();
+	}
+
+  //@EventListener
+  //public void handleSubscribeEvent(SessionSubscribeEvent event)
+  //{
+  //  simpMessagingTemplate.convertAndSendToUser(event.getUser().getName(), "/greetings", "greetings");
+  //}
+
   // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
   @MessageMapping("/playerList")
   // send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
   //@SendTo("/topic/messages")
   //public List<TictactoePlayerListDto> getMessages(String clientMessage)
-  public void getPlayerList(String receive)
+  public void getPlayerList()
   {
-	  logger.info("playerList message: " + receive);
-      List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+    ArrayList<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
+    List<String> connections = this.simpUserRegistry
+            .getUsers()
+            .stream()
+            .map(SimpUser::getName)
+            .collect(Collectors.toList());
+	  logger.info("playerList message: ");
+
+    for (int i = 0; i < connections.size(); i++)
+    {
+      playerList.add(new TictactoePlayerListDto(connections[i], true, true));
+    }
+
+    //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
 
 	  simpMessagingTemplate.convertAndSend("/topic/playerList", playerList);
 
@@ -125,227 +176,5 @@ public class TictactoeController
       //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
 	  //return playerList;
   }
-
-
-////  private final ExecutorService executor = Executors.newSingleThreadExecutor();
-////
-////  private void sleep(int seconds, SseEmitter sseEmitter) {
-////    try {
-////      Thread.sleep(seconds * 1000);
-////    } catch (InterruptedException e) {
-////      e.printStackTrace();
-////      sseEmitter.completeWithError(e);
-////    }
-////  }
-////
-////  @GetMapping("/tictactoe/playerlist")
-////  @CrossOrigin
-////  public SseEmitter streamDateTime() {
-////
-////    //SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
-////    SseEmitter sseEmitter = new SseEmitter();
-////
-////    sseEmitter.onCompletion(() -> logger.info("SseEmitter is completed"));
-////    sseEmitter.onTimeout(() -> logger.info("SseEmitter is timed out"));
-////    sseEmitter.onError((ex) -> logger.info("SseEmitter got error:", ex));
-////
-////	executor.execute(() -> 
-////	{
-////		try 
-////		{
-////			List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
-////			sseEmitter.send(playerList);
-////
-////			//sleep(10, sseEmitter);
-////		} catch (IOException e) {
-////			e.printStackTrace();
-////			sseEmitter.completeWithError(e);
-////		}
-////		sseEmitter.complete();
-////	});
-////	executor.shutdown();
-////
-////    //executor.execute(() -> {
-////    //  for (int i = 0; i < 15000; i++) {
-////    //    try {
-////    //      List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
-////    //      sseEmitter.send(playerList);
-////
-////    //      sleep(10, sseEmitter);
-////    //    } catch (IOException e) {
-////    //      e.printStackTrace();
-////    //      sseEmitter.completeWithError(e);
-////    //    }
-////    //  }
-////    //  sseEmitter.complete();
-////    //});
-////
-////    logger.info("Controller exits");
-////    return sseEmitter;
-////  }
-  //@RequestMapping(
-  //  value = {"/tictactoe/playerlist"},
-  //  method = RequestMethod.GET,
-  //  produces = "application/json",
-  //  consumes = "application/json"
-  //)
-  //@ResponseBody
-////  public List<TictactoePlayerListDto> getPlayerList(@RequestHeader(value="Authorization") String authHeader)
-////  {
-////    logger.info("get auth header: " + authHeader);
-////    
-////
-////    
-////    //HashMap<String, String> responseJson = new HashMap<>();
-////    //String loginJwt;
-////
-////    //try 
-////    //{
-////    //  loginJwt = userService.login(userLogin);
-////    //} catch (Exception e) 
-////    //{
-////    //  return new ResponseEntity<>("Failed to get player list: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-////    //}
-////
-////    //HttpHeaders responseHeader = new HttpHeaders();
-////    //responseHeader.add("Authorization", loginJwt);
-////
-////    //responseJson.put("Auth", loginJwt);
-////    //System.out.println(responseJson);
-////    
-////    List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
-////    //TictactoePlayerListDto player = new TictactoePlayerListDto("username", true, true);
-////    //List<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
-////
-////    return playerList;
-////    // return ResponseEntity.ok()
-////    //   .headers(responseHeader)
-////    //   .body(playerList.toString());
-////  }
-//  @Autowired
-//  private UserService userService;
-//
-//  @Autowired
-//  private TictactoeService tictactoeService;
-//
-//  @Autowired
-//  Logger logger;
-//
-//
-//  @RequestMapping(
-//    value = {"/login"},
-//    method = RequestMethod.POST,
-//    produces = "application/json",
-//    consumes = "application/json"
-//  )
-//  @ResponseBody
-//  public ResponseEntity<String> login(@RequestBody UserLoginDto userLogin) 
-//  {
-//    System.out.println(userLogin);
-//    HashMap<String, String> responseJson = new HashMap<>();
-//    String loginJwt;
-//
-//    // read post
-//    String username = userLogin.getUsername();
-//    String password = userLogin.getPassword();
-//    System.out.println("username: " + username);
-//
-//    try 
-//    {
-//      loginJwt = userService.login(username, password);
-//    } catch (Exception e) 
-//    {
-//      logger.info("Failed jwt login for username: " + userLogin.getUsername());
-//
-//      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//    }
-//    logger.info("Returned jwt: '" + loginJwt + "' for user " + username);
-//
-//    HttpHeaders responseHeader = new HttpHeaders();
-//    responseHeader.add("Authorization", loginJwt);
-//
-//    responseJson.put("Auth", loginJwt);
-//
-//    System.out.println(responseJson);
-//    return ResponseEntity.ok()
-//      .headers(responseHeader)
-//      .body("{\"Authorization\": \"" + loginJwt + "\"}");
-//  }
-//
-//  @RequestMapping(
-//    value = {"/register"},
-//    method = RequestMethod.POST,
-//    produces = "application/json",
-//    consumes = "application/json"
-//  )
-//
-//  @ResponseBody
-//  public ResponseEntity<String> register(@RequestBody UserRegistrationDto registrationRequest) 
-//  {
-//    System.out.println(registrationRequest);
-//    HashMap<String, String> responseJson = new HashMap<>();
-//    String loginJwt;
-//
-//    // read post
-//    String username = registrationRequest.getUsername();
-//    String email = registrationRequest.getEmail();
-//    String password = registrationRequest.getPassword();
-//    System.out.println("username: " + username);
-//
-//    try 
-//    {
-//      loginJwt = userService.register(username, email, password);
-//    } catch (Exception e) 
-//    {
-//      logger.info("Failed jwt login for username: " + registrationRequest.getUsername());
-//
-//      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//    }
-//    logger.info("Returned jwt: '" + loginJwt + "' for user " + username);
-//
-//    HttpHeaders responseHeader = new HttpHeaders();
-//    responseHeader.add("Authorization", loginJwt);
-//
-//    responseJson.put("Auth", loginJwt);
-//
-//    System.out.println(responseJson);
-//    return ResponseEntity.ok()
-//      .headers(responseHeader)
-//      .body("{\"Authorization\": \"" + loginJwt + "\"}");
-//  }
-//
-//  @PostMapping("/register")
-//  @ResponseStatus(code = HttpStatus.CREATED)
-//  public void register(@RequestBody UserRegistrationDto newUserRequest) 
-//  {
-//    userService.register(newUserRequest);
-//  }
 }
-//@PostMapping("/login")
-//ResponseEntity<String> jwtResponse = ResponseEntity.header("Authorization", loginJwt);
-//.contentType(TEXT_PLAIN)
-//.body("some body");
 
-//  .body("Response with header using ResponseEntity");
-////return ResponseEntity.ok()
-////  .headers(responseHeader)
-////  .body("Response with header using ResponseEntity");
-//ResponseEntity<String> jwtResponse = ResponseEntity.header("Authorization", loginJwt);
-//RequestEntity.HeadersBuilder<?> head(String uriTemplate, Object... uriVariables);
-//return new ResponseEntity<>(HttpStatus.OK);
-//return ResponseEntity.created("/login").header("").body("");
-//return responseJson;
-
-//ResponseEntity responseHeaders = new HttpHeaders();
-//responseHeaders.set("Authorization", loginJwt);
-
-//System.out.println(new JSONObject(map));
-
-////String username = (String) credentials.get("username");
-////String password = (String) credentials.get("password");
-//System.out.println("password: " + password);
-//loginJwt = userService.login(userLogin.getUsername(), userLogin.getPassword());
-//logger.info("Failed jwt login for username: " + credentials.get("username"));
-//public Map<String, String> login(@RequestBody @Valid UserLoginDto userLogin) 
-//public ResponseEntity<String> login(@RequestBody Map<String, String> credentials) 
-//public ResponseEntity<String> login(@RequestBody @Valid UserLoginDto userLogin) 

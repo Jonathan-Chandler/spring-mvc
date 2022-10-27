@@ -23,7 +23,6 @@ export default function AppMain(...props)
 	return (
 		<div className="App">
 			<AuthProvider>
-			<TictactoeProvider>
 				<Router>
 					<HeaderComponent/>
 					<Routes>
@@ -41,9 +40,33 @@ export default function AppMain(...props)
 					</Routes>
 					<FooterComponent/>
 				</Router>
-			</TictactoeProvider>
 			</AuthProvider>
 		</div>
 	);
 }
 
+//	return (
+//		<div className="App">
+//			<AuthProvider>
+//			<TictactoeProvider>
+//				<Router>
+//					<HeaderComponent/>
+//					<Routes>
+//						<Route exact path="/" element={<Navigate to="/welcome" />} />
+//						<Route exact path="/welcome" element={<WelcomeComponent />} />
+//						<Route exact path="/tictactoe" element={<TictactoeGameSelect />} />
+//						<Route exact path="/tictactoe/game/local" element={<LocalGame />} />
+//						<Route exact path="/tictactoe/game/ai" element={<AiGame />} />
+//						<Route exact path="/tictactoe/game/online" element={<OnlineGame />} />
+//						<Route exact path="/tictactoe/playerlist" element={<TictactoePlayerList />} />
+//						<Route exact path="/register" element={<RegisterComponent />} />
+//						<Route exact path="/login" element={<LoginComponent />} />
+//						<Route exact path="/logout" element={<LogoutComponent />} />
+//						<Route exact path="/todos" element={<ListTodosComponent />} />
+//					</Routes>
+//					<FooterComponent/>
+//				</Router>
+//			</TictactoeProvider>
+//			</AuthProvider>
+//		</div>
+//	);

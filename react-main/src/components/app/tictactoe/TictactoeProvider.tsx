@@ -2,6 +2,8 @@ import React, { ReactNode, useCallback, useState, useEffect, useMemo, createCont
 import axios, { Axios, AxiosError } from 'axios'
 //import { PLAYER_LIST_API_URL, LOGIN_API_URL, REGISTER_API_URL } from '../../Constants'
 import { Client } from '@stomp/stompjs';
+//import useAuth from '../../authentication/AuthProvider';
+import useAuth from '../../authentication/AuthProvider';
 
 interface PlayerListEntry
 {
@@ -12,10 +14,11 @@ interface PlayerListEntry
 
 // context vars/functions
 interface TictactoeContextType {
-	loading: boolean;
+	loadingTictactoe: boolean;
 	client: any;
 	getMessages: () => void;
 	sendMessage: () => void;
+	getPlayerList: () => void;
 	playerList: PlayerListEntry[];
 	messages: String;
 	error?: any;
@@ -33,11 +36,14 @@ export function TictactoeProvider({
 	children: ReactNode;
 }): JSX.Element {
 	const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loadingTictactoe, setLoadingTictactoe] = useState<boolean>(false);
 	const [client, setClient] = useState<any>();
 	const [messages, setMessages] = useState<String>("")
 	const [playerList, setPlayerList] = useState<PlayerListEntry[]>()
 	const [error, setError] = useState<any>();
+	const authContext = useAuth();
+	//const { isAuthenticated, getSession, username, token } = useAuth();
+
 
 	const onMessage = useCallback((msg) => {
 		console.log("msg.body:")
@@ -52,9 +58,9 @@ export function TictactoeProvider({
 		//console.log(new Date(), err)
 	}, []);
 
-	const onConnect = useCallback(() => {
-		client.subscribe('/topic/messages', onMessage)
-	}, [client, onMessage]);
+	const onWsConnect = useCallback(() => {
+		//client.subscribe('/topic/messages', onMessage)
+	}, []);
 		//console.log('onConnect');
 
 		
@@ -81,39 +87,17 @@ export function TictactoeProvider({
 	//	//});
 	//}, 
 	useEffect(() => {
-		if (loadingInitial && !loading)
+		if (loadingInitial && !loadingTictactoe && authContext.isAuthenticated())
 		{
-			setLoading(true)
+			setLoadingTictactoe(true)
 			var _client = new Client();
-			setClient(_client);
+			//var headerValues = {
+			//	Authorization: authContext.token
+			//}
 
 			_client.configure({
 				brokerURL: 'ws://localhost:8080/stomp',
-				//onConnect: () => onConnect(),
-				onConnect: 
-					() => {
-						_client.subscribe(
-							'/topic/greetings', 
-							message => {
-								const messageBody = message.body
-								//console.log(JSON.parse(message.body).message);
-								console.log("msg")
-								console.log(messageBody)
-								setMessages(messageBody)
-							})
-						_client.subscribe('/topic/playerList', message => {
-							var newPlayerList = null;
-							try {
-								newPlayerList = JSON.parse(message.body)
-								console.log("Recv playerlist: " + newPlayerList);
-							}
-							catch (e) {
-								console.log("Invalid PlayerList response: " + e)
-							}
-
-							setPlayerList(newPlayerList)
-						})
-					},
+				onConnect: onWsConnect,
 				onStompError: (frame) => {
 					console.log("stompError: " + frame);},
 				// Helps during debugging, remove in production
@@ -128,9 +112,69 @@ export function TictactoeProvider({
 
 			// initialize done
 			setLoadingInitial(false)
-			setLoading(false)
+			setLoadingTictactoe(false)
 		}
-	}, [loadingInitial, onMessage, loading, onConnect, onDebug]);
+	}, [authContext, loadingInitial, onMessage, loadingTictactoe, onWsConnect, onDebug]);
+
+//	useEffect(() => {
+//		if (loadingInitial && !loadingTictactoe && authContext.isAuthenticated())
+//		{
+//			setLoadingTictactoe(true)
+//			var _client = new Client();
+//			var headerValues = {
+//				Authorization: authContext.token
+//			}
+//
+//			_client.configure({
+//				brokerURL: 'ws://localhost:8080/stomp',
+//				//onConnect: () => onConnect(),
+//				onConnect: 
+//					() => {
+//						_client.subscribe(
+//							'/topic/greetings', 
+//							message => {
+//								const messageBody = message.body
+//								//console.log(JSON.parse(message.body).message);
+//								console.log("msg")
+//								console.log(messageBody)
+//								setMessages(messageBody)
+//							},
+//							headerValues
+//						)
+//						_client.subscribe(
+//							'/topic/playerList', 
+//							message => {
+//								var newPlayerList = null;
+//								try {
+//									newPlayerList = JSON.parse(message.body)
+//									console.log("Recv playerlist: " + newPlayerList);
+//								}
+//								catch (e) {
+//									console.log("Invalid PlayerList response: " + e)
+//								}
+//
+//								setPlayerList(newPlayerList)
+//							},
+//							headerValues
+//						)
+//					},
+//				onStompError: (frame) => {
+//					console.log("stompError: " + frame);},
+//				// Helps during debugging, remove in production
+//				debug: onDebug
+//				//debug: (str) => {
+//				//	console.log(new Date(), str);
+//				//}
+//			});
+//
+//			_client.activate();
+//			setClient(_client);
+//
+//			// initialize done
+//			setLoadingInitial(false)
+//			setLoadingTictactoe(false)
+//		}
+//	}, [authContext, loadingInitial, onMessage, loadingTictactoe, onConnect, onDebug]);
 
 	const getMessages = useCallback(async () => {
 		return messages;
@@ -138,32 +182,55 @@ export function TictactoeProvider({
 
 	const sendMessage = useCallback(async () => {
 		client.publish({destination: '/app/greetings', body: 'Hello world'});
-		client.publish({destination: '/app/playerList', body: 'test playerList'});
 	}, [client])
 
 	const getPlayerList = useCallback(async () => {
-		client.subscribe('/topic/playerList', message => {
-			const playerList = message.body
-			console.log(JSON.parse(message.body).message);
-			console.log("playerList")
-			console.log(playerList)
-			setPlayerList(playerList)
-		})
+		console.log("getplayerlist");
+		if (authContext.isAuthenticated())
+		{
+			let authHeader = {Authorization: authContext.token};
+			let newPlayerList = null;
+			console.log("getplayerlist-auth");
+			client.subscribe(
+				'/topic/playerList', 
+				message => 
+				{
+					try {
+						newPlayerList = JSON.parse(message.body)
+						console.log("Recv playerlist: " + newPlayerList);
+						setPlayerList(newPlayerList)
+					}
+					catch (e) {
+						console.log("Invalid PlayerList response: " + e)
+					}
+				},
+				authHeader
+			)
+		client.publish({destination: '/app/playerList', body: 'test playerList'});
+
+				//const playerList = message.body
+				//console.log("playerList")
+				//console.log(playerList)
+				//console.log(JSON.parse(message.body).message);
+				//setPlayerList(playerList)
+			//})
+		}
 		//client.publish({destination: '/app/greetings', body: 'Hello world'});
-	}, [client])
+	}, [client, authContext])
 
 	// use memo for AuthContext to reduce rendering
 	const memoedValue = useMemo(
 		() => ({
-			loading,
+			loadingTictactoe,
 			client,
 			getMessages,
 			sendMessage,
+			getPlayerList,
 			playerList,
 			messages,
 			error,
 		}),
-		[ loading, client, getMessages, sendMessage, playerList, messages, error ]
+		[ loadingTictactoe, client, getMessages, sendMessage, getPlayerList, playerList, messages, error ]
 	);
 
 	// render components after initialization

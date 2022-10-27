@@ -1,6 +1,14 @@
 import React, { ReactNode, useCallback, useState, useEffect, useMemo, createContext, useContext } from 'react';
 import axios, { Axios, AxiosError } from 'axios'
 import { LOGIN_API_URL, REGISTER_API_URL } from '../../Constants'
+import { Client } from '@stomp/stompjs';
+
+//interface PlayerListEntry
+//{
+//	username: String;
+//	myRequest: boolean;
+//	theirRequest: boolean;
+//}
 
 // atuh context vars/functions
 interface AuthContextType {
@@ -12,6 +20,8 @@ interface AuthContextType {
 	register: (username: string, email: string, password: string) => void;
 	logout: () => void;
 	getSession: () => Axios;
+	//getPlayerListSession: () => void;
+	//playerList: PlayerListEntry[];
 	error?: any;
 }
 
@@ -190,6 +200,95 @@ export function AuthProvider({
 			return axiosSession;
 		}, [handleResponseAuthFailure, token]);
 
+	//const connectPlayerList = (currentClient, headerValues) =>
+	//{
+	//	currentClient.subscribe
+	//	(
+	//		'/topic/playerList', 
+	//		message => {
+	//			let newPlayerList = null;
+	//			try {
+	//				newPlayerList = JSON.parse(message.body)
+	//				console.log("Recv playerlist: " + newPlayerList);
+	//			}
+	//			catch (e) {
+	//				console.log("Invalid PlayerList response: " + e)
+	//			}
+
+	//			setPlayerList(newPlayerList);
+	//		},
+	//		headerValues,
+	//	)
+	//}
+
+	////const playerListMessageHandler = (message) =>
+	////{
+	////	let newPlayerList = null;
+
+	////	try {
+	////		newPlayerList = JSON.parse(message.body)
+	////		console.log("Recv playerlist: " + newPlayerList);
+	////	}
+	////	catch (e) {
+	////		console.log("Invalid PlayerList response: " + e)
+	////	}
+
+	////	setPlayerList(newPlayerList);
+	////}
+
+	////const getPlayerListSession = useCallback(async () => 
+	////{
+	////	setLoading(true)
+	////	if (stompSession == null)
+	////	{
+	////		var _client = new Client();
+	////		var headerValues = {
+	////			Authorization: token
+	////		}
+
+	////		_client.configure({
+	////			brokerURL: 'ws://localhost:8080/stomp',
+	////			connectHeaders: headerValues,
+	////			onConnect: () => 
+	////				{
+	////					_client.subscribe
+	////					(
+	////						'/topic/playerList', 
+	////						playerListMessageHandler,
+	////						headerValues,
+	////					)
+	////				},
+	////			onStompError: (frame) => {
+	////				console.log("stompError: " + frame);
+	////			},
+	////			// debug messages
+	////			//debug: (str) => {
+	////			//	console.log(new Date(), str);
+	////			//}
+	////		});
+
+	////		_client.activate();
+	////		setStompSession(_client);
+	////	}
+
+	////	await stompSession.connect
+	////	await stompSession.publish({destination: '/app/playerList', body: 'test playerList'});
+	////	setLoading(false);
+	////}, [token, stompSession])
+
+	//message => {
+	//	let newPlayerList = null;
+	//	try {
+	//		newPlayerList = JSON.parse(message.body)
+	//		console.log("Recv playerlist: " + newPlayerList);
+	//	}
+	//	catch (e) {
+	//		console.log("Invalid PlayerList response: " + e)
+	//	}
+
+	//	setPlayerList(newPlayerList);
+	//},
+
 	// use memo for AuthContext to reduce rendering
 	const memoedValue = useMemo(
 		() => ({
@@ -201,6 +300,8 @@ export function AuthProvider({
 			register,
 			logout,
 			getSession,
+			//getPlayerListSession,
+			//playerList,
 			error,
 		}),
 		[ username, token, loading, isAuthenticated, login, register, logout, getSession, error ]
