@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jonathan.web.entities.User;
-import com.jonathan.web.entities.Tictactoe;
+import com.jonathan.web.entities.TictactoeGame;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Service
-public interface TictactoeRepository extends JpaRepository<User, Integer>
+public interface TictactoeGameRepository extends JpaRepository<User, Integer>
 {
 }
 

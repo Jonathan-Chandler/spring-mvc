@@ -5,12 +5,13 @@ import useAuth from "../authentication/AuthProvider.tsx";
 export default function HeaderComponent(...params) {
     const { isAuthenticated } = useAuth();
 
+//					<div className="collapse navbar-collapse">
     if (isAuthenticated())
 	{
 		return (
 			<header>
 				<nav className="navbar navbar-expand-md navbar-dark bg-dark">
-					<div className="collapse navbar-collapse">
+					<div className="navbar-collapse">
 						<ul className="navbar-nav mr-auto">
 							<li className="nav-item active">
 								<NavLink className="nav-link" href="/welcome">Something</NavLink>
@@ -23,6 +24,9 @@ export default function HeaderComponent(...params) {
 							</li>
 							<li className="nav-item">
 								<NavLink className="nav-link" to="/todos">Todos</NavLink>
+							</li>
+							<li className="nav-item">
+								<NavLink className="nav-link" to="/tictactoe/game/online">Online Game</NavLink>
 							</li>
 						</ul>
 					</div>
@@ -42,7 +46,7 @@ export default function HeaderComponent(...params) {
 		return (
 			<header>
 				<nav className="navbar navbar-expand-md navbar-dark bg-dark">
-					<div className="collapse navbar-collapse">
+					<div className="navbar-collapse">
 						<ul className="navbar-nav mr-auto">
 							<li className="nav-item active">
 								<NavLink className="nav-link" href="/welcome">Something</NavLink>

@@ -2,7 +2,7 @@ package com.jonathan.web.service;
 
 import java.util.List;
 
-import com.jonathan.web.entities.Tictactoe;
+import com.jonathan.web.entities.TictactoeGame;
 import com.jonathan.web.resources.TictactoePlayerListDto;
 
 public interface TictactoeService

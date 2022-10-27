@@ -57,18 +57,132 @@ import java.util.ArrayList;
 //import javax.json.JsonObject;
 //import org.springframework.http.
 import org.slf4j.Logger;
+import java.io.IOException;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+//import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import com.jonathan.web.resources.TestDto;
+import org.springframework.stereotype.Controller;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 //@CrossOrigin(origins = "http://localhost:3000/tictactoe/playerlist")
-@RestController
+@Controller
 @CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000", allowedHeaders="*")
 public class TictactoeController 
 {
   @Autowired
   private TictactoeService tictactoeService;
 
+  private final SimpMessagingTemplate simpMessagingTemplate;
+
   @Autowired
   Logger logger;
 
+  public TictactoeController(SimpMessagingTemplate simpMessagingTemplate) 
+  {
+    this.simpMessagingTemplate = simpMessagingTemplate;
+  }
+
+  // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
+  @MessageMapping("/greetings")
+  // send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
+  //@SendTo("/topic/messages")
+  //public List<TictactoePlayerListDto> getMessages(String clientMessage)
+  public void getMessages(String greeting)
+  {
+	  logger.info("client message");
+	  logger.info("client message: " + greeting);
+	  String text = "[" + Instant.now() + "]: " + greeting;
+	  simpMessagingTemplate.convertAndSend("/topic/greetings", text);
+
+	  //return new TestDto("test");
+	  //return clientMessage;
+	  //logger.info("get client message: " + clientMessage);
+      //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+	  //return playerList;
+  }
+
+  // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
+  @MessageMapping("/playerList")
+  // send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
+  //@SendTo("/topic/messages")
+  //public List<TictactoePlayerListDto> getMessages(String clientMessage)
+  public void getPlayerList(String receive)
+  {
+	  logger.info("playerList message: " + receive);
+      List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+
+	  simpMessagingTemplate.convertAndSend("/topic/playerList", playerList);
+
+	  //return new TestDto("test");
+	  //return clientMessage;
+	  //logger.info("get client message: " + clientMessage);
+      //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+	  //return playerList;
+  }
+
+
+////  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+////
+////  private void sleep(int seconds, SseEmitter sseEmitter) {
+////    try {
+////      Thread.sleep(seconds * 1000);
+////    } catch (InterruptedException e) {
+////      e.printStackTrace();
+////      sseEmitter.completeWithError(e);
+////    }
+////  }
+////
+////  @GetMapping("/tictactoe/playerlist")
+////  @CrossOrigin
+////  public SseEmitter streamDateTime() {
+////
+////    //SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
+////    SseEmitter sseEmitter = new SseEmitter();
+////
+////    sseEmitter.onCompletion(() -> logger.info("SseEmitter is completed"));
+////    sseEmitter.onTimeout(() -> logger.info("SseEmitter is timed out"));
+////    sseEmitter.onError((ex) -> logger.info("SseEmitter got error:", ex));
+////
+////	executor.execute(() -> 
+////	{
+////		try 
+////		{
+////			List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+////			sseEmitter.send(playerList);
+////
+////			//sleep(10, sseEmitter);
+////		} catch (IOException e) {
+////			e.printStackTrace();
+////			sseEmitter.completeWithError(e);
+////		}
+////		sseEmitter.complete();
+////	});
+////	executor.shutdown();
+////
+////    //executor.execute(() -> {
+////    //  for (int i = 0; i < 15000; i++) {
+////    //    try {
+////    //      List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+////    //      sseEmitter.send(playerList);
+////
+////    //      sleep(10, sseEmitter);
+////    //    } catch (IOException e) {
+////    //      e.printStackTrace();
+////    //      sseEmitter.completeWithError(e);
+////    //    }
+////    //  }
+////    //  sseEmitter.complete();
+////    //});
+////
+////    logger.info("Controller exits");
+////    return sseEmitter;
+////  }
   //@RequestMapping(
   //  value = {"/tictactoe/playerlist"},
   //  method = RequestMethod.GET,
@@ -76,39 +190,38 @@ public class TictactoeController
   //  consumes = "application/json"
   //)
   //@ResponseBody
-  @GetMapping("/tictactoe/playerlist")
-  public List<TictactoePlayerListDto> login(@RequestHeader(value="Authorization") String authHeader)
-  {
-    logger.info("get auth header: " + authHeader);
-    
-
-    
-    //HashMap<String, String> responseJson = new HashMap<>();
-    //String loginJwt;
-
-    //try 
-    //{
-    //  loginJwt = userService.login(userLogin);
-    //} catch (Exception e) 
-    //{
-    //  return new ResponseEntity<>("Failed to get player list: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-    //}
-
-    //HttpHeaders responseHeader = new HttpHeaders();
-    //responseHeader.add("Authorization", loginJwt);
-
-    //responseJson.put("Auth", loginJwt);
-    //System.out.println(responseJson);
-    
-    List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
-    //TictactoePlayerListDto player = new TictactoePlayerListDto("username", true, true);
-    //List<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
-
-    return playerList;
-    // return ResponseEntity.ok()
-    //   .headers(responseHeader)
-    //   .body(playerList.toString());
-  }
+////  public List<TictactoePlayerListDto> getPlayerList(@RequestHeader(value="Authorization") String authHeader)
+////  {
+////    logger.info("get auth header: " + authHeader);
+////    
+////
+////    
+////    //HashMap<String, String> responseJson = new HashMap<>();
+////    //String loginJwt;
+////
+////    //try 
+////    //{
+////    //  loginJwt = userService.login(userLogin);
+////    //} catch (Exception e) 
+////    //{
+////    //  return new ResponseEntity<>("Failed to get player list: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+////    //}
+////
+////    //HttpHeaders responseHeader = new HttpHeaders();
+////    //responseHeader.add("Authorization", loginJwt);
+////
+////    //responseJson.put("Auth", loginJwt);
+////    //System.out.println(responseJson);
+////    
+////    List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+////    //TictactoePlayerListDto player = new TictactoePlayerListDto("username", true, true);
+////    //List<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
+////
+////    return playerList;
+////    // return ResponseEntity.ok()
+////    //   .headers(responseHeader)
+////    //   .body(playerList.toString());
+////  }
 //  @Autowired
 //  private UserService userService;
 //

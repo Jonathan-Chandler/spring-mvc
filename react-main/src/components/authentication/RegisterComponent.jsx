@@ -9,9 +9,9 @@ export default function RegisterComponent(...props) {
 	// username/password form data
 	const [data, setData] = useState(
 		{
-			username: "test_user1",
+			username: "test_user123",
 			email: "test_user1@email.com",
-			password: "password3",
+			password: "password123",
 		});
 	const [registerAttempted, setRegisterAttempted] = useState(false);
 	const [registerFailed, setRegisterFailed] = useState(false);

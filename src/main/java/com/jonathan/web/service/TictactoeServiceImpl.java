@@ -3,7 +3,7 @@ package com.jonathan.web.service;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.jonathan.web.entities.Tictactoe;
+import com.jonathan.web.entities.TictactoeGame;
 import com.jonathan.web.resources.TictactoePlayerListDto;
 import com.jonathan.web.resources.OnlineUserDto;
 import com.jonathan.web.service.TictactoeService;
