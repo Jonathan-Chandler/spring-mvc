@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@stomp/stompjs": "^6.1.2",
-    "react-hook-form": "^7.36.1"
-  }
-}

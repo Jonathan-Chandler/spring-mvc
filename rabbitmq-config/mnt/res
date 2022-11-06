@@ -1,0 +1,2 @@
+2022-11-03 23:57:37.770 [debug] <0.928.0> Supervisor {<0.928.0>,tcp_listener_sup} started tcp_listener:start_link({127,0,0,1}, 61613, {rabbit_networking,tcp_listener_started,[stomp,[{sndbuf,196608},{send_timeout,120},{recbuf,196608},...]]}, {rabbit_networking,tcp_listener_stopped,[stomp,[{sndbuf,196608},{send_timeout,120},{recbuf,196608},...]]}, "STOMP TCP listener") at pid <0.945.0>
+

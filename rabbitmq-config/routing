@@ -1,0 +1,9 @@
+
+/exchange -- SEND to arbitrary routing keys and SUBSCRIBE to arbitrary binding patterns;
+/queue -- SEND and SUBSCRIBE to queues managed by the STOMP gateway;
+/amq/queue -- SEND and SUBSCRIBE to queues created outside the STOMP gateway;
+/topic -- SEND and SUBSCRIBE to transient and durable topics;
+/temp-queue/ -- create temporary queues (in reply-to headers only).
+
+For SEND frames, the message is sent to the amq.topic exchange with the routing key <name>.
+For SUBSCRIBE frames, an autodeleted, non-durable queue is created and bound to the amq.topic exchange with routing key <name>. A subscription is created against the queue.

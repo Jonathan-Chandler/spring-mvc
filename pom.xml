@@ -38,6 +38,12 @@
       <artifactId>spring-session-core</artifactId>
     </dependency>
 
+	<!-- AMQP / rabbitmq -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-amqp</artifactId>
+	</dependency>
+
     <!-- javax parameter validation -->
     <dependency>
         <groupId>javax.validation</groupId>

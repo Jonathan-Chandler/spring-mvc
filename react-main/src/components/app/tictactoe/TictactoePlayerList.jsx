@@ -6,113 +6,117 @@ import { PLAYER_LIST_API_URL } from '../../../Constants';
 //import SockJsClient from 'react-stomp';
 //import SockJS from 'sockjs-client';
 //import Stomp from 'stompjs';
-import { Client } from '@stomp/stompjs';
 import useTictactoe from './TictactoeProvider.tsx'
 //import {StompSessionProvider, useSubscription} from 'react-stomp';
 //import { Stomp, Client } from 'stompjs';
 
+//import { Client } from '@stomp/stompjs';
 
 export default function TictactoePlayerList()
 {
-	//const navigate = useNavigate();
-	const { username, token } = useAuth();
-	const [localMessage, setLocalMessage] = useState("");
-	const [messages, setMessages] = useState("");
-	const [stompSession, setStompSession] = useState(null);
-	const [playerList, setPlayerList] = useState(null)
-	const [initialLoad, setInitialLoad] = useState(true)
-
-	useEffect(() => 
-    {
-		if (initialLoad)
-		{
-			setInitialLoad(false);
-
-			var _client = new Client();
-			var headerValues = {
-				login: username,
-				passcode: token,
-				'Authorization': token
-			}
-
-			_client.configure({
-				brokerURL: 'ws://localhost:8080/stomp',
-				connectHeaders: headerValues,
-				onConnect: () => 
-					{
-						_client.subscribe
-						(
-							'/topic/playerList', 
-							playerListMessageHandler,
-							headerValues,
-						)
-					},
-				onStompError: (frame) => {
-					console.log("stompError: " + frame);
-				},
-				// debug messages
-				//debug: (str) => {
-				//	console.log(new Date(), str);
-				//}
-			});
-
-			_client.activate();
-			setStompSession(_client);
-		}
-	}, [initialLoad, stompSession, username, token])
-
-	const refreshPlayerListClicked = () => {
-		stompSession.publish({destination: '/app/playerList', body: 'test playerList'});
-	}
-
-	const playerListMessageHandler = (message) =>
-	{
-		let newPlayerList = null;
-
-		try {
-			newPlayerList = JSON.parse(message.body)
-			console.log("Recv playerlist: " + newPlayerList);
-		}
-		catch (e) {
-			console.log("Invalid PlayerList response: " + e)
-		}
-
-		setPlayerList(newPlayerList);
-	}
-
-
-	return (
-		<div>
-			<div>
-				<h1>Player List</h1>
-				<p /><button className="btn btn-success" onClick={refreshPlayerListClicked}>Refresh</button>
-				<div className="container">
-					<table className="table">
-						<thead>
-							<tr>
-								<th>Username</th>
-								<th>IsRequesting</th>
-								<th>YouRequested</th>
-								<th>InitiateRequest</th>
-							</tr>
-						</thead>
-						<tbody>
-							{
-								playerList && playerList.map(
-									player =>
-										<tr key={player.username}>
-											<td>{player.username}</td>
-											<td>{player.myRequest ? "Yes" : "No"}</td>
-											<td>{player.theirRequest ? "Yes" : "No"}</td>
-										</tr>
-								)
-							}
-						</tbody>
-					</table>
-				</div>
-			</div>
+	return (<div>
 		</div>
-	)
+		);
+//	//const navigate = useNavigate();
+//	const { username, token } = useAuth();
+//	const [localMessage, setLocalMessage] = useState("");
+//	const [messages, setMessages] = useState("");
+//	const [stompSession, setStompSession] = useState(null);
+//	const [playerList, setPlayerList] = useState(null)
+//	const [initialLoad, setInitialLoad] = useState(true)
+//
+//	useEffect(() => 
+//    {
+//		if (initialLoad)
+//		{
+//			setInitialLoad(false);
+//
+//			var _client = new Client();
+//			var headerValues = {
+//				login: username,
+//				passcode: token,
+//				'Authorization': token
+//			}
+//
+//			_client.configure({
+//				brokerURL: 'ws://localhost:8080/stomp',
+//				connectHeaders: headerValues,
+//				onConnect: () => 
+//					{
+//						_client.subscribe
+//						(
+//							'/topic/playerList', 
+//							playerListMessageHandler,
+//							headerValues,
+//						)
+//					},
+//				onStompError: (frame) => {
+//					console.log("stompError: " + frame);
+//				},
+//				// debug messages
+//				//debug: (str) => {
+//				//	console.log(new Date(), str);
+//				//}
+//			});
+//
+//			_client.activate();
+//			setStompSession(_client);
+//		}
+//	}, [initialLoad, stompSession, username, token])
+//
+//	const refreshPlayerListClicked = () => {
+//		stompSession.publish({destination: '/app/playerList', body: 'test playerList'});
+//	}
+//
+//	const playerListMessageHandler = (message) =>
+//	{
+//		let newPlayerList = null;
+//
+//		try {
+//			newPlayerList = JSON.parse(message.body)
+//			console.log("Recv playerlist: " + newPlayerList);
+//		}
+//		catch (e) {
+//			console.log("Invalid PlayerList response: " + e)
+//		}
+//
+//		setPlayerList(newPlayerList);
+//	}
+//
+//
+//	return (
+//		<div>
+//			<div>
+//				<h1>Player List</h1>
+//				<p /><button className="btn btn-success" onClick={refreshPlayerListClicked}>Refresh</button>
+//				<div className="container">
+//					<table className="table">
+//						<thead>
+//							<tr>
+//								<th>Username</th>
+//								<th>IsRequesting</th>
+//								<th>YouRequested</th>
+//								<th>InitiateRequest</th>
+//							</tr>
+//						</thead>
+//						<tbody>
+//							{
+//								playerList && playerList.map(
+//									player =>
+//										<tr key={player.username}>
+//											<td>{player.username}</td>
+//											<td>{player.myRequest ? "Yes" : "No"}</td>
+//											<td>{player.theirRequest ? "Yes" : "No"}</td>
+//										</tr>
+//								)
+//							}
+//						</tbody>
+//					</table>
+//				</div>
+//			</div>
+//		</div>
+//	)
+}
 
 //
 //	useEffect(() => {
@@ -451,7 +455,6 @@ export default function TictactoePlayerList()
     //            </div>
     //        </>
     //    )        
-}
 //                                        <tr key={player.id}>
 //                                            <td>
 //												{!player.theirRequest && <button className="btn btn-warning" onClick={() => requestMatchClicked(player.username)}>Request</button>}

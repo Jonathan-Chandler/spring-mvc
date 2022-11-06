@@ -17,6 +17,7 @@ import { AuthProvider } from '../authentication/AuthProvider.tsx'
 import { TictactoeProvider } from './tictactoe/TictactoeProvider.tsx'
 import 'bootstrap/dist/css/bootstrap.css';
 import '../css/AppMain.css';
+import TictactoeAmqpTest from './tictactoe/TictactoeAmqpTest.jsx'
 
 export default function AppMain(...props) 
 {
@@ -33,6 +34,7 @@ export default function AppMain(...props)
 						<Route exact path="/tictactoe/game/ai" element={<AiGame />} />
 						<Route exact path="/tictactoe/game/online" element={<OnlineGame />} />
 						<Route exact path="/tictactoe/playerlist" element={<TictactoePlayerList />} />
+						<Route exact path="/tictactoe/amqp" element={<TictactoeAmqpTest />} />
 						<Route exact path="/register" element={<RegisterComponent />} />
 						<Route exact path="/login" element={<LoginComponent />} />
 						<Route exact path="/logout" element={<LogoutComponent />} />

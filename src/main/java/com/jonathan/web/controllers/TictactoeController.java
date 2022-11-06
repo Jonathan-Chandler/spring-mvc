@@ -1,4 +1,4 @@
-package com.jonathan.web.controller.authentication;
+package com.jonathan.web.controllers;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -66,115 +66,129 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import com.jonathan.web.resources.TestDto;
 import org.springframework.stereotype.Controller;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
+//import org.springframework.messaging.simp.user.SimpUserRegistry;
 
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+//import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.messaging.simp.user.SimpUser;
+//import org.springframework.messaging.simp.user.SimpUser;
 import java.security.Principal;
+import com.jonathan.web.controllers.RSender;
 
 //@CrossOrigin(origins = "http://localhost:3000/tictactoe/playerlist")
 @Controller
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders="*")
 public class TictactoeController 
 {
-  @Autowired
-  private TictactoeService tictactoeService;
+	@Autowired
+	private TictactoeService tictactoeService;
 
-  @Autowired
-  private SimpUserRegistry simpUserRegistry;
+	//@Autowired
+	//private SimpUserRegistry simpUserRegistry;
 
-  private final SimpMessagingTemplate simpMessagingTemplate;
+	//private final SimpMessagingTemplate simpMessagingTemplate;
 
-  @Autowired
-  Logger logger;
+	
+	//@Autowired
+	//RSender rabbitSender;
 
-  public TictactoeController(SimpMessagingTemplate simpMessagingTemplate) 
-  {
-    this.simpMessagingTemplate = simpMessagingTemplate;
-  }
-  // send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
-  //@SendTo("/topic/messages")
-  //public List<TictactoePlayerListDto> getMessages(String clientMessage)
+	@Autowired
+	Logger logger;
 
-  // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
-  @MessageMapping("/greetings")
-  public void getMessages(String greeting)
-  {
-	  logger.info("client message");
-	  logger.info("client message: " + greeting);
-	  String text = "[" + Instant.now() + "]: " + greeting;
-	  simpMessagingTemplate.convertAndSend("/topic/greetings", text);
+	//public TictactoeController(SimpMessagingTemplate simpMessagingTemplate) 
+	//{
+	//	this.simpMessagingTemplate = simpMessagingTemplate;
+	//}
+	// send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
+	//@SendTo("/topic/messages")
+	//public List<TictactoePlayerListDto> getMessages(String clientMessage)
 
-	  //return new TestDto("test");
-	  //return clientMessage;
-	  //logger.info("get client message: " + clientMessage);
-      //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
-	  //return playerList;
-  }
-
-	@EventListener
-	public void handleSessionSubscribeEvent(SessionSubscribeEvent event)
+	// handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
+	//@MessageMapping("/greetings")
+	@GetMapping(value="/greetings")
+	public void getMessages()
 	{
-		logger.info("sessionsubscribeevent: ");
-		GenericMessage message = (GenericMessage) event.getMessage();
-		String simpDestination = (String) message.getHeaders().get("simpDestination");
-		String authHeader = (String) message.getHeaders().get("Authorization");
-		logger.info("allHeaders: " + message.getHeaders().toString());
-		logger.info("simpDestination: " + simpDestination);
-		logger.info("authHeader: " + authHeader);
+		logger.info("sent test message to rsend");
+		//rabbitSender.send("test-greetings");
+		//logger.info("client message");
+		//logger.info("client message: " + greeting);
+		//String text = "[" + Instant.now() + "]: " + greeting;
+		//simpMessagingTemplate.convertAndSend("/topic/greetings", text);
 
-		if (simpDestination.startsWith("/topic/playerList"))
-		{
-			// read user name
-			Principal userPrincipal = event.getUser();
-			if (userPrincipal != null)
-				logger.info("userPrincipal: " + userPrincipal.toString());
-			else
-				logger.info("userPrincipal: null");
-		}
 
-		//userPrincipal.getName();
+		//return new TestDto("test");
+		//return clientMessage;
+		//logger.info("get client message: " + clientMessage);
+		//List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+		//return playerList;
 	}
 
-  //@EventListener
-  //public void handleSubscribeEvent(SessionSubscribeEvent event)
-  //{
-  //  simpMessagingTemplate.convertAndSendToUser(event.getUser().getName(), "/greetings", "greetings");
-  //}
+	//@EventListener
+	//public void handleSessionSubscribeEvent(SessionSubscribeEvent event)
+	//{
+	//	//getNativeHeader()
+	//	logger.info("sessionsubscribeevent: ");
+	//	GenericMessage message = (GenericMessage) event.getMessage();
+	//	String simpDestination = (String) message.getHeaders().get("simpDestination");
+	//	String authHeader = (String) message.getHeaders().get("Authorization");
+	//	String nativeHeaders = message.getHeaders().get("nativeHeaders").toString();
+	//	logger.info("nativeHeaders: " + nativeHeaders);
+	//	logger.info("allHeaders: " + message.getHeaders().toString());
+	//	logger.info("simpDestination: " + simpDestination);
+	//	logger.info("authHeader: " + authHeader);
 
-  // handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
-  @MessageMapping("/playerList")
-  // send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
-  //@SendTo("/topic/messages")
-  //public List<TictactoePlayerListDto> getMessages(String clientMessage)
-  public void getPlayerList()
-  {
-    ArrayList<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
-    List<String> connections = this.simpUserRegistry
-            .getUsers()
-            .stream()
-            .map(SimpUser::getName)
-            .collect(Collectors.toList());
-	  logger.info("playerList message: ");
+	//	if (simpDestination.startsWith("/topic/playerList"))
+	//	{
+	//		// read user name
+	//		Principal userPrincipal = event.getUser();
+	//		if (userPrincipal != null)
+	//			logger.info("userPrincipal: " + userPrincipal.toString());
+	//		else
+	//			logger.info("userPrincipal: null");
+	//	}
 
-    for (int i = 0; i < connections.size(); i++)
-    {
-      playerList.add(new TictactoePlayerListDto(connections[i], true, true));
-    }
+	//	//userPrincipal.getName();
+	//}
 
-    //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+	//@EventListener
+	//public void handleSubscribeEvent(SessionSubscribeEvent event)
+	//{
+	//  simpMessagingTemplate.convertAndSendToUser(event.getUser().getName(), "/greetings", "greetings");
+	//}
 
-	  simpMessagingTemplate.convertAndSend("/topic/playerList", playerList);
-
-	  //return new TestDto("test");
-	  //return clientMessage;
-	  //logger.info("get client message: " + clientMessage);
-      //List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
-	  //return playerList;
-  }
+	// handle messages from /tictactoe/playerlist stompClient.send("/tictactoe/playerlist", ...)
+//	@MessageMapping("/playerList")
+//	// send return value to /tictactoe/playerlist (stompClient.subscribe('/tictactoe/playerlist'))
+//	//@SendTo("/topic/messages")
+//	//public List<TictactoePlayerListDto> getMessages(String clientMessage)
+//	public void getPlayerList()
+//	{
+//		ArrayList<TictactoePlayerListDto> playerList = new ArrayList<TictactoePlayerListDto>();
+//		List<String> connections = this.simpUserRegistry
+//			.getUsers()
+//			.stream()
+//			.map(u -> u.getName())
+//			.collect(Collectors.toList());
+////			.collect(Collectors.toList());
+////			.map(SimpUser::getName)
+//		logger.info("playerList size: " + connections.size());
+//
+//		for (int i = 0; i < connections.size(); i++)
+//		{
+//			playerList.add(new TictactoePlayerListDto(connections.get(i), true, true));
+//		}
+//
+//		//List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+//
+//		simpMessagingTemplate.convertAndSend("/topic/playerList", playerList);
+//
+//		//return new TestDto("test");
+//		//return clientMessage;
+//		//logger.info("get client message: " + clientMessage);
+//		//List<TictactoePlayerListDto> playerList = tictactoeService.getPlayerList();
+//		//return playerList;
+//	}
 }
 

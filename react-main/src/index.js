@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import AppMain from './components/app/AppMain';
+//import {Buffer} from 'buffer';
+//window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
