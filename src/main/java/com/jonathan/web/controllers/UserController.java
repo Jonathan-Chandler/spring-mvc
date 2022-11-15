@@ -48,12 +48,18 @@ import com.jonathan.web.dao.UserRepository;
 import com.jonathan.web.resources.UserRegistrationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
+
+// rabbitmq request
+import org.springframework.web.bind.annotation.RequestParam;
+import com.jonathan.web.resources.rabbitmq.*;
 //import javax.json.JsonObject;
 //import org.springframework.http.
 import org.slf4j.Logger;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = {"http://localhost:3000"})
+@CrossOrigin(origins = "*")
 public class UserController 
 {
   @Autowired
@@ -71,6 +77,7 @@ public class UserController
   @ResponseBody
   public ResponseEntity<String> login(@RequestBody UserLoginDto userLogin) 
   {
+	logger.error("login call");
     HashMap<String, String> responseJson = new HashMap<>();
     String loginJwt;
 
@@ -102,6 +109,7 @@ public class UserController
   @ResponseBody
   public ResponseEntity<String> register(@RequestBody UserRegistrationDto registrationRequest) 
   {
+	logger.error("Registration call");
     System.out.println(registrationRequest);
 
     try {
@@ -114,6 +122,86 @@ public class UserController
 
       return new ResponseEntity<>("Failed to register: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+  }
+
+//username - the name of the user
+//password - the password provided (may be missing if e.g. rabbitmq-auth-mechanism-ssl is used)
+
+  //@RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST })
+  //@RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST }, consumes="application/json")
+  @RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST }, consumes="text/plain")
+  //public String rabbitUserPath(@RequestBody UserPathDto userPathDto) 
+  public String rabbitUser(@RequestParam("username") String username, @RequestParam("password") String password)
+  {
+	  logger.error("rabbitUser call");
+	  HttpHeaders responseHeader = new HttpHeaders();
+	  HashMap<String, String> responseJson = new HashMap<>();
+	  String loginJwt;
+	  //logger.info("Get /rabbitmq/user request: " + userPathDto.toString());
+	  logger.info("Get /rabbitmq/user request: " + username + ":" + password);
+	  if (username.equals("guest")
+	     && password.equals("guest"))
+		 {
+			 return "allow administrator";
+		 }
+	//  if (userPathDto.getUsername().equals("guest")
+	//     && userPathDto.getPassword().equals("guest"))
+	//	 {
+	//		 return "allow administrator";
+	//	 }
+
+	  try 
+	  {
+		  // convert to standard login dto
+		  //UserLoginDto loginDto = new UserLoginDto(userPathDto.getUsername(), userPathDto.getPassword());
+		  UserLoginDto loginDto = new UserLoginDto(username, password);
+		  loginJwt = userService.login(loginDto);
+	  } catch (Exception e) 
+	  {
+		  return "deny";
+	  }
+
+	  //allow [list of tags] - (for user_path only) - allow access, and mark the user as an having the tags listed
+	  return "allow ";
+  }
+
+  //vhost_path
+  //username - the name of the user
+  //vhost - the name of the virtual host being accessed
+  //ip - the client ip address
+  //Note that you cannot create arbitrary virtual hosts using this plugin; you can only determine whether your users can see / access the ones that exist.
+  @RequestMapping(path="/rabbitmq/vhost", method={ RequestMethod.GET, RequestMethod.POST })
+  public String rabbitVhostPath(@RequestBody VhostPathDto vhostPathDto) 
+  {
+	  logger.info("Get /rabbitmq/vhost request: " + vhostPathDto.toString());
+	  return "allow";
+  }
+	//resource_path
+	//username - the name of the user
+	//vhost - the name of the virtual host containing the resource
+	//resource - the type of resource (exchange, queue, topic)
+	//name - the name of the resource
+	//permission - the access level to the resource (configure, write, read) - see the Access Control guide for their meaning
+  @RequestMapping(path="/rabbitmq/resource", method={ RequestMethod.GET, RequestMethod.POST })
+  public String rabbitResourcePath(@RequestBody ResourcePathDto resourcePathDto) 
+  {
+	  logger.info("Get /rabbitmq/resource request: " + resourcePathDto.toString());
+	  return "allow";
+  }
+	//
+	//topic_path
+	//username - the name of the user
+	//vhost - the name of the virtual host containing the resource
+	//resource - the type of resource (topic in this case)
+	//name - the name of the exchange
+	//permission - the access level to the resource (write or read)
+	//routing_key - the routing key of a published message (when the permission is write) or routing key of the queue binding (when the permission is read)
+	//See topic authorisation for more information about topic authorisation.
+  @RequestMapping(path="/rabbitmq/topic", method={ RequestMethod.GET, RequestMethod.POST })
+  public String rabbitTopicPath(@RequestBody TopicPathDto topicPathDto) 
+  {
+	  logger.info("Get /rabbitmq/topic request: " + topicPathDto.toString());
+	  return "allow";
   }
 
 //  {

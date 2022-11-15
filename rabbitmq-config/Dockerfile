@@ -1,6 +1,6 @@
 FROM rabbitmq:3.8-management
 
-RUN rabbitmq-plugins enable rabbitmq_management rabbitmq_management_agent rabbitmq_mqtt rabbitmq_web_stomp rabbitmq_stomp rabbitmq_web_dispatch rabbitmq_prometheus
+RUN rabbitmq-plugins enable rabbitmq_management rabbitmq_management_agent rabbitmq_mqtt rabbitmq_web_stomp rabbitmq_stomp rabbitmq_web_dispatch rabbitmq_prometheus rabbitmq_auth_backend_http
 
 RUN apt-get update \
 	&& apt-get install openssl -y
@@ -19,9 +19,11 @@ EXPOSE 5672 15672 61611 61612 61613 61614
 RUN ls -al /
 RUN ls -al /etc/rabbitmq
 COPY ./rabbitmq.config /etc/rabbitmq/conf.d/10-defaults.conf
+COPY ./advanced.config /etc/rabbitmq/advanced.conf
 RUN mkdir -p /backup
 RUN chown -R rabbitmq:rabbitmq /mnt
 RUN chown -R rabbitmq:rabbitmq /backup
+# rabbitmqctl authenticate_user "test_user123" "password123"
 
 #RUN rabbitmqctl add_user "guest123" "guest123"
 

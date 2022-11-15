@@ -37,6 +37,8 @@
 
 # sudo docker run -p 5672:5672 -p 15672:15672 -p 25672:25672 -p 61613:61613 --network host rabbitmq-custom
 #sudo docker run -p 5672:5672 -p 15672:15672 -p 25672:25672 -p 61613:61613 -v $(pwd):/backup --network host rabbitmq-custom
-sudo docker run -p 1883:1883 -p 5672:5672 -p 15672:15672 -p 25672:25672 -p 61611:61611 -p 61612:61612 -p 61613:61613 -p 61614:61614 -v $(pwd):/backup rabbitmq-custom
+
+# expose ports for react / mariadb / spring, mount volume for spring
+sudo docker run -p 3000:3000 -p 3306:3306 -p 8080:8080 -v $(pwd)/..:/home/user spring-mvc
 
 #docker run -d -p 5672:5672 -p 15672:15672 -p 61613:61613 --name rabbitmq-broker rabbitmq:3-management

@@ -10,55 +10,18 @@ import { PLAYER_LIST_API_URL } from '../../../Constants';
 //import SockJS from 'sockjs-client';
 import Stomp from 'stompjs'
 
-//import { AMQPClient } from '@cloudamqp/amqp-client';
-//import { AMQPWebSocketClient } from 'amqp-websocket-client.mjs'
-//import { AMQPClient, AMQPWebSocketClient } from '@cloudamqp/amqp-client';
-//'amqp-websocket-client.mjs'
-
-//var amqp = require('amqplib/callback_api');
-
-//var ws = new WebSocket("ws://localhost:61613/hello");
-////var ws = new SockJS('http://127.0.0.1:15672/stomp')
-//var client = Stomp.over(ws)
-//client.connectHeaders = {
-//	login: 'guest',
-//	passcode: 'guest',
-//};
-//
-//client.debug = onDebug;
-//
-//function onDebug(m)
-//{
-//	console.log("STOMP_DEBUG: " + m);
-//}
-//
-//function onConnect() {
-//	console.log("connected")
-//	//client.subscribe('/topic/messages', message => {
-//	client.subscribe('/hello', message => {
-//		console.log(message);
-//		//setState({mess: message.body});
-//	});
-//}
-//
-//function onError() {
-//	console.log("Error")
-//}
-//
-//client.connect('guest', 'guest', onConnect, onError, '/');
-//
 export default function TictactoeAmqpTest()
 {
 	const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:61611/ws');
 	const [stompTopic, setStompTopic] = useState('/topic/hello');
-	const [stomp_subscribe_header] = useState({});
+	const [stomp_subscribe_header] = useState({login: 'test_user123', passcode: 'password124'});
 	const [webSockSession, setWebSockSession] = useState(null);
 	const [stompSession, setStompSession] = useState(null);
 	//const [playerList, setPlayerList] = useState([]);
 	const [playerList, setPlayerList] = useState([{}]);
 	//const [stomp_headers] = useState({login: 'guest', passcode: 'guest'});
-	const [stomp_headers] = useState({login: 'guest', passcode: 'guest'});
-	const [stomp_send_header] = useState({login: 'stomp_send_guest', destination: '/topic/hello'});
+	const [stomp_headers] = useState({login: 'test_user123', passcode: 'password123'});
+	//const [stomp_send_header] = useState({login: 'test_user123', passcode: 'password123', destination: '/topic/hello'});
 	//const stomp_send_header = {login: 'guest', passcode: 'guest', destination: '/topic/hello'};
 	//const [debugWsEnabled, setDebugWsEnabled] = useState(true);
 	const [debugStompEnabled, setDebugStompEnabled] = useState(true);
@@ -148,14 +111,15 @@ export default function TictactoeAmqpTest()
 		}
 
 		// connect using guest credentials in header
-		client.connect(stomp_headers, on_connect, on_error);
+		//client.connect(stomp_headers, on_connect, on_error);
 		//client.connect('guest', 'guest', on_connect, on_error, '/');
+		client.connect('test_user123', 'password123', on_connect, on_error, '/');
 
 		// set ws/stomp session after initialized
 		setWebSockSession(ws);
 		setStompSession(client);
 
-	},[debugWsEnabled, debugStompEnabled, socketUrl, stompTopic])
+	},[debugWsEnabled, debugStompEnabled, socketUrl, stompTopic, onMessage, stomp_headers, stomp_subscribe_header])
 
 	// send message to stomp topic
 	const sendMessage = () => 
@@ -164,7 +128,7 @@ export default function TictactoeAmqpTest()
 		console.log("send " + data)
 
 		//stompSession.send(stompTopic, {}, JSON.stringify(data));
-		stompSession.send(stompTopic, stomp_send_header, JSON.stringify(data));
+		stompSession.send(stompTopic, stomp_subscribe_header, JSON.stringify(data));
 	};
 //{stompMessage}
 
@@ -215,6 +179,43 @@ export default function TictactoeAmqpTest()
 		</div>
 	);
 
+//import { AMQPClient } from '@cloudamqp/amqp-client';
+//import { AMQPWebSocketClient } from 'amqp-websocket-client.mjs'
+//import { AMQPClient, AMQPWebSocketClient } from '@cloudamqp/amqp-client';
+//'amqp-websocket-client.mjs'
+
+//var amqp = require('amqplib/callback_api');
+
+//var ws = new WebSocket("ws://localhost:61613/hello");
+////var ws = new SockJS('http://127.0.0.1:15672/stomp')
+//var client = Stomp.over(ws)
+//client.connectHeaders = {
+//	login: 'guest',
+//	passcode: 'guest',
+//};
+//
+//client.debug = onDebug;
+//
+//function onDebug(m)
+//{
+//	console.log("STOMP_DEBUG: " + m);
+//}
+//
+//function onConnect() {
+//	console.log("connected")
+//	//client.subscribe('/topic/messages', message => {
+//	client.subscribe('/hello', message => {
+//		console.log(message);
+//		//setState({mess: message.body});
+//	});
+//}
+//
+//function onError() {
+//	console.log("Error")
+//}
+//
+//client.connect('guest', 'guest', onConnect, onError, '/');
+//
 		// (Object) subscribe(destination, callback, headers = {})
 		//client.subscribe(
 		//	stompTopic, 

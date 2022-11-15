@@ -1,0 +1,2 @@
+2022-11-06 06:39:44.969 [debug] <0.3388.0> Supervisor {<0.3388.0>,amqp_connection_sup} started amqp_gen_connection:start_link(<0.3389.0>, {amqp_params_direct,<<"test_user123">>,{encrypted,<<"uThIBoLGbLCyLXySO75ointEaQAlvlrGqC+7nCazaGxVQ...">>},...}) at pid <0.3390.0>
+

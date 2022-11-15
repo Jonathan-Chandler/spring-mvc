@@ -1,0 +1,10 @@
+3000 - react
+3306 - SQL
+8080 - spring
+5672 - default rabbit
+15672 - management
+61611 - web_stomp
+61612 - ssl_web_stomp
+61613 - stomp
+61614 - ssl_stomp
+

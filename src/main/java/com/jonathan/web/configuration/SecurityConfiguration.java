@@ -277,6 +277,10 @@ public class SecurityConfiguration
 			//      .antMatchers("/todos/**")
 			// don't filter login or register api
 			.antMatchers("/login")
+			.antMatchers("/rabbitmq/user")
+			.antMatchers("/rabbitmq/vhost")
+			.antMatchers("/rabbitmq/resource")
+			.antMatchers("/rabbitmq/topic")
 			.antMatchers("/tictactoe/*")
 			.antMatchers("/tictactoe/playerlist")
 			.antMatchers("/tictactoe/playerlist/*")
