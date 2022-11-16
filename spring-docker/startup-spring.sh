@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # sqldb (port 3306)
-systemctl start mariadb
+mariadbd &
 
 # launch spring boot (port 8080)
 /home/user/run.sh &
