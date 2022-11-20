@@ -24,7 +24,6 @@ public class Todo
 
 	@Column(name="target_date")
 	private java.sql.Date targetDate;
-	//private java.util.Date targetDate;
 
 	public Todo()
 	{
