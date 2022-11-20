@@ -41,22 +41,12 @@
 #sudo docker run -p 3000:3000 -p 3306:3306 -p 8080:8080 -v $(pwd)/..:/home/user spring-mvc
 
 # expose ports for react / mariadb / spring, also mount the volume that contains web app binaries
-# 	--user user:user		\
-
-# 3000 - react
-# 8080 - java spring
 sudo docker run -i -t		\
-	--user mysql:mysql		\
-	--ip 172.17.0.2			\
-	-p 3000:3000			\
-	-p 8080:8080			\
+	--ip 172.17.0.3			\
+	-p 3306:3306 			\
 	-v $(pwd)/..:/home/user \
-	-v $(pwd)/../../mysql-database/mysql:/var/lib/mysql \
-	-w /home/user			\
-	spring-mvc 
-
-#	-p 3306:3306			\
-#	-p 8080:8080 			\
+	--user mysql:mysql		\
+	sql-backend
 
 # mariadbd as root
 

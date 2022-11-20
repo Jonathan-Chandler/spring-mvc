@@ -1,13 +1,11 @@
-/* 
-  mysql -u root -p
-  CREATE USER 'dbtest'@'localhost' IDENTIFIED BY 'dbtest';
-  GRANT ALL PRIVILEGES ON application_db.* TO 'dbtest'@'localhost';
-  FLUSH PRIVILEGES;
-  source todo.sql
-*/
+--  mysql -u root -p
+--  CREATE USER 'dbtest'@'localhost' IDENTIFIED BY 'dbtest';
+--  GRANT ALL PRIVILEGES ON application_db.* TO 'dbtest'@'localhost';
+--  FLUSH PRIVILEGES;
+--  source todo.sql
 
-CREATE DATABASE IF NOT EXISTS `application_db`;
-USE `application_db`;
+-- CREATE DATABASE IF NOT EXISTS `application_db`;
+-- USE `application_db`;
 
 DROP TABLE IF EXISTS `todo`;
 

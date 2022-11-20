@@ -2,6 +2,8 @@ FROM archlinux
 
 #VOLUME /home/jonathan/work/java/spring-mvc/spring-docker:/home/user
 
+VOLUME $(pwd)/../:/home/user
+
 RUN pacman -Syu --noconfirm
 # RUN useradd -m -G wheel -s /bin/bash jonathan
 # RUN echo "%wheel	ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -12,37 +14,16 @@ RUN locale-gen
 RUN echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 # react / mariadb / spring
-EXPOSE 3000
-#EXPOSE 3000 3306 8080
+EXPOSE 3306
 
 RUN pacman -Sy --noconfirm \
-	jre11-openjdk \
-	ant \
-	maven \
-	mariadb \
-	npm
+	mariadb
 
+# add mysql user to run mariadb daemon
+#RUN useradd --create-home --shell /bin/bash mysql
 RUN mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-RUN mkdir /home/mysql
-RUN useradd -m -G mysql -s /bin/bash user
-#RUN pacman -Sy --noconfirm \
-#	chpasswd
-RUN echo "user:pass" | chpasswd
-
-RUN pacman -Sy --noconfirm \
-	expect
-
-#VOLUME $(pwd)/../:/home/user
-#VOLUME /home/jonathan/work/java/spring-mvc:/home/user
-#USER user:user
-##RUN echo "$(ls /home/user)"
-#
-#RUN /home/user/backend-sql/sql/everything.sh
-
-
-#RUN chown -R 974:974 /home/mysql
-#USER user
-#WORKDIR /home/user
+USER mysql
+WORKDIR /home/mysql
 
 # ENTRYPOINT /home/user/spring-docker/startup-spring.sh 
 

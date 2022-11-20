@@ -1,3 +1,7 @@
+.bash_history
+.m2/
+.npm/
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar

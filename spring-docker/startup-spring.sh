@@ -1,11 +1,16 @@
 #!/bin/bash
+# this script runs on the docker container to start the web and sql services
 
-# sqldb (port 3306)
+# launch sql (port 3306)
 mariadbd &
 
+su - user <<!
+pass
+
 # launch spring boot (port 8080)
-/home/user/run.sh &
+/home/user/java-spring-backend/run.sh &
 
 # launch react (port 3000)
-/home/user/react-main/run.sh
+/home/user/react-frontend/run.sh
 
+!

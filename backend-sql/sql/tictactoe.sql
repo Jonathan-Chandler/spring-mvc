@@ -10,6 +10,7 @@
 --- USE `application_db`;
 
 --- DROP TABLE IF EXISTS `tictactoe`;
+--- PRIMARY KEY (`player1`,`player2`)
 
 CREATE TABLE `tictactoe` (
 	`id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -19,6 +20,6 @@ CREATE TABLE `tictactoe` (
 	`realtime_game` BOOLEAN NOT NULL,
 	`start_time` DATE NOT NULL,
 	`board` char(9) NOT NULL,
-  PRIMARY KEY (`player1`,`player2`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 

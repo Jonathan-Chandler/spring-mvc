@@ -12,7 +12,8 @@ import Stomp from 'stompjs'
 
 export default function TictactoeAmqpTest()
 {
-	const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:61611/ws');
+	//const [socketUrl, setSocketUrl] = useState('ws://127.0.0.1:61611/ws');
+	const [socketUrl, setSocketUrl] = useState('ws://172.17.0.3:61611/ws');
 	const [stompTopic, setStompTopic] = useState('/topic/hello');
 	const [stomp_subscribe_header] = useState({login: 'test_user123', passcode: 'password124'});
 	const [webSockSession, setWebSockSession] = useState(null);
