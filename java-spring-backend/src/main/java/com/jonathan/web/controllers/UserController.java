@@ -129,8 +129,16 @@ public class UserController
 
   //@RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST })
   //@RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST }, consumes="application/json")
-  @RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST }, consumes="text/plain")
+
+	
+  //@RequestMapping(path="/rabbitmq/user", method={ RequestMethod.GET, RequestMethod.POST }, consumes="text/plain")
   //public String rabbitUserPath(@RequestBody UserPathDto userPathDto) 
+  @RequestMapping(
+    path = {"/rabbitmq/user"},
+    method = {RequestMethod.GET, RequestMethod.POST},
+    produces = "application/x-www-form-urlencoded",
+    consumes = "application/x-www-form-urlencoded"
+  )
   public String rabbitUser(@RequestParam("username") String username, @RequestParam("password") String password)
   {
 	  logger.error("rabbitUser call");
@@ -170,10 +178,23 @@ public class UserController
   //vhost - the name of the virtual host being accessed
   //ip - the client ip address
   //Note that you cannot create arbitrary virtual hosts using this plugin; you can only determine whether your users can see / access the ones that exist.
-  @RequestMapping(path="/rabbitmq/vhost", method={ RequestMethod.GET, RequestMethod.POST })
-  public String rabbitVhostPath(@RequestBody VhostPathDto vhostPathDto) 
+  //@RequestMapping(path="/rabbitmq/vhost", method={ RequestMethod.GET, RequestMethod.POST })
+
+  //public String rabbitVhostPath(@RequestBody VhostPathDto vhostPathDto) 
+  @RequestMapping(
+    path = {"/rabbitmq/vhost"},
+    method = {RequestMethod.GET, RequestMethod.POST},
+    produces = "application/x-www-form-urlencoded",
+    consumes = "application/x-www-form-urlencoded"
+  )
+  public String rabbitVhostPath(
+		@RequestParam("username")  String username, 
+		@RequestParam("vhost")  String vhost, 
+		@RequestParam("ip")  String ip
+  ) 
   {
-	  logger.info("Get /rabbitmq/vhost request: " + vhostPathDto.toString());
+	  //logger.info("Get /rabbitmq/vhost request: " + vhostPathDto.toString());
+	  logger.info("Get /rabbitmq/vhost request: " + username + " vhost: " + vhost + " ip: " + ip);
 	  return "allow";
   }
 	//resource_path
@@ -182,10 +203,31 @@ public class UserController
 	//resource - the type of resource (exchange, queue, topic)
 	//name - the name of the resource
 	//permission - the access level to the resource (configure, write, read) - see the Access Control guide for their meaning
-  @RequestMapping(path="/rabbitmq/resource", method={ RequestMethod.GET, RequestMethod.POST })
-  public String rabbitResourcePath(@RequestBody ResourcePathDto resourcePathDto) 
+  //@RequestMapping(path="/rabbitmq/resource", method={ RequestMethod.GET, RequestMethod.POST })
+  @RequestMapping(
+    path = {"/rabbitmq/resource"},
+    method = {RequestMethod.GET, RequestMethod.POST},
+    produces = "application/x-www-form-urlencoded",
+    consumes = "application/x-www-form-urlencoded"
+  )
+  public String rabbitResourcePath(
+		@RequestParam("username")  String username, 
+		@RequestParam("vhost")  String vhost, 
+		@RequestParam("resource")  String resource,
+		@RequestParam("name")  String name,
+		@RequestParam("permission")  String permission
+  )
   {
-	  logger.info("Get /rabbitmq/resource request: " + resourcePathDto.toString());
+	  //logger.info("Get /rabbitmq/resource request: " + resourcePathDto.toString());
+	  logger.info(
+			  "Get /rabbitmq/resource request: " + 
+			  "username: " + username +
+			  "vhost: " + vhost +
+			  "resource: " + resource +
+			  "name: " + name +
+			  "permission: " + permission
+	  );
+
 	  return "allow";
   }
 	//
@@ -197,10 +239,32 @@ public class UserController
 	//permission - the access level to the resource (write or read)
 	//routing_key - the routing key of a published message (when the permission is write) or routing key of the queue binding (when the permission is read)
 	//See topic authorisation for more information about topic authorisation.
-  @RequestMapping(path="/rabbitmq/topic", method={ RequestMethod.GET, RequestMethod.POST })
-  public String rabbitTopicPath(@RequestBody TopicPathDto topicPathDto) 
+  //@RequestMapping(path="/rabbitmq/topic", method={ RequestMethod.GET, RequestMethod.POST })
+  //public String rabbitTopicPath(@RequestBody TopicPathDto topicPathDto) 
+  @RequestMapping(
+    path = {"/rabbitmq/topic"},
+    method = {RequestMethod.GET, RequestMethod.POST},
+    produces = "application/x-www-form-urlencoded",
+    consumes = "application/x-www-form-urlencoded"
+  )
+  public String rabbitTopicPath(
+		@RequestParam("username")  String username, 
+		@RequestParam("vhost")  String vhost, 
+		@RequestParam("resource")  String resource,
+		@RequestParam("name")  String name,
+		@RequestParam("permission")  String permission,
+		@RequestParam("routing_key")  String routing_key
+  )
   {
-	  logger.info("Get /rabbitmq/topic request: " + topicPathDto.toString());
+	  logger.info(
+			"Get /rabbitmq/topic request: " +
+			"username: " + username +
+			"vhost: " + vhost +
+			"resource: " + resource + 
+			"name: " + name + 
+			"permission: " + permission + 
+			"routing_key: " + routing_key
+		);
 	  return "allow";
   }
 

@@ -44,6 +44,17 @@
 		<artifactId>spring-boot-starter-amqp</artifactId>
 	</dependency>
 
+	<!--   <version>5.7.1</version> -->
+    <dependency>
+      <groupId>com.rabbitmq</groupId>
+      <artifactId>amqp-client</artifactId>
+    </dependency>
+	<!-- <version>2.4.7</version> -->
+	<dependency>
+	  <groupId>org.springframework.amqp</groupId>
+	  <artifactId>spring-rabbit</artifactId>
+	</dependency>
+
     <!-- javax parameter validation -->
     <dependency>
         <groupId>javax.validation</groupId>

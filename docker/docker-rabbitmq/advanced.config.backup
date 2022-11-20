@@ -1,0 +1,7 @@
+[
+  {rabbitmq_web_stomp,
+      [{use_http_auth, true}]},
+  {rabbit,
+	  [{auth_backends, [rabbit_auth_backend_internal, rabbit_auth_backend_amqp]}]
+  }
+].
