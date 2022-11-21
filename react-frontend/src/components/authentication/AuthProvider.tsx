@@ -1,6 +1,7 @@
 import React, { ReactNode, useCallback, useState, useEffect, useMemo, createContext, useContext } from 'react';
 import axios, { Axios, AxiosError } from 'axios'
 import { LOGIN_API_URL, REGISTER_API_URL } from '../../Constants'
+import { Stomp, Client } from '@stomp/stompjs';
 //import { Client } from '@stomp/stompjs';
 
 //interface PlayerListEntry
@@ -20,8 +21,9 @@ interface AuthContextType {
 	register: (username: string, email: string, password: string) => void;
 	logout: () => void;
 	getSession: () => Axios;
+	getStompSession: () => Client;
 	//getPlayerListSession: () => void;
-	//playerList: PlayerListEntry[];
+	playerList: any;
 	error?: any;
 }
 
@@ -41,6 +43,8 @@ export function AuthProvider({
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>();
 	const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
+	const [stompSession, setStompSession] = useState(null);
+	const [playerList, setPlayerList] = useState([{}]);
 
 	useEffect(() => {
 		// initialize done
@@ -72,6 +76,7 @@ export function AuthProvider({
 						sessionStorage.setItem("Authorization", response.data.Authorization);
 						sessionStorage.setItem("username", username);
 						setError("");
+						startStompSession();
 						setLoading(false);
 					}
 				})
@@ -200,6 +205,79 @@ export function AuthProvider({
 			return axiosSession;
 		}, [handleResponseAuthFailure, token]);
 
+	//const getPlayerList = useCallback(() =>
+	//	{
+	//		return playerList;
+	//	},[playerList]);
+
+	const onMessage = useCallback((d) =>
+	{
+		try 
+		{
+			var parsed = JSON.parse(d.body);
+			//var message = parsed.message;
+			//setStompMessage(stompMessage.push(message));
+			setPlayerList((playerList) => [...playerList, parsed]);
+		}
+		catch (err)
+		{
+			console.log("Failed to get message: " + err);
+		}
+	},[])
+
+	const getStompSession = useCallback(() =>
+		{
+			return stompSession;
+		},[stompSession]);
+
+	const startStompSession = useCallback(() =>
+		{
+			let stompTopic = '/topic/hello';
+			let stomp_headers = {login: 'test_user123', passcode: 'password123'};
+
+			//const client = new StompJs.Client({
+			//passcode: token
+			//login: username,
+			const client = new Client({
+				brokerURL: 'ws://172.17.0.3:61611/ws',
+				connectHeaders: {
+					login: 'test_user123',
+					passcode: 'password123',
+					//'heart-beat': '4000,4000'
+				},
+
+				debug: function (str) 
+				{
+					console.log(str);
+				},
+				reconnectDelay: 5000,
+				//heartbeatIncoming: 4000,
+				//heartbeatOutgoing: 4000,
+			});
+
+			client.onConnect = function (frame) 
+			{
+				console.log("onConnect")
+
+				// all subscribes must be done here for reconnect
+				client.subscribe(
+					stompTopic, 
+					onMessage, 
+					stomp_headers
+				);
+			};
+
+			client.onStompError = function (frame) {
+				// error encountered at Broker
+				console.log('Broker reported error: ' + frame.headers['message']);
+				console.log('Additional details: ' + frame.body);
+			};
+
+			// init and save stomp session
+			client.activate();
+			setStompSession(client);
+		},[onMessage])
+
 	//const connectPlayerList = (currentClient, headerValues) =>
 	//{
 	//	currentClient.subscribe
@@ -300,11 +378,13 @@ export function AuthProvider({
 			register,
 			logout,
 			getSession,
+			getStompSession,
+			//getPlayerList,
 			//getPlayerListSession,
-			//playerList,
+			playerList,
 			error,
 		}),
-		[ username, token, loading, isAuthenticated, login, register, logout, getSession, error ]
+		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, error ]
 	);
 
 	// render components after initialization

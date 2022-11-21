@@ -34,11 +34,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestHeader;
-//import org.springframework.web.bind.annotation.Produces;
-//import org.springframework.web.bind.annotation.Path;
-//import org.springframework.web.bind.annotation.Consumes;
-//import org.springframework.web.bind.annotation.Method;
-//import org.springframework.web.bind.annotation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.jonathan.web.service.UserService;
@@ -54,32 +49,6 @@ import org.springframework.http.HttpHeaders;
 import java.util.List;
 import java.util.ArrayList;
 
-//import javax.json.JsonObject;
-//import org.springframework.http.
-//import java.io.IOException;
-//
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
-////import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-//import org.springframework.messaging.handler.annotation.MessageMapping;
-//import org.springframework.messaging.handler.annotation.SendTo;
-//import com.jonathan.web.resources.TestDto;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.stereotype.Component;
-////import org.springframework.messaging.simp.user.SimpUserRegistry;
-//
-//import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-////import org.springframework.messaging.simp.SimpMessagingTemplate;
-//import org.springframework.context.event.EventListener;
-//import org.springframework.messaging.support.GenericMessage;
-////import org.springframework.messaging.simp.user.SimpUser;
-//import java.security.Principal;
-
-//@CrossOrigin(origins = "http://localhost:3000/tictactoe/playerlist")
-//@Component
-//@CrossOrigin(origins = "http://localhost:3000")
-//@CrossOrigin(origins = "http://localhost:3000", allowedHeaders="*")
-
 import org.slf4j.Logger;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -87,32 +56,19 @@ import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
-public class TReceiver {
+public class TReceiver 
+{
 	@Autowired
 	Logger logger;
 
-    //@RabbitHandler
-	//@RabbitListener(queues = "hello")
 	@RabbitListener(bindings = @QueueBinding(
 		value = @Queue(value = "hello", durable = "true"),
         exchange = @Exchange(value = "auto.exch"),
         key = "orderRoutingKey")
 	)
-	//@JsonProperty("username")
     public void receive(@RequestBody final TictactoePlayerListDto playerList)
 	{
         System.out.println(" [x] Received '" + playerList + "'");
     }
 }
-//public class Receiver 
-//{
-//	@Autowired
-//	Logger logger;
-//
-//	public void receiveMessage(String message)
-//	{
-//		logger.info("recv message: " + message);
-//	}
-//}
-
 

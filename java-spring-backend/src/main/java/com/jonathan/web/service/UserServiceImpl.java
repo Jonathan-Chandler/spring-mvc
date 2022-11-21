@@ -12,13 +12,11 @@ import org.springframework.stereotype.Service;
 
 import com.jonathan.web.service.UserService;
 import com.jonathan.web.dao.UserRepository;
-//import com.jonathan.web.entities.UserData;
 import com.jonathan.web.entities.User;
 
 import java.util.List;
 import java.util.ArrayList;
 
-//import com.jonathan.web.entities.UserData;
 import com.jonathan.web.service.JwtTokenService;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

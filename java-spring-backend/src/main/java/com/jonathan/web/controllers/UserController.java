@@ -44,9 +44,7 @@ import com.jonathan.web.resources.UserRegistrationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 
-// rabbitmq request
 import org.springframework.web.bind.annotation.RequestParam;
-import com.jonathan.web.resources.rabbitmq.*;
 import org.slf4j.Logger;
 
 @RestController
@@ -86,7 +84,7 @@ public class UserController
 		responseHeader.add("Authorization", loginJwt);
 
 		responseJson.put("Auth", loginJwt);
-		System.out.println(responseJson);
+		//System.out.println(responseJson);
 
 		return ResponseEntity.ok()
 			.headers(responseHeader)
@@ -118,8 +116,13 @@ public class UserController
 		}
 	}
 
-	//username - the name of the user
-	//password - the password provided (may be missing if e.g. rabbitmq-auth-mechanism-ssl is used)
+	//rabbitmq param
+	//vhost - name of the virtual host being accessed - cannot create virtual hosts
+	//name - name of the resource/exchange
+	//resource - type of resource / topic
+	//routing_key - routing key of a published message (write) or routing key of the queue binding (when permission is read)
+	//resource - type of resource (exchange, queue, topic)
+	//permission - access level to the resource (configure, write, read)
 	@RequestMapping
 	(
 		path = {"/rabbitmq/user"},
@@ -130,16 +133,9 @@ public class UserController
 	public String rabbitUser(@RequestParam("username") String username, @RequestParam("password") String password)
 	{
 		logger.error("rabbitUser call");
-		HttpHeaders responseHeader = new HttpHeaders();
-		HashMap<String, String> responseJson = new HashMap<>();
 		String loginJwt;
 
 		logger.info("Get /rabbitmq/user request: " + username + ":" + password);
-		if (username.equals("guest")
-				&& password.equals("guest"))
-		{
-			return "allow administrator";
-		}
 
 		try 
 		{
@@ -152,14 +148,10 @@ public class UserController
 			return "deny";
 		}
 
-		//allow [list of tags] - (for user_path only) - allow access, and mark the user as an having the tags listed
+		//allow [list of tags] for user_path only - allow access, and mark the user as an having the tags listed
 		return "allow ";
 	}
 
-	//username - the name of the user
-	//vhost - the name of the virtual host being accessed
-	//ip - the client ip address
-	//Note that you cannot create arbitrary virtual hosts using this plugin; you can only determine whether your users can see / access the ones that exist.
 	@RequestMapping
 	(
 		path = {"/rabbitmq/vhost"},
@@ -178,11 +170,6 @@ public class UserController
 		return "allow";
 	}
 
-	//username - the name of the user
-	//vhost - the name of the virtual host containing the resource
-	//resource - the type of resource (exchange, queue, topic)
-	//name - the name of the resource
-	//permission - the access level to the resource (configure, write, read) - see the Access Control guide for their meaning
 	@RequestMapping
 	(
 		path = {"/rabbitmq/resource"},
@@ -212,11 +199,6 @@ public class UserController
 		return "allow";
 	}
 
-	//vhost - the name of the virtual host containing the resource
-	//resource - the type of resource / topic
-	//name - the name of the exchange
-	//permission - the access level to the resource (write or read)
-	//routing_key - the routing key of a published message (when the permission is write) or routing key of the queue binding (when the permission is read)
 	@RequestMapping
 	(
 		path = {"/rabbitmq/topic"},

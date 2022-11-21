@@ -27,17 +27,5 @@ public class TictactoeServiceImpl implements TictactoeService
 
     return tttPlayerList;
   }
-//	private TictactoeRepository tictactoeRepository;
-//
-//	@Autowired
-//	private Logger logger;
-//
-//	public Tictactoe findByPlayer(String username)
-//	{
-//
-//		return Tictactoe;
-//	}
-//
-//	public void deleteById(int id);
 }
 

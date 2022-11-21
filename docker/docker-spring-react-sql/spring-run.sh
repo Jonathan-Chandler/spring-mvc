@@ -50,8 +50,8 @@ sudo docker run -i -t		\
 	--ip 172.17.0.2			\
 	-p 3000:3000			\
 	-p 8080:8080			\
-	-v $(pwd)/..:/home/user \
-	-v $(pwd)/../../mysql-database/mysql:/var/lib/mysql \
+	-v $(pwd)/../..:/home/user \
+	-v $(pwd)/../../../mysql-database/mysql:/var/lib/mysql \
 	-w /home/user			\
 	spring-mvc 
 
