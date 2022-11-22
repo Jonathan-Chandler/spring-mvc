@@ -32,10 +32,11 @@ export default function TictactoeAmqpTest()
 
 		// Additional headers
 		//client.publish({
+		let pass = token.split(' ')[1]
 		stompSession.publish({
 		  destination: '/topic/hello',
 		  body: JSON.stringify(data),
-		  headers: {login: username, passcode: token}
+		  headers: {login: username, passcode: pass}
 		});
 	};
 

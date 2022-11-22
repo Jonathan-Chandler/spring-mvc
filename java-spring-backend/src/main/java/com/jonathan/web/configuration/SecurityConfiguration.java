@@ -79,13 +79,27 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.jonathan.web.controllers.RSender;
 import com.jonathan.web.controllers.TReceiver;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableWebSecurity
+@EnableScheduling
 public class SecurityConfiguration
 {
-	static final String topicExchangeName = "spring-boot-exchange";
+	//static final String topicExchangeName = "spring-boot-exchange";
+	//static final String topicExchangeName = "hello";
+	static final String topicExchangeName = "amq.topic";
 	static final String queueName = "spring-boot";
+
+	////@Bean
+    ////public TopicExchange playerList() {
+    ////    return new TopicExchange("tut.topic");
+    ////}
+
+	////@Bean
+	////public Queue autoDeleteQueue1() {
+	////	return new AnonymousQueue();
+	////}
 
 	@Bean
     public DirectExchange direct() 
@@ -112,7 +126,7 @@ public class SecurityConfiguration
 	@Bean
 	Binding binding(Queue queue, TopicExchange exchange) 
 	{
-		return BindingBuilder.bind(queue).to(exchange).with("foo.bar.#");
+		return BindingBuilder.bind(queue).to(exchange).with("user.#");
 	}
 
 	@Bean

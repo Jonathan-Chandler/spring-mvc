@@ -66,15 +66,21 @@ public class TReceiver
 
     //public void receive(@RequestBody final TictactoePlayerListDto playerList)
 
+	//@RabbitListener(bindings = @QueueBinding(
+	//	value = @Queue(value = "hello", durable = "true"),
+    //    exchange = @Exchange(value = "auto.exch"),
+    //    key = "orderRoutingKey")
+	//)
 	@RabbitListener(bindings = @QueueBinding(
-		value = @Queue(value = "hello", durable = "true"),
-        exchange = @Exchange(value = "auto.exch"),
-        key = "orderRoutingKey")
+		value = @Queue(value = "playerQueue", durable = "true"),
+        exchange = @Exchange(value = "amq.topic", type = "topic"),
+        key = "user.*")
 	)
     public void receive(@RequestBody TestDto playerList)
 	{
-        System.out.println(" [x] Received '" + playerList + "'");
-        logger.error(" [x] message from amq topic: '" + playerList.getMessage() + "'");
+        //System.out.println(" [x] Received '" + playerList + "'");
+        //logger.error(" [x] message from amq topic: '" + playerList.getMessage() + "'");
+        logger.error(" [x] message from amq.topic user.*: '" + playerList.getMessage() + "'");
     }
 
 	//@RabbitListener(bindings = @QueueBinding(

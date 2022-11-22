@@ -71,7 +71,12 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.support.GenericMessage;
 import java.security.Principal;
-import com.jonathan.web.controllers.RSender;
+//import com.jonathan.web.controllers.RSender;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 @Controller
 public class TictactoeController 
@@ -87,5 +92,17 @@ public class TictactoeController
 	{
 		logger.info("sent test message to rsend");
 	}
+
+	//// bind 
+	//@RabbitListener(bindings = @QueueBinding(
+	//	value = @Queue(value = "playerQueue", durable = "true"),
+    //    exchange = @Exchange(value = "amqp.topic"),
+    //    key = "user.*")
+	//)
+    //public void receive(@RequestBody TestDto playerList)
+	//{
+    //    //System.out.println(" [x] Received '" + playerList + "'");
+    //    logger.error(" [x] message from amqp.topic user.*: '" + playerList.getMessage() + "'");
+    //}
 }
 

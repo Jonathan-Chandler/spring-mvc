@@ -270,6 +270,15 @@ export function AuthProvider({
 					onMessage, 
 					stomp_headers
 				);
+
+				const usernameTopic = '/exchange/amq.topic/user.' + new_username;
+				client.subscribe(
+					usernameTopic,
+					function (msg) {
+						console.log(usernameTopic + " msg = " + msg);
+					},
+					stomp_headers
+				);
 			};
 
 			client.onStompError = function (frame) {
