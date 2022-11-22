@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService
 		}
 		catch (Exception e)
 		{
-			logger.info("Unknown error while trying to auth user " + loginCredentials.getUsername() + ": " + e.getMessage());
+			logger.error("Unknown error while trying to auth user " + loginCredentials.getUsername() + ": " + e.getMessage());
 			throw new RuntimeException("Bad login credentials");
 		}
 

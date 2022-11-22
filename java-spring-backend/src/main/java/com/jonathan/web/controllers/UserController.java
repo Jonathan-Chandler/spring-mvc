@@ -46,6 +46,7 @@ import org.springframework.http.HttpHeaders;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.slf4j.Logger;
+import com.jonathan.web.service.JwtTokenService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -53,6 +54,9 @@ public class UserController
 {
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private JwtTokenService jwtTokenService;
 
 	@Autowired
 	Logger logger;
@@ -84,7 +88,7 @@ public class UserController
 		responseHeader.add("Authorization", loginJwt);
 
 		responseJson.put("Auth", loginJwt);
-		//System.out.println(responseJson);
+		logger.error("Return login auth: " + responseJson);
 
 		return ResponseEntity.ok()
 			.headers(responseHeader)
@@ -132,16 +136,36 @@ public class UserController
 	)
 	public String rabbitUser(@RequestParam("username") String username, @RequestParam("password") String password)
 	{
-		logger.error("rabbitUser call");
 		String loginJwt;
+		logger.error("rabbitUser call");
+		logger.info("Get /rabbitmq/user login request username:" + username + " password:" + password);
 
-		logger.info("Get /rabbitmq/user request: " + username + ":" + password);
+		if (username.equals("guest") || username.isEmpty() || password.isEmpty())
+		{
+			logger.error("bad login");
+			return "deny";
+		}
 
 		try 
 		{
-			// convert to standard login dto
-			UserLoginDto loginDto = new UserLoginDto(username, password);
-			loginJwt = userService.login(loginDto);
+			// auth failed
+			if (!jwtTokenService.validateJwtToken(password) 
+					|| !jwtTokenService.validateJwtTokenUsername(password, username))
+			{
+
+				logger.error("validation fails for user: " + username + " token: " + password);
+				if (!jwtTokenService.validateJwtToken(password))
+					logger.error("validation fails to validate jwt token");
+
+				if (!jwtTokenService.validateJwtTokenUsername(password, username))
+					logger.error("validation fails to validate username in jwt token");
+
+				return "deny";
+			}
+
+			//// convert to standard login dto
+			//UserLoginDto loginDto = new UserLoginDto(username, token);
+			//loginJwt = userService.login(loginDto);
 		} 
 		catch (Exception e) 
 		{
@@ -189,11 +213,11 @@ public class UserController
 		logger.info
 		(
 			"Get /rabbitmq/resource request: " + 
-			"username: " + username +
-			"vhost: " + vhost +
-			"resource: " + resource +
-			"name: " + name +
-			"permission: " + permission
+			" username: " + username +
+			" vhost: " + vhost +
+			" resource: " + resource +
+			" name: " + name +
+			" permission: " + permission
 		);
 
 		return "allow";
@@ -219,12 +243,12 @@ public class UserController
 		logger.info
 		(
 			"Get /rabbitmq/topic request: " +
-			"username: " + username +
-			"vhost: " + vhost +
-			"resource: " + resource + 
-			"name: " + name + 
-			"permission: " + permission + 
-			"routing_key: " + routing_key
+			" username: " + username +
+			" vhost: " + vhost +
+			" resource: " + resource + 
+			" name: " + name + 
+			" permission: " + permission + 
+			" routing_key: " + routing_key
 		);
 		return "allow";
 	}

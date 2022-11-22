@@ -2,17 +2,17 @@ package com.jonathan.web.resources;
 
 public class TestDto {
 
-  private String content;
+  private String message;
 
   public TestDto() {
   }
 
-  public TestDto(String content) {
-    this.content = content;
+  public TestDto(String message) {
+    this.message = message;
   }
 
-  public String getContent() {
-    return content;
+  public String getMessage() {
+    return message;
   }
 
 }

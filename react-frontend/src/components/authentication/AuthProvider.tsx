@@ -76,7 +76,7 @@ export function AuthProvider({
 						sessionStorage.setItem("Authorization", response.data.Authorization);
 						sessionStorage.setItem("username", username);
 						setError("");
-						startStompSession();
+						startStompSession(userData.username, response.data.Authorization);
 						setLoading(false);
 					}
 				})
@@ -146,20 +146,23 @@ export function AuthProvider({
 		setUsername(null);
 		setToken(null);
 		setError(null);
+		if (stompSession)
+			stompSession.deactivate();
+		setStompSession(null);
 		setLoading(false);
 	}, []);
 
 	// interceptor updates token from response header
 	const handleResponseHeaders = (response) => 
 	{
-		// update token if exists in response header
-		if (response.headers.authorization)
-		{
-			// update token for session and local storage
-			sessionStorage.setItem("Authorization", response.data.Authorization);
-			setToken(response.headers.authorization);
-			//console.log("captured response header and set auth: " + response.headers.authorization);
-		}
+		//// update token if exists in response header
+		//if (response.headers.authorization)
+		//{
+		//	// update token for session and local storage
+		//	sessionStorage.setItem("Authorization", response.data.Authorization);
+		//	setToken(response.headers.authorization);
+		//	//console.log("captured response header and set auth: " + response.headers.authorization);
+		//}
 
 		// return intercepted response to caller
 		return response;
@@ -230,19 +233,21 @@ export function AuthProvider({
 			return stompSession;
 		},[stompSession]);
 
-	const startStompSession = useCallback(() =>
+	const startStompSession = useCallback((new_username, new_token) =>
 		{
+			let pass = new_token.split(' ')[1]
 			let stompTopic = '/topic/hello';
-			let stomp_headers = {login: 'test_user123', passcode: 'password123'};
+			let stomp_headers = {login: new_username, passcode: pass};
+			console.log("stomp login: " + new_username + " pass: " + pass)
 
 			//const client = new StompJs.Client({
 			//passcode: token
-			//login: username,
+			//login: new_username,
 			const client = new Client({
 				brokerURL: 'ws://172.17.0.3:61611/ws',
 				connectHeaders: {
-					login: 'test_user123',
-					passcode: 'password123',
+					login: new_username,
+					passcode: pass,
 					//'heart-beat': '4000,4000'
 				},
 

@@ -22,7 +22,7 @@ export default function TictactoeAmqpTest()
 	////const [debugWsEnabled, setDebugWsEnabled] = useState(false);
 	////const [stompMessage, setStompMessage] = useState([]);
 	const [stomp_headers] = useState({login: 'test_user123', passcode: 'password123'});
-	const { isAuthenticated, getStompSession, playerList } = useAuth();
+	const { username, token, isAuthenticated, getStompSession, playerList } = useAuth();
 
 	const sendMessage = () => 
 	{
@@ -35,7 +35,7 @@ export default function TictactoeAmqpTest()
 		stompSession.publish({
 		  destination: '/topic/hello',
 		  body: JSON.stringify(data),
-		  headers: stomp_headers,
+		  headers: {login: username, passcode: token}
 		});
 	};
 

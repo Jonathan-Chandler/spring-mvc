@@ -18,7 +18,10 @@ import org.slf4j.LoggerFactory;
 @Component
 public class JwtTokenService
 {
-  private int secondsToExpire = 300;
+  //private int secondsToExpire = 300;
+
+  // jwt will expire in 8 hours
+  private int secondsToExpire = 8*60*60;
   private String issuer;
   private byte[] secretKey;
   private JWSSigner signer;

@@ -55,20 +55,37 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import com.jonathan.web.resources.TestDto;
+
+//import org.springframework.amqp.core.ExchangeTypes.*;
 
 public class TReceiver 
 {
 	@Autowired
 	Logger logger;
 
+    //public void receive(@RequestBody final TictactoePlayerListDto playerList)
+
 	@RabbitListener(bindings = @QueueBinding(
 		value = @Queue(value = "hello", durable = "true"),
         exchange = @Exchange(value = "auto.exch"),
         key = "orderRoutingKey")
 	)
-    public void receive(@RequestBody final TictactoePlayerListDto playerList)
+    public void receive(@RequestBody TestDto playerList)
 	{
         System.out.println(" [x] Received '" + playerList + "'");
+        logger.error(" [x] message from amq topic: '" + playerList.getMessage() + "'");
     }
+
+	//@RabbitListener(bindings = @QueueBinding(
+	//	value = @Queue(value = "hello", durable = "true"),
+    //    exchange = @Exchange(value = "amq.topic", type = "topic"),
+    //    key = "hello")
+	//)
+    //public void receive(@RequestBody final String message)
+	//{
+    //    System.out.println(" [x] message from amq topic: '" + message + "'");
+    //    logger.error(" [x] message from amq topic: '" + message + "'");
+    //}
 }
 

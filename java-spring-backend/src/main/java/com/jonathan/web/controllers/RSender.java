@@ -28,4 +28,7 @@ public class RSender
         //this.template.convertAndSend(direct.getName(), key, null, message);
         System.out.println(" [x] Sent '" + message + "'");
     }
+
+	// amqpTemplate.convertAndSend(exchange, routingKey, messageData)
+	// amqp
 }
