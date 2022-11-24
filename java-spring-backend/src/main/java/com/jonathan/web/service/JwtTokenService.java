@@ -70,7 +70,7 @@ public class JwtTokenService
     }
     catch(Exception e)
     {
-      logger.info("Failed to generate JWT token for user " + username);
+      logger.info("Failed to generate JWT token for user " + username + " return: " + e.getMessage());
       return "";
     }
   }
@@ -88,7 +88,7 @@ public class JwtTokenService
       SignedJWT signedJWT = SignedJWT.parse(token);
       if (!signedJWT.verify(verifier))
       {
-        logger.info("Failed to validate token");
+        logger.error("Failed to validate token signature");
         return false;
       }
 
@@ -102,7 +102,7 @@ public class JwtTokenService
     }
     catch (Exception e)
     {
-      logger.info("Failed to validate token");
+      logger.info("Failed to validate token: " + e);
       return false;
     }
 

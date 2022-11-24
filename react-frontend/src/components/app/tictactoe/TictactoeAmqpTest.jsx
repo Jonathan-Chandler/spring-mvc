@@ -28,16 +28,27 @@ export default function TictactoeAmqpTest()
 	{
 		let stompSession = getStompSession();
 		const data = {message: "test_message"}
+		//const data = "test";
 		console.log("send " + data)
 
 		// Additional headers
 		//client.publish({
 		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/user." + username
+		//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
 		stompSession.publish({
-		  destination: '/topic/hello',
+		  destination: msg_destination,
 		  body: JSON.stringify(data),
-		  headers: {login: username, passcode: pass}
+		  //body: "{\"message\":\"data\"}",
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", "__TypeId__":"com.jonathan.web.resources.TestDto"
+		  }
 		});
+		  //body: JSON.stringify(data),
+		console.log("send body: " + JSON.stringify(data))
 	};
 
 	////const onMessage = useCallback((d) =>

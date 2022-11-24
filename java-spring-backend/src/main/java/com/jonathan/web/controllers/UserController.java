@@ -137,12 +137,11 @@ public class UserController
 	public String rabbitUser(@RequestParam("username") String username, @RequestParam("password") String password)
 	{
 		String loginJwt;
-		logger.error("rabbitUser call");
 		logger.info("Get /rabbitmq/user login request username:" + username + " password:" + password);
 
 		if (username.equals("guest") || username.isEmpty() || password.isEmpty())
 		{
-			logger.error("bad login");
+			logger.error("/rabbitmq/user denies request: username:" + username + " password:" + password);
 			return "deny";
 		}
 
@@ -160,6 +159,7 @@ public class UserController
 				if (!jwtTokenService.validateJwtTokenUsername(password, username))
 					logger.error("validation fails to validate username in jwt token");
 
+				logger.error("/rabbitmq/user denies request: username:" + username + " password:" + password);
 				return "deny";
 			}
 
@@ -169,10 +169,13 @@ public class UserController
 		} 
 		catch (Exception e) 
 		{
+			logger.error("/rabbitmq/user denies request: username:" + username + " password:" + password);
+			logger.error("/rabbitmq/user Error: " + e.getMessage());
 			return "deny";
 		}
 
-		//allow [list of tags] for user_path only - allow access, and mark the user as an having the tags listed
+		// allow [list of tags] - user should not have administrator/management tags
+		// possible tags: Admin Monitoring Policymaker Management Impersonator None
 		return "allow ";
 	}
 
@@ -191,6 +194,14 @@ public class UserController
 	) 
 	{
 		logger.info("Get /rabbitmq/vhost request: " + username + " vhost: " + vhost + " ip: " + ip);
+
+		// only allow vhost /
+		if (!vhost.equals("/"))
+		{
+			logger.error("/rabbitmq/vhost denies request: " + username + " vhost: " + vhost + " ip: " + ip);
+			return "deny";
+		}
+
 		return "allow";
 	}
 
@@ -210,6 +221,9 @@ public class UserController
 		@RequestParam("permission")  String permission
 	)
 	{
+		String stompPrefix = "stomp-subscription-";
+
+		// Get /rabbitmq/resource request:  username: test_user123 vhost: / resource: queue name: stomp-subscription-cctHqEUpExbyBY2jbtz3ag permission: write
 		logger.info
 		(
 			"Get /rabbitmq/resource request: " + 
@@ -220,7 +234,44 @@ public class UserController
 			" permission: " + permission
 		);
 
-		return "allow";
+		// only allow vhost /
+		if (!vhost.equals("/"))
+		{
+			logger.error(
+				"/rabbitmq/resource denies request: " + 
+				" username: " + username +
+				" vhost: " + vhost +
+				" resource: " + resource +
+				" name: " + name +
+				" permission: " + permission
+			);
+			return "deny";
+		}
+
+
+		// allow access to auto created stomp subscription queues
+		if (resource.equals("queue") && name.startsWith(stompPrefix))
+		{
+			return "allow";
+		}
+
+		// allow access to read/write amq topic list
+		if ((permission.equals("read") || permission.equals("write"))
+			&& resource.equals("exchange") 
+			&& name.equals("amq.topic"))
+		{
+			return "allow";
+		}
+
+		logger.error(
+			"/rabbitmq/resource denies request: " + 
+			" username: " + username +
+			" vhost: " + vhost +
+			" resource: " + resource +
+			" name: " + name +
+			" permission: " + permission
+		);
+		return "deny";
 	}
 
 	@RequestMapping
@@ -240,6 +291,10 @@ public class UserController
 		@RequestParam("routing_key")  String routing_key
 	)
 	{
+		String userRoutingKey = "user." + username;
+		String playerlistRoutingKey = "playerlist";
+
+		// Get /rabbitmq/topic request:  username: test_user123 vhost: / resource: topic name: amq.topic permission: write routing_key: user.test_user123
 		logger.info
 		(
 			"Get /rabbitmq/topic request: " +
@@ -250,6 +305,75 @@ public class UserController
 			" permission: " + permission + 
 			" routing_key: " + routing_key
 		);
-		return "allow";
+
+		// only allow vhost /
+		if (!vhost.equals("/"))
+		{
+			logger.error(
+				"/rabbitmq/topic denies request: " + 
+				" username: " + username +
+				" vhost: " + vhost +
+				" resource: " + resource + 
+				" name: " + name + 
+				" permission: " + permission + 
+				" routing_key: " + routing_key
+			);
+			return "deny";
+		}
+
+		// only using topic exchange
+		if (!resource.equals("topic"))
+		{
+			logger.error(
+				"/rabbitmq/topic denies request: " + 
+				" username: " + username +
+				" vhost: " + vhost +
+				" resource: " + resource + 
+				" name: " + name + 
+				" permission: " + permission + 
+				" routing_key: " + routing_key
+			);
+			return "deny";
+		}
+
+		// only allow topics in amq.topic
+		if (!name.equals("amq.topic"))
+		{
+			logger.error(
+				"/rabbitmq/topic denies request: " + 
+				" username: " + username +
+				" vhost: " + vhost +
+				" resource: " + resource + 
+				" name: " + name + 
+				" permission: " + permission + 
+				" routing_key: " + routing_key
+			);
+			return "deny";
+		}
+
+		// allow read/write for current user on /topic/user.<username>
+		if ((permission.equals("read") || permission.equals("write")) 
+			&& routing_key.equals(userRoutingKey))
+		{
+			return "allow";
+		}
+
+		// allow read for all users on /topic/playerlist
+		if (permission.equals("read") 
+			&& routing_key.equals(playerlistRoutingKey))
+		{
+			return "allow";
+		}
+
+		logger.error(
+			"/rabbitmq/topic denies request: " + 
+			" username: " + username +
+			" vhost: " + vhost +
+			" resource: " + resource + 
+			" name: " + name + 
+			" permission: " + permission + 
+			" routing_key: " + routing_key
+		);
+		return "deny";
 	}
 }

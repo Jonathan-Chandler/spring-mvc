@@ -101,33 +101,41 @@ public class SecurityConfiguration
 	////	return new AnonymousQueue();
 	////}
 
+	//@Bean
+    //public DirectExchange direct() 
+	//{
+    //    return new DirectExchange("tut.direct");
+    //}
+
 	@Bean
-    public DirectExchange direct() 
+	public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory)
 	{
-        return new DirectExchange("tut.direct");
-    }
+		final var rabbitTemplate = new RabbitTemplate(connectionFactory);
+		rabbitTemplate.setMessageConverter(jsonMessageConverter());
+		return rabbitTemplate;
+	}
 
 	@Bean
 	public MessageConverter jsonMessageConverter() {
 		return new Jackson2JsonMessageConverter();
 	}
 
-	@Bean public Queue hello() 
-	{
-		return new Queue(queueName, false);
-	}
+	//@Bean public Queue hello() 
+	//{
+	//	return new Queue(queueName, false);
+	//}
 
-	@Bean
-	TopicExchange exchange() 
-	{
-		return new TopicExchange(topicExchangeName);
-	}
+	//@Bean
+	//TopicExchange exchange() 
+	//{
+	//	return new TopicExchange(topicExchangeName);
+	//}
 
-	@Bean
-	Binding binding(Queue queue, TopicExchange exchange) 
-	{
-		return BindingBuilder.bind(queue).to(exchange).with("user.#");
-	}
+	//@Bean
+	//Binding binding(Queue queue, TopicExchange exchange) 
+	//{
+	//	return BindingBuilder.bind(queue).to(exchange).with("user.#");
+	//}
 
 	@Bean
 	public RSender sender() {
