@@ -58,6 +58,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.core.Message;
 import com.jonathan.web.resources.TestDto;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 //import org.springframework.amqp.core.ExchangeTypes.*;
 
@@ -81,42 +82,27 @@ public class TReceiver
         exchange = @Exchange(value = "amq.topic", type = "topic"),
         key = "user.*")
 	)
-    //public void receive(@RequestHeader(name="login") String username, @RequestHeader(name="passcode") String token, @RequestBody String playerList)
-    //public void receive(@RequestBody String playerList)
-    //public void receive(final Message playerList)
-    //public void receive(final Message playerList)
-	//{
-    //    //System.out.println(" [x] Received '" + playerList + "'");
-    //    //logger.error(" [x] message from amq topic: '" + playerList.getMessage() + "'");
-    //    //logger.error(" [x] message from user " + username + " with token: " + token + " amq.topic user.*: '" + playerList.getMessage() + "'");
-    //    //logger.error(" [x] message from amq.topic user.*: '" + playerList.getMessage() + "'");
-
-	//	//Test
-    //    //logger.error(" [x] message from user " + username + " with token: " + token + " amq.topic user.*: '" + playerList + "'");
-    //    logger.error(" [x] message from user amq.topic user.*: '" + playerList.toString() + "'");
-    //    logger.error(" [x] message from user amq.topic user.*: '" + playerList.getBody() + "'");
-	//	String convertedString = new String(playerList.getBody(), StandardCharsets.UTF_8);
-    //    logger.error("to utf8: " + convertedString);
-
-	//	//ObjectMapper objectMapper = new ObjectMapper();
-	//	//objectMapper.readValue(playerList.
-    //}
-    public void receive(@RequestBody final TestDto playerList)
+    public void receive(Message message)
 	{
-        //System.out.println(" [x] Received '" + playerList + "'");
-        //logger.error(" [x] message from amq topic: '" + playerList.getMessage() + "'");
-        //logger.error(" [x] message from user " + username + " with token: " + token + " amq.topic user.*: '" + playerList.getMessage() + "'");
-        //logger.error(" [x] message from amq.topic user.*: '" + playerList.getMessage() + "'");
+        Map<String, Object> headers = message.getMessageProperties().getHeaders();
+		String routingKey = message.getMessageProperties().getReceivedRoutingKey();
+		String routingUsername = routingKey.substring(5);
+		String headerUsername = headers.get("login").toString();
 
-		//Test
-        //logger.error(" [x] message from user " + username + " with token: " + token + " amq.topic user.*: '" + playerList + "'");
-        logger.error(" [x] message from user amq.topic user.*: '" + playerList.getMessage() + "'");
-        //logger.error(" [x] message from user amq.topic user.*: '" + playerList.getBody() + "'");
-		//String convertedString = new String(playerList.getBody(), StandardCharsets.UTF_8);
-        //logger.error("to utf8: " + convertedString);
+		//receivedRoutingKey=user.test_user123
 
-		//ObjectMapper objectMapper = new ObjectMapper();
-		//objectMapper.readValue(playerList.
+        logger.error(" [x] message headers login: " + headers.get("login"));
+        logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
+
+		// check if username in header matches routing key format 'user.<username>'
+		if (!routingUsername.equals(headerUsername))
+		{
+			logger.error("routing key username: " + routingUsername);
+			logger.error("Fail username / topic comparison");
+			return;
+		}
+
+		tictactoeService.userCheckIn(routingUsername);
     }
 
 	//@RabbitListener(bindings = @QueueBinding(

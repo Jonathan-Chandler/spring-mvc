@@ -12,17 +12,21 @@ import { Stomp, Client } from '@stomp/stompjs';
 
 export default function TictactoeAmqpTest()
 {
-	////const [socketUrl, setSocketUrl] = useState('ws://172.17.0.3:61611/ws');
-	////const [stompTopic, setStompTopic] = useState('/topic/hello');
-	////const [stomp_subscribe_header] = useState({login: 'test_user123', passcode: 'password124'});
-	//////const [webSockSession, setWebSockSession] = useState(null);
-	////const [stompSession, setStompSession] = useState(null);
-	////const [playerList, setPlayerList] = useState([{}]);
-	////const [debugStompEnabled, setDebugStompEnabled] = useState(true);
-	////const [debugWsEnabled, setDebugWsEnabled] = useState(false);
-	////const [stompMessage, setStompMessage] = useState([]);
-	const [stomp_headers] = useState({login: 'test_user123', passcode: 'password123'});
 	const { username, token, isAuthenticated, getStompSession, playerList } = useAuth();
+	const data = ["A", "B", "C", "D"]
+    const [state, setState] = useState({
+      convertedPlayerList: [],
+      message: "",
+      loadedTodos: false,
+    });
+
+	useEffect(() =>
+	{
+		//setState({...state, convertedPlayerList: ["aoeu","oaeu"]})
+		console.log("playerList: " + playerList);
+		console.log("convertedPlayerList: " + state.convertedPlayerList);
+		//setState({...state, convertedPlayerList: playerList})
+	},[state, playerList])
 
 	const sendMessage = () => 
 	{
@@ -51,106 +55,46 @@ export default function TictactoeAmqpTest()
 		console.log("send body: " + JSON.stringify(data))
 	};
 
-	////const onMessage = useCallback((d) =>
-	////{
-	////	try 
-	////	{
-	////		var parsed = JSON.parse(d.body);
-	////		var message = parsed.message;
-	////		setStompMessage(stompMessage.push(message));
-	////		setPlayerList((playerList) => [...playerList, parsed]);
-	////	}
-	////	catch (err)
-	////	{
-	////		console.log("Failed to get message: " + err);
-	////	}
-	////},[stompMessage])
-	//////},[stompMessage, playerList])
-
-	////useEffect(() => 
-	////{
-	////	//const client = new StompJs.Client({
-	////	const client = new Client({
-	////		brokerURL: 'ws://172.17.0.3:61611/ws',
-	////		connectHeaders: {
-	////			login: 'test_user123',
-	////			passcode: 'password123',
-	////			//'heart-beat': '4000,4000'
-	////		},
-
-	////		debug: function (str) 
-	////		{
-	////			console.log(str);
-	////		},
-	////		reconnectDelay: 5000,
-	////		//heartbeatIncoming: 4000,
-	////		//heartbeatOutgoing: 4000,
-	////	});
-
-	////	client.onConnect = function (frame) 
-	////	{
-	////		console.log("onConnect")
-
-	////		// all subscribes must be done here for reconnect
-	////  		client.subscribe(
-	////  			stompTopic, 
-	////  			onMessage, 
-	////  			stomp_headers
-	////		);
-	////	};
-
-	////	client.onStompError = function (frame) {
-	////		// error encountered at Broker
-	////		console.log('Broker reported error: ' + frame.headers['message']);
-	////		console.log('Additional details: ' + frame.body);
-	////	};
-
-	////	// init and save stomp session
-	////	client.activate();
-	////	setStompSession(client);
-	////},[stompTopic, onMessage, stomp_headers])
-
-	////// send message to stomp topic
-	////const sendMessage = () => 
-	////{
-	////	const data = {message: "test_message"}
-	////	console.log("send " + data)
-
-	////	// Additional headers
-	////	//client.publish({
-	////	stompSession.publish({
-	////	  destination: '/topic/hello',
-	////	  body: JSON.stringify(data),
-	////	  headers: stomp_headers,
-	////	});
-	////};
-
 	return (
 		<div>
 			amqp test
 			<p />
-				<div className="container">
-					<table className="table">
-						<thead>
-							<tr>
-								<th>Username</th>
-							</tr>
-						</thead>
-						<tbody>
-							{
-								playerList && playerList.map(
-									player =>
-										<tr key={player.id}>
-											<td>{player.message}</td>
-										</tr>
-								)
-							}
-						</tbody>
-					</table>
-				</div>
+			<div className="container">
+				<table className="table">
+					<tr>
+						<th>Name</th>
+					</tr>
+					<tbody>
+						{
+							playerList.map((item) => (
+								<tr key={item}>
+									<td>{item}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
 			<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
 		</div>
 	);
+
+}
+////				<div className="container">
+////					<table className="table">
+////						<thead>
+////							<tr>
+////								<th>Username</th>
+////							</tr>
+////						</thead>
+////						<tbody>
+////							{
+////								createTable()
+////							}
+////						</tbody>
+////					</table>
+////				</div>
+////			<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
 	//const {sendMessage, lastMessage, readyState} = useWebSocket(socketUrl)
 
 	//////useEffect(() => {
@@ -316,5 +260,77 @@ export default function TictactoeAmqpTest()
 	//	//stompSession.send(stompTopic, {}, JSON.stringify(data));
 	//	stompSession.send(stompTopic, stomp_subscribe_header, JSON.stringify(data));
 	//};
+	////const onMessage = useCallback((d) =>
+	////{
+	////	try 
+	////	{
+	////		var parsed = JSON.parse(d.body);
+	////		var message = parsed.message;
+	////		setStompMessage(stompMessage.push(message));
+	////		setPlayerList((playerList) => [...playerList, parsed]);
+	////	}
+	////	catch (err)
+	////	{
+	////		console.log("Failed to get message: " + err);
+	////	}
+	////},[stompMessage])
+	//////},[stompMessage, playerList])
 
-}
+	////useEffect(() => 
+	////{
+	////	//const client = new StompJs.Client({
+	////	const client = new Client({
+	////		brokerURL: 'ws://172.17.0.3:61611/ws',
+	////		connectHeaders: {
+	////			login: 'test_user123',
+	////			passcode: 'password123',
+	////			//'heart-beat': '4000,4000'
+	////		},
+
+	////		debug: function (str) 
+	////		{
+	////			console.log(str);
+	////		},
+	////		reconnectDelay: 5000,
+	////		//heartbeatIncoming: 4000,
+	////		//heartbeatOutgoing: 4000,
+	////	});
+
+	////	client.onConnect = function (frame) 
+	////	{
+	////		console.log("onConnect")
+
+	////		// all subscribes must be done here for reconnect
+	////  		client.subscribe(
+	////  			stompTopic, 
+	////  			onMessage, 
+	////  			stomp_headers
+	////		);
+	////	};
+
+	////	client.onStompError = function (frame) {
+	////		// error encountered at Broker
+	////		console.log('Broker reported error: ' + frame.headers['message']);
+	////		console.log('Additional details: ' + frame.body);
+	////	};
+
+	////	// init and save stomp session
+	////	client.activate();
+	////	setStompSession(client);
+	////},[stompTopic, onMessage, stomp_headers])
+
+	////// send message to stomp topic
+	////const sendMessage = () => 
+	////{
+	////	const data = {message: "test_message"}
+	////	console.log("send " + data)
+
+	////	// Additional headers
+	////	//client.publish({
+	////	stompSession.publish({
+	////	  destination: '/topic/hello',
+	////	  body: JSON.stringify(data),
+	////	  headers: stomp_headers,
+	////	});
+	////};
+

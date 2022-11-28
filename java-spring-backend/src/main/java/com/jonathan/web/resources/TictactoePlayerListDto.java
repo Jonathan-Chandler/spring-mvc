@@ -14,14 +14,15 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class TictactoePlayerListDto 
 {
-	//public TictactoePlayerListDto(String username, boolean myRequest, boolean theirRequest)
+	//TictactoePlayerListDto(String[] players)
 	//{
-	//	this.username = username;
-	//	this.myRequest = myRequest;
-	//	this.theirRequest = theirRequest;
+	//	Arrays.copyOf(players, players.length);
 	//}
-	private String username;
-	private boolean myRequest;
-	private boolean theirRequest;
+
+	private String[] usernames;
+	//@Override
+    //public String toString() {
+    //    return String.format("{usernames:%s}", usernames);
+    //}
 }
 

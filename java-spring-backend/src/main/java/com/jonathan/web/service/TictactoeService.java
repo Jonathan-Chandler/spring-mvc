@@ -7,7 +7,9 @@ import com.jonathan.web.resources.TictactoePlayerListDto;
 
 public interface TictactoeService
 {
-  public List<TictactoePlayerListDto> getPlayerList();
+  //public List<TictactoePlayerListDto> getPlayerList();
+	public TictactoePlayerListDto getPlayerList();
+	public void userCheckIn(String playerName);
 //  public Tictactoe findByPlayer(String username);
 //
 //  public void deleteById(int id);
