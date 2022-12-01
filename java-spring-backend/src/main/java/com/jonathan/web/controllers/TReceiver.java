@@ -80,17 +80,15 @@ public class TReceiver
 	@RabbitListener(bindings = @QueueBinding(
 		value = @Queue(value = "playerQueue", durable = "true"),
         exchange = @Exchange(value = "amq.topic", type = "topic"),
-        key = "user.*")
+        key = "from.user.*")
 	)
-    public void receive(Message message)
+    public void receive(Message message, @RequestBody final TestDto value)
 	{
         Map<String, Object> headers = message.getMessageProperties().getHeaders();
 		String routingKey = message.getMessageProperties().getReceivedRoutingKey();
-		String routingUsername = routingKey.substring(5);
+		String routingUsername = routingKey.substring(10);
 		String headerUsername = headers.get("login").toString();
-
-		//receivedRoutingKey=user.test_user123
-
+		String requestToUser = value.getMessage();
         logger.error(" [x] message headers login: " + headers.get("login"));
         logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
 
@@ -102,7 +100,16 @@ public class TReceiver
 			return;
 		}
 
+		//receivedRoutingKey=user.test_user123
+        logger.error("get testDto value: " + value.getMessage());
+
+		// update last check in time
 		tictactoeService.userCheckIn(routingUsername);
+
+
+		// send match request
+		logger.error("userRequestMatch(" + headerUsername + ", " + requestToUser + ")");
+		tictactoeService.userRequestMatch(headerUsername, requestToUser);
     }
 
 	//@RabbitListener(bindings = @QueueBinding(

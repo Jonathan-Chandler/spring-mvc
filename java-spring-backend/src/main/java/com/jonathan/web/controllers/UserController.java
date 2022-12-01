@@ -291,7 +291,8 @@ public class UserController
 		@RequestParam("routing_key")  String routing_key
 	)
 	{
-		String userRoutingKey = "user." + username;
+		String toUserRoutingKey = "to.user." + username;
+		String fromUserRoutingKey = "from.user." + username;
 		String playerlistRoutingKey = "playerlist";
 
 		// Get /rabbitmq/topic request:  username: test_user123 vhost: / resource: topic name: amq.topic permission: write routing_key: user.test_user123
@@ -351,9 +352,14 @@ public class UserController
 			return "deny";
 		}
 
-		// allow read/write for current user on /topic/user.<username>
-		if ((permission.equals("read") || permission.equals("write")) 
-			&& routing_key.equals(userRoutingKey))
+		// allow read for user on /topic/to.user.<username>
+		if (permission.equals("read") && routing_key.equals(toUserRoutingKey))
+		{
+			return "allow";
+		}
+
+		// allow write for user on /topic/from.user.<username>
+		if (permission.equals("write") && routing_key.equals(fromUserRoutingKey))
 		{
 			return "allow";
 		}

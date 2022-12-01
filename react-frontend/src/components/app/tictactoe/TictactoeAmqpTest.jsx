@@ -38,7 +38,7 @@ export default function TictactoeAmqpTest()
 		// Additional headers
 		//client.publish({
 		let pass = token.split(' ')[1]
-		const msg_destination = "/topic/user." + username
+		const msg_destination = "/topic/from.user." + username
 		//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
 		stompSession.publish({
 		  destination: msg_destination,
@@ -49,6 +49,34 @@ export default function TictactoeAmqpTest()
 			  passcode: pass, 
 			  "content-type":"application/json", 
 			  "content-encoding":"UTF-8", "__TypeId__":"com.jonathan.web.resources.TestDto"
+		  }
+		});
+		  //body: JSON.stringify(data),
+		console.log("send body: " + JSON.stringify(data))
+	};
+
+	const sendRequest = (name) => 
+	{
+		let stompSession = getStompSession();
+		const data = {message: name}
+		//const data = "test";
+		console.log("send " + data)
+
+		// Additional headers
+		//client.publish({
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  //body: "{\"message\":\"data\"}",
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.resources.TestDto"
 		  }
 		});
 		  //body: JSON.stringify(data),
@@ -69,6 +97,7 @@ export default function TictactoeAmqpTest()
 							playerList.map((item) => (
 								<tr key={item}>
 									<td>{item}</td>
+									<td><button className="btn btn-success" onClick={() => sendRequest(item)}>Message</button></td>
 								</tr>
 							))
 						}
@@ -76,6 +105,8 @@ export default function TictactoeAmqpTest()
 				</table>
 			</div>
 			<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
+			<p /><button className="btn btn-success" onClick={() => sendRequest("test_user123")}>req test_user123</button>
+			<p /><button className="btn btn-success" onClick={() => sendRequest("test_user1234")}>req test_user1234</button>
 		</div>
 	);
 

@@ -211,31 +211,6 @@ export function AuthProvider({
 			return axiosSession;
 		}, [handleResponseAuthFailure, token]);
 
-	//const getPlayerList = useCallback(() =>
-	//	{
-	//		return playerList;
-	//	},[playerList]);
-
-	//const onMessage = useCallback((d) =>
-	//{
-	//	try 
-	//	{
-	//		var parsed = JSON.parse(d.body);
-	//		//var message = parsed.message;
-	//		//setStompMessage(stompMessage.push(message));
-	//		setPlayerList((playerList) => [...playerList, parsed]);
-	//	}
-	//	catch (err)
-	//	{
-	//		console.log("Failed to get message: " + err);
-	//	}
-	//},[])
-
-	//const createStompSession = ( () =>
-	//{
-
-	//})
-
 	const handlePlayerlistRx = useCallback(async (message: IMessage) => {
 		console.log("handleplayerlistrx: " + message);
 		let messageBody = JSON.parse(message.body);
@@ -254,6 +229,15 @@ export function AuthProvider({
 		console.log("stringNewPlayerList: " + JSON.stringify(newPlayerList));
 		const regularArray = ["abc", "def", "ghi"];
 		console.log("regular array: " + regularArray);
+
+		// don't return this username in playerlist
+		const index = newPlayerList.indexOf(username)
+		if (index > -1)
+		{
+			newPlayerList.splice(index, 1); // 2nd parameter means remove one item only
+			console.log("new player list: " + newPlayerList)
+		}
+
 		setPlayerList(newPlayerList);
 		// console.log("jsonparse newPlayerList: " + JSON.parse(newPlayerList)); - not valid json
 
@@ -267,11 +251,27 @@ export function AuthProvider({
 
 		//console.log("rx playerlist: " + JSON.stringify(newPlayerList))
 		//console.log("rx playerlist: " + newPlayerList)
-	},[]);
+	},[username]);
 
 	const handleUserRx = useCallback(async (message: IMessage) => {
-		console.log("handleUserRx: " + message);
-	},[]);
+		let loginHeader = message.headers["login"];
+		let messageType = message.headers["__TypeId__"];
+		console.log("loginHeader: " + loginHeader);
+		console.log("handleUserRx: message: " + message);
+
+		if (loginHeader === username)
+		{
+			console.log("outgoing message");
+			console.log("messageType: " + messageType);
+			return;
+		}
+
+		console.log("messageType: " + messageType);
+		//{
+		console.log("incoming message: " + message);
+		//}
+
+	},[username]);
 
 	useEffect(() =>
 	{
@@ -316,16 +316,24 @@ export function AuthProvider({
 		{
 			const pass = token.split(' ')[1]
 			const stompHeaders = {login: username, passcode: pass};
+			//const stompHeaders2 = {login: username, passcode: pass, ack: 'client'};
 			const usernameTopic = '/topic/user.' + username;
+			const toUsernameTopic = '/topic/to.user.' + username;
 
 			stompClientSession.configure({
 				brokerURL: "ws://172.17.0.3:61611/ws",
 				connectHeaders: stompHeaders,
 				onConnect: () => 
 					{
+					//stompClientSession.subscribe
+					//(
+					//	fromUsernameTopic,
+					//	handleUserRx,
+					//	stompHeaders2,
+					//)
 					stompClientSession.subscribe
 					(
-						usernameTopic,
+						toUsernameTopic,
 						handleUserRx,
 						stompHeaders,
 					)
@@ -345,6 +353,8 @@ export function AuthProvider({
 			});
 
 			stompClientSession.activate();
+
+			// check in every 15 seconds for playerlist
 			const interval = setInterval(() => 
 				{
 					const data = {message: "test_message"}
@@ -353,7 +363,7 @@ export function AuthProvider({
 
 					// Additional headers
 					let pass = token.split(' ')[1]
-					const msg_destination = "/topic/user." + username
+					const msg_destination = "/topic/from.user." + username
 					//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
 					stompClientSession.publish({
 						destination: msg_destination,
@@ -378,9 +388,6 @@ export function AuthProvider({
 		}
 	},[stompClientSession, username, token, loading, loadingInitial, handleUserRx, handlePlayerlistRx]);
 
-	// check in every 15 seconds
-	useEffect(() => {
-	}, [stompClientSession, username, token]);
 
 	const getStompSession = useCallback(() =>
 	{

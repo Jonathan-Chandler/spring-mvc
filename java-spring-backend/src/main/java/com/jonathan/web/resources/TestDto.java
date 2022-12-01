@@ -1,7 +1,8 @@
 package com.jonathan.web.resources;
 
-public class TestDto {
-
+//public class TestDto extends Serializable
+public class TestDto
+{
   private String message;
 
   public TestDto() {
@@ -14,5 +15,4 @@ public class TestDto {
   public String getMessage() {
     return message;
   }
-
 }

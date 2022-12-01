@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.jonathan.web.resources.TictactoePlayer;
+import org.springframework.lang.NonNull;
+
 
 @Service
 public class TictactoeServiceImpl implements TictactoeService
@@ -21,12 +25,16 @@ public class TictactoeServiceImpl implements TictactoeService
 	@Autowired
 	Logger logger;
 
+    @Autowired
+    private RabbitTemplate template;
+
 	@Autowired
 	private UserService userService;
 
 	public TictactoeServiceImpl()
 	{
-		playerList = new ConcurrentHashMap<String, Long>();
+		onlinePlayerList = new ConcurrentHashMap<String, Long>();
+		playerList = new ConcurrentHashMap<String, TictactoePlayer>();
 	}
 
 	//Map<Integer, Object> table = new ConcurrentHashMap<>();
@@ -34,7 +42,10 @@ public class TictactoeServiceImpl implements TictactoeService
 	//Map<Integer, String> map = new ConcurrentHashMap<>();
 	//Map m = Collections.synchronizedMap(new HashMap(...));
 
-	ConcurrentMap<String, Long> playerList;
+	ConcurrentMap<String, Long> onlinePlayerList;
+	ConcurrentMap<String, TictactoePlayer> playerList;
+	//ConcurrentMap<String, List<String>> gameRequestList;
+	//ConcurrentMap<String, TictactoePlayer> playerList;
 
 	//public List<TictactoePlayerListDto> getPlayerList()
 	public TictactoePlayerListDto getPlayerList()
@@ -50,9 +61,9 @@ public class TictactoeServiceImpl implements TictactoeService
 		//playerList.removeIf(entry -> (entry.getValue() - timeNow > checkinTimeout));
 
 		ArrayList<String> deletedPlayers = new ArrayList<String>();
-		for ( String key : playerList.keySet() ) 
+		for ( String key : onlinePlayerList.keySet() ) 
 		{
-			long playerCheckinTime = playerList.get(key);
+			long playerCheckinTime = onlinePlayerList.get(key);
 
 			if ((timeNow - playerCheckinTime > checkinTimeout))
 			{
@@ -65,11 +76,10 @@ public class TictactoeServiceImpl implements TictactoeService
 
 		for ( String deletedPlayer : deletedPlayers ) 
 		{
-			playerList.remove(deletedPlayer);
+			onlinePlayerList.remove(deletedPlayer);
 		}
 
 		logger.error("player list: " + activePlayers);
-
 		return (new TictactoePlayerListDto(activePlayers.toArray(new String[0])));
 	}
 
@@ -78,7 +88,91 @@ public class TictactoeServiceImpl implements TictactoeService
 		long lastCheckin = System.currentTimeMillis();
         logger.error("checked in player: " + playerName + " at time: " + lastCheckin);
 
-		playerList.put(playerName, lastCheckin);
+		onlinePlayerList.put(playerName, lastCheckin);
+
+		if (playerList.get(playerName) == null)
+		{
+			playerList.put(playerName, new TictactoePlayer(lastCheckin));
+			logger.error("new player: " + playerName);
+		}
 	}
+
+	public void userRequestMatch(@NonNull String requestFrom, @NonNull String requestTo)
+	{
+		logger.error("requestFrom: " + requestFrom);
+		logger.error("requestTo: " + requestTo);
+
+		if (requestFrom.equals("") || requestTo.equals("") || requestFrom.equals(requestTo))
+		{
+			logger.error("Bad request");
+			return;
+		}
+
+		TictactoePlayer requestToPlayer = playerList.get(requestTo);
+		TictactoePlayer requestFromPlayer = playerList.get(requestFrom);
+
+		// player is not in list
+		if (playerList.get(requestTo) == null || playerList.get(requestFrom) == null)
+		{
+			logger.error("could not find player");
+			return;
+		}
+
+		// player is already in a game
+		if (requestToPlayer.isInLobby() || requestFromPlayer.isInLobby())
+		{
+			logger.error("Player already in game");
+			return;
+		}
+
+		// if other user requested a match against this player
+		if (requestToPlayer.hasRequestedUser(requestFrom))
+		{
+			String topic = "amq.topic";
+			String requestToPlayerKey = "to.user." + requestTo;
+			String requestFromPlayerKey = "to.user." + requestFrom;
+			String message = "join game with " + requestToPlayer + " and " + requestFromPlayer;
+
+			// clear request list for both users
+			requestToPlayer.clearRequests();
+			requestFromPlayer.clearRequests();
+
+			// send both users to game
+			template.convertAndSend(topic, requestToPlayerKey, message);
+			template.convertAndSend(topic, requestFromPlayerKey, message);
+		}
+		else
+		{
+			// no match, add to request list
+			requestFromPlayer.addRequestedUser(requestTo);
+		}
+	}
+
+	//public void userRequestMatch(String requestFrom, String requestTo)
+	//{
+	//	TictactoePlayer requestToPlayer = playerList.get(requestTo);
+	//	TictactoePlayer requestFromPlayer = playerList.get(requestFrom);
+
+	//	if (playerList.get(requestTo) == null || playerList.get(requestFrom) == null)
+	//	{
+	//		logger.error("could not find player");
+	//		return;
+	//	}
+
+	//	// start a new game
+	//	if (requestToPlayer.hasRequestedUser(requestFrom))
+	//	{
+	//		String topic = "amq.topic";
+	//		String requestToPlayerKey = "to.user." + requestTo;
+	//		String requestFromPlayerKey = "to.user." + requestFrom;
+	//		String message = "join game with " + requestToPlayer + " and " + requestFromPlayer;
+	//		template.convertAndSend(topic, requestToPlayerKey, message);
+	//		template.convertAndSend(topic, requestFromPlayerKey, message);
+	//	}
+	//	else
+	//	{
+	//		requestFromPlayer.addRequestedUser(requestTo);
+	//	}
+	//}
 }
 
