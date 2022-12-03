@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -62,10 +64,15 @@ import java.util.Map;
 
 //import org.springframework.amqp.core.ExchangeTypes.*;
 
+import org.springframework.context.annotation.Profile;
+
+@Profile("production")
 public class TReceiver 
 {
-	@Autowired
-	Logger logger;
+	//@Autowired
+	//Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
 	@Autowired
 	private TictactoeService tictactoeService;

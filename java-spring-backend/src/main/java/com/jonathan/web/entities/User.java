@@ -27,23 +27,23 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails
 {
 	@Id
 	@NotEmpty
 	@Column(unique=true, name="id")
-	@Size(min=8, max=50)
+	//@Size(min=8, max=50)
 	private int id;
 
 	@NotEmpty
-	@Column(unique=true, name="username", length=50)
-	@Size(min=8, max=50)
+	@Column(unique=true, name="username", length=36)
+	@Size(min=8, max=36)
 	private String username;
 
 	@NotEmpty
-	@Column(unique=true, name="email", length=100)
-	@Size(min=10, max=100)
+	@Column(unique=true, name="email", length=254)
+	@Size(min=8, max=254)
 	private String email;
 
 	@NotEmpty

@@ -89,15 +89,32 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <scope>runtime</scope>
     </dependency>
+
+	<!-- execute unit tests -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+
+	<!-- h2database for unit test -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+	  <scope>test</scope>
+    </dependency>
+
+	<!-- mockito for unit test -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+	  <scope>test</scope>
     </dependency>
   </dependencies>
 

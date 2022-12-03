@@ -49,12 +49,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.jonathan.web.service.UserDetailsServiceImpl;
 import com.jonathan.web.resources.UserLoginDto;
 import com.jonathan.web.resources.OnlineUserDto;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserServiceImpl implements UserService
 {
-	@Autowired
-	Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	// @Autowired
+	// Logger logger;
 
 	@Autowired
 	UserRepository userRepository;

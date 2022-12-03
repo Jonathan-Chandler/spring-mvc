@@ -15,6 +15,7 @@ import java.util.List;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.lang.NonNull;
+import org.slf4j.LoggerFactory;
 
 public class TictactoeGame 
 {
@@ -36,11 +37,9 @@ public class TictactoeGame
 		NONE,
 	}
 
-	@Autowired
-	Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private static final int ACTION_TIMEOUT = 15;
-	private static final int BOARD_SIZE = 9;
+	public static final int BOARD_SIZE = 9;
 
 	// game is starting/player is moving/player won/draw
 	private GameState gameState;
@@ -56,13 +55,16 @@ public class TictactoeGame
 	// 3x3 tictactoe game board (row = index/3; col = row%3)
 	private char gameBoard[];
 
-	// time that last allowed move was received from user
-	private Long lastMoveTime;
+	// milliseconds before game times out if no action taken
+	public static final long ACTION_TIMEOUT_MS = 15000;
+
+	// system time (in milliseconds) that last allowed move was received from user
+	private long lastMoveTimeMs;
 
 	// reason the game ended
 	private String gameOverMessage;
 
-	public TictactoeGame(@NonNull String xPlayer, @NonNull String oPlayer)
+	public TictactoeGame(long gameStartTimeMs, @NonNull String xPlayer, @NonNull String oPlayer)
 	{
 		// initialize board
 		gameBoard = new char[BOARD_SIZE];
@@ -72,11 +74,15 @@ public class TictactoeGame
 		gameState = GameState.STARTING;
 		
 		// record time as last
-		lastMoveTime = System.currentTimeMillis();
+		lastMoveTimeMs = gameStartTimeMs;
 
 		// player client has responded with waiting to play message
 		xPlayerReady = false;
 		oPlayerReady = false;
+
+		// record player names
+		xPlayerName = xPlayer;
+		oPlayerName = oPlayer;
 
 		gameOverMessage = "Unknown error";
 	}
@@ -113,10 +119,19 @@ public class TictactoeGame
 		logger.error(gameOverMessage);
 	}
 
-	// check if timeout and return game state
-	public GameState getGameState()
+	public Long getLastMoveTime()
 	{
-		long currentTime;
+		return lastMoveTimeMs;
+	}
+
+	public void setLastMoveTime(Long time)
+	{
+		lastMoveTimeMs = time;
+	}
+
+	// check if timeout and return game state
+	public GameState getGameState(long currentTimeMs)
+	{
 		// game already ended
 		if (gameState.ordinal() >= GameState.GAME_OVER_ERROR.ordinal())
 		{
@@ -124,15 +139,13 @@ public class TictactoeGame
 		}
 
 		// game timed out
-		currentTime = System.currentTimeMillis();
-		if ((currentTime - lastMoveTime) > ACTION_TIMEOUT)
+		if ((currentTimeMs - lastMoveTimeMs) > ACTION_TIMEOUT_MS)
 		{
-			handleTimeout(currentTime);
+			handleTimeout();
 		}
 
 		return gameState;
 	}
-
 	
 	public PlayerSymbol getPlayerSymbol(@NonNull String playerName)
 	{
@@ -146,7 +159,7 @@ public class TictactoeGame
 		return PlayerSymbol.NONE;
 	}
 
-	public boolean handlePlayerMove(PlayerSymbol symbol, int location)
+	public boolean handlePlayerMove(long currentTimeMs, PlayerSymbol symbol, int location)
 	{
 		// requested move is out of range
 		if (location > 0 && location < BOARD_SIZE)
@@ -159,7 +172,7 @@ public class TictactoeGame
 					(symbol == PlayerSymbol.O_PLAYER && gameState == GameState.O_PLAYER_MOVING))
 				{
 					// update last message receive time
-					lastMoveTime = System.currentTimeMillis();
+					lastMoveTimeMs = currentTimeMs;
 
 					// update board state
 					gameBoard[location] = (symbol == PlayerSymbol.X_PLAYER) ? 'X' : 'O';
@@ -263,31 +276,42 @@ public class TictactoeGame
 		}
 	}
 
-	public void handleTimeout(long currentTime)
+	public void handleTimeout()
 	{
+		GameState newGameState;
+
 		// game timed out
 		switch (gameState)
 		{
 			case STARTING:
+				// player(s) failed to join
 				setGameFailedToStartMessage();
 				gameState = GameState.GAME_OVER_ERROR;
+				newGameState = GameState.GAME_OVER_ERROR;
 				break;
 			case X_PLAYER_MOVING:
 				// player X took too long
-				gameState = GameState.GAME_OVER_O_WINS;
+				newGameState = GameState.GAME_OVER_O_WINS;
 				setGameTimeoutMessage(oPlayerName);
 				break;
 			case O_PLAYER_MOVING:
-				gameState = GameState.GAME_OVER_X_WINS;
+				// player O took too long
+				newGameState = GameState.GAME_OVER_X_WINS;
 				setGameTimeoutMessage(xPlayerName);
 				break;
 			default:
-				gameOverMessage = "Unknown game state: " + gameState.ordinal();
+				gameOverMessage = new String("Unknown game state: " + gameState.ordinal());
 				logger.error(gameOverMessage);
-				gameState = GameState.GAME_OVER_ERROR;
+				newGameState = GameState.GAME_OVER_ERROR;
 		}
+
+		gameState = newGameState;
 	}
 
+	public String getGameOverMessage()
+	{
+		return gameOverMessage;
+	}
 
 	public String getWinner()
 	{

@@ -2,6 +2,8 @@ package com.jonathan.web.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -71,7 +73,6 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.core.DirectExchange;
@@ -81,83 +82,58 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.jonathan.web.controllers.RSender;
 import com.jonathan.web.controllers.TReceiver;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ActiveProfiles("test")
+//@ContextConfiguration
 @Configuration
 @EnableWebSecurity
-@EnableScheduling
-@Profile("production")
-public class SecurityConfiguration
+//@EnableScheduling
+
+@SpringBootTest
+//@ExtendWith(SpringExtension.class)
+public class TestSecurityConfiguration
 {
 	//static final String topicExchangeName = "spring-boot-exchange";
 	//static final String topicExchangeName = "hello";
 	static final String topicExchangeName = "amq.topic";
 	static final String queueName = "spring-boot";
 
-	////@Bean
-    ////public TopicExchange playerList() {
-    ////    return new TopicExchange("tut.topic");
-    ////}
-
-	////@Bean
-	////public Queue autoDeleteQueue1() {
-	////	return new AnonymousQueue();
-	////}
-
 	//@Bean
-    //public DirectExchange direct() 
-	//{
-    //    return new DirectExchange("tut.direct");
+	//public RSender sender() {
+    //    return new RSender();
     //}
 
-	@Bean
-	public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory)
-	{
-		final var rabbitTemplate = new RabbitTemplate(connectionFactory);
-		rabbitTemplate.setMessageConverter(jsonMessageConverter());
-		return rabbitTemplate;
-	}
+	//@Bean
+	//public TReceiver receiver() {
+    //    return new TReceiver();
+    //}
+
+	//@Bean
+	//public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory)
+	//{
+	//	final var rabbitTemplate = new RabbitTemplate(connectionFactory);
+	//	rabbitTemplate.setMessageConverter(jsonMessageConverter());
+	//	return rabbitTemplate;
+	//}
 
 	@Bean
 	public MessageConverter jsonMessageConverter() {
 		return new Jackson2JsonMessageConverter();
 	}
 
-	//@Bean public Queue hello() 
-	//{
-	//	return new Queue(queueName, false);
-	//}
-
-	//@Bean
-	//TopicExchange exchange() 
-	//{
-	//	return new TopicExchange(topicExchangeName);
-	//}
-
-	//@Bean
-	//Binding binding(Queue queue, TopicExchange exchange) 
-	//{
-	//	return BindingBuilder.bind(queue).to(exchange).with("user.#");
-	//}
-
-	@Bean
-	public RSender sender() {
-        return new RSender();
-    }
-
-	@Bean
-	public TReceiver receiver() {
-        return new TReceiver();
-    }
-
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	//@Bean
-	//@Scope("prototype")
-	//public Logger produceLogger(InjectionPoint injectionPoint) {
-	//	Class<?> classOnWired = injectionPoint.getMember().getDeclaringClass();
-	//	return LoggerFactory.getLogger(classOnWired);
-	//}
+	@Bean
+	@Scope("prototype")
+	public Logger produceLogger(InjectionPoint injectionPoint) {
+		Class<?> classOnWired = injectionPoint.getMember().getDeclaringClass();
+		return LoggerFactory.getLogger(classOnWired);
+	}
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -233,5 +209,40 @@ public class SecurityConfiguration
 		// default is strength=10; range 4-31
 		return new BCryptPasswordEncoder(14);
 	}
+
+	////@Bean
+    ////public TopicExchange playerList() {
+    ////    return new TopicExchange("tut.topic");
+    ////}
+
+	////@Bean
+	////public Queue autoDeleteQueue1() {
+	////	return new AnonymousQueue();
+	////}
+
+	//@Bean
+    //public DirectExchange direct() 
+	//{
+    //    return new DirectExchange("tut.direct");
+    //}
+
+	//@Bean public Queue hello() 
+	//{
+	//	return new Queue(queueName, false);
+	//}
+
+	//@Bean
+	//TopicExchange exchange() 
+	//{
+	//	return new TopicExchange(topicExchangeName);
+	//}
+
+	//@Bean
+	//Binding binding(Queue queue, TopicExchange exchange) 
+	//{
+	//	return BindingBuilder.bind(queue).to(exchange).with("user.#");
+	//}
+
 }
+
 

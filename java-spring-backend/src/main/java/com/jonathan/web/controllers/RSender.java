@@ -7,12 +7,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.amqp.core.DirectExchange;
 import com.jonathan.web.resources.TictactoePlayerListDto;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.jonathan.web.resources.TestDto;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.BindingBuilder;
 import com.jonathan.web.service.TictactoeService;
+import org.springframework.context.annotation.Profile;
 
+@Profile("production")
 public class RSender 
 {
     @Autowired
@@ -27,8 +30,9 @@ public class RSender
     //@Autowired
     //private TopicExchange topic;
 
-    @Autowired
-    private Logger logger;
+    //@Autowired
+    //private Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private TictactoeService tictactoeService;

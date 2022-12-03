@@ -11,14 +11,17 @@ import com.jonathan.web.service.TodoService;
 import com.jonathan.web.dao.TodoRepository;
 import com.jonathan.web.entities.Todo;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class TodoServiceImpl implements TodoService
 {
   private TodoRepository todoRepository;
 
-  @Autowired
-  private Logger logger;
+  //@Autowired
+  //private Logger logger;
+  final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
   @Autowired
   public TodoServiceImpl(TodoRepository todoRepository)

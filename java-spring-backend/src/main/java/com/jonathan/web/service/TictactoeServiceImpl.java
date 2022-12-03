@@ -3,6 +3,7 @@ package com.jonathan.web.service;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import com.jonathan.web.entities.TictactoeGame;
@@ -22,8 +23,10 @@ import org.springframework.lang.NonNull;
 @Service
 public class TictactoeServiceImpl implements TictactoeService
 {
-	@Autowired
-	Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	//@Autowired
+	//Logger logger;
 
     @Autowired
     private RabbitTemplate template;

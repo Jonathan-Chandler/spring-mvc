@@ -27,7 +27,8 @@ public class JwtTokenService
   private JWSSigner signer;
   private JWSVerifier verifier;
 
-  private static final Logger logger = LoggerFactory.getLogger(JwtTokenService.class);
+  //private static final Logger logger = LoggerFactory.getLogger(JwtTokenService.class);
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   JwtTokenService() throws KeyLengthException, JOSEException
   {

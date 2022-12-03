@@ -57,6 +57,7 @@ import java.util.ArrayList;
 //import javax.json.JsonObject;
 //import org.springframework.http.
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 import java.util.concurrent.ExecutorService;
@@ -84,8 +85,9 @@ public class TictactoeController
 	@Autowired
 	private TictactoeService tictactoeService;
 
-	@Autowired
-	Logger logger;
+	//@Autowired
+	//Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@GetMapping(value="/greetings")
 	public void getMessages()

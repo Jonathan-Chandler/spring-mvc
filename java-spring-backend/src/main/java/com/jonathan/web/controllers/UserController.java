@@ -46,6 +46,7 @@ import org.springframework.http.HttpHeaders;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.jonathan.web.service.JwtTokenService;
 
 @RestController
@@ -58,8 +59,9 @@ public class UserController
 	@Autowired
 	private JwtTokenService jwtTokenService;
 
-	@Autowired
-	Logger logger;
+	//@Autowired
+	//Logger logger;
+	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@RequestMapping
 	(
