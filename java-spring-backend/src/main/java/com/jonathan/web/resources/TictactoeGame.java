@@ -64,6 +64,20 @@ public class TictactoeGame
 	// reason the game ended
 	private String gameOverMessage;
 
+	// create new game in error state
+	public TictactoeGame(long gameStartTimeMs)
+	{
+		// record time for auto delete
+		lastMoveTimeMs = gameStartTimeMs;
+
+		xPlayerReady = false;
+		oPlayerReady = false;
+
+		// game is in error state
+		gameState = GameState.GAME_OVER_ERROR;
+		gameOverMessage = "Unknown game failure - game did not exist";
+	}
+
 	public TictactoeGame(long gameStartTimeMs, @NonNull String xPlayer, @NonNull String oPlayer)
 	{
 		// initialize board

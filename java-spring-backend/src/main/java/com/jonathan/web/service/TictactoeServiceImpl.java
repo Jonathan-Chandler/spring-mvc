@@ -151,34 +151,37 @@ public class TictactoeServiceImpl implements TictactoeService
 		}
 	}
 
-	public ArrayList<String> getGameState(String playerName)
+	public TictactoeGame.GameState getGameState(String thisPlayerName)
 	{
 		long currentTime = System.currentTimeMillis();
-		ArrayList<String> deletedPlayers = new ArrayList<String>();
-		ArrayList<String> currentPlayerList = new ArrayList<String>();
+		TictactoeGame currentGame;
+		TictactoePlayer thisPlayer;
+		long thisGameId;
 
-		for ( String key : playerList.keySet() ) 
+		if (!playerList.containsKey(thisPlayerName))
 		{
-			TictactoePlayer currentPlayer = playerList.get(key);
-			if (!currentPlayer.isActive(currentTime))
-			{
-				deletedPlayers.add(key);
-			}
-			else
-			{
-				currentPlayerList.add(key);
-			}
+			currentGame = new TictactoeGame(currentTime);
+			return currentGame.getGameState(currentTime);
+		}
+		else
+		{
+			thisPlayer = playerList.get(thisPlayerName);
+			thisGameId = thisPlayer.getGameId();
 		}
 
-		// delete timed out players from playerList map
-		for ( String deletedPlayer : deletedPlayers ) 
+		if (!gameList.containsKey(thisGameId))
 		{
-			playerList.remove(deletedPlayer);
+			// return error state game if not in the list
+			currentGame = new TictactoeGame(currentTime);
+		}
+		else
+		{
+			// return tictactoe game
+			currentGame = gameList.get(thisGameId);
 		}
 
-		return currentPlayerList;
+		return currentGame.getGameState(currentTime);
 	}
-
 
 	public static synchronized long createGameId()
 	{

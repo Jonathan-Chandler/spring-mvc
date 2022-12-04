@@ -33,13 +33,14 @@ public class TictactoePlayer
 	private Long lastCheckin;
 
 	// ID of the game that this player has joined
-	private Long currentGame;
+	private Long currentGameId;
 
 	public TictactoePlayer(Long time)
 	{
 		state = PlayerState.NONE;
 		requestedUsers = new ArrayList<String>();
 		lastCheckin = time;
+		currentGameId = Long.valueOf(-1);
 	}
 
 	public void setCheckinTime(Long currentTime)
@@ -77,12 +78,20 @@ public class TictactoePlayer
 
 	public void joinGame(long currentTime, long gameId)
 	{
+		// set time that player joined game
+		lastCheckin = currentTime;
+
 		// set ID for game lookup
-		currentGame = gameId;
+		currentGameId = gameId;
 
 		// clear requested users and set state to join game
 		requestedUsers.clear();
 		state = PlayerState.JOINING_GAME;
+	}
+
+	public Long getGameId()
+	{
+		return currentGameId;
 	}
 
 	public void setState(PlayerState newState)
