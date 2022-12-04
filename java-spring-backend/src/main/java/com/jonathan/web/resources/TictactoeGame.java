@@ -159,10 +159,49 @@ public class TictactoeGame
 		return PlayerSymbol.NONE;
 	}
 
+	// user has checked in and is waiting to start the game
+	public void setPlayerReadyBySymbol(long currentTimeMs, @NonNull PlayerSymbol readyPlayer)
+	{
+		switch (readyPlayer)
+		{
+			case X_PLAYER:
+				xPlayerReady = true;
+				lastMoveTimeMs = currentTimeMs;
+				break;
+			case O_PLAYER:
+				oPlayerReady = true;
+				lastMoveTimeMs = currentTimeMs;
+				break;
+			default:
+				logger.error("Tried to set invalid player symbol as ready: " + readyPlayer.ordinal());
+				break;
+		}
+
+		// start the game with X player moving after both players are ready
+		if (oPlayerReady && xPlayerReady
+				&& gameState == GameState.STARTING)
+		{
+			gameState = GameState.X_PLAYER_MOVING;
+		}
+	}
+
+	public char getBoardTile(int tileId)
+	{
+		if (tileId >= 0 && tileId < BOARD_SIZE)
+			return gameBoard[tileId];
+
+		return '?';
+	}
+
+	public String getBoard()
+	{
+		return new String(gameBoard);
+	}
+
 	public boolean handlePlayerMove(long currentTimeMs, PlayerSymbol symbol, int location)
 	{
 		// requested move is out of range
-		if (location > 0 && location < BOARD_SIZE)
+		if (location >= 0 && location < BOARD_SIZE)
 		{
 			// space is empty
 			if (gameBoard[location] == '_')
@@ -194,23 +233,23 @@ public class TictactoeGame
 
 	private void setWinner(PlayerSymbol symbol)
 	{
-		if (symbol == PlayerSymbol.X_PLAYER)
+		switch (symbol) 
 		{
-			gameState = GameState.GAME_OVER_X_WINS;
-			gameOverMessage = "Player " + xPlayerName + " wins!";
-			logger.error("Game ends X player: " + xPlayerName + " wins against " + oPlayerName);
-		}
-		if (symbol == PlayerSymbol.O_PLAYER)
-		{
-			gameState = GameState.GAME_OVER_O_WINS;
-			gameOverMessage = "Player " + oPlayerName + " wins!";
-			logger.error("Game ends O player: " + oPlayerName + " wins against " + xPlayerName);
-		}
-		else 
-		{
-			gameState = GameState.GAME_OVER_DRAW;
-			gameOverMessage = "Draw!";
-			logger.error("Game ends in a draw: " + xPlayerName + " vs " + oPlayerName);
+			case X_PLAYER:
+				gameState = GameState.GAME_OVER_X_WINS;
+				gameOverMessage = "Player " + xPlayerName + " wins!";
+				logger.error("Game ends X player: " + xPlayerName + " wins against " + oPlayerName);
+				break;
+			case O_PLAYER:
+				gameState = GameState.GAME_OVER_O_WINS;
+				gameOverMessage = "Player " + oPlayerName + " wins!";
+				logger.error("Game ends O player: " + oPlayerName + " wins against " + xPlayerName);
+				break;
+			default:
+				gameState = GameState.GAME_OVER_DRAW;
+				gameOverMessage = "Draw!";
+				logger.error("Game ends in a draw: " + xPlayerName + " vs " + oPlayerName);
+				break;
 		}
 	}
 
@@ -286,18 +325,17 @@ public class TictactoeGame
 			case STARTING:
 				// player(s) failed to join
 				setGameFailedToStartMessage();
-				gameState = GameState.GAME_OVER_ERROR;
 				newGameState = GameState.GAME_OVER_ERROR;
 				break;
 			case X_PLAYER_MOVING:
 				// player X took too long
 				newGameState = GameState.GAME_OVER_O_WINS;
-				setGameTimeoutMessage(oPlayerName);
+				setGameTimeoutMessage(xPlayerName);
 				break;
 			case O_PLAYER_MOVING:
 				// player O took too long
 				newGameState = GameState.GAME_OVER_X_WINS;
-				setGameTimeoutMessage(xPlayerName);
+				setGameTimeoutMessage(oPlayerName);
 				break;
 			default:
 				gameOverMessage = new String("Unknown game state: " + gameState.ordinal());

@@ -30,15 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ActiveProfiles("test")
 //@ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class TestTictactoeGame 
+public class TestTictactoeGameInit
 {
-	//@Test
-	//public void testDummy()
-	//{
-	//	System.out.println("TEST DUMMY");
-	//	assertEquals(2, (1+1));
-	//}
-	private TictactoeGame testGame;
+	private TictactoeGame game;
 	private static long GAME_START_TIME = 30000;
 	private static String PLAYER_X_NAME = "xName";
 	private static String PLAYER_O_NAME = "oName";
@@ -46,19 +40,19 @@ public class TestTictactoeGame
 	@BeforeEach
 	public void initGame()
 	{
-		testGame = new TictactoeGame(GAME_START_TIME, PLAYER_X_NAME, PLAYER_O_NAME);
+		game = new TictactoeGame(GAME_START_TIME, PLAYER_X_NAME, PLAYER_O_NAME);
 	}
 
 	@Test
 	public void playerNamesShouldMatchSymbols()
 	{
 		// return expected symbols given player name
-		assertEquals(TictactoeGame.PlayerSymbol.X_PLAYER, testGame.getPlayerSymbol(PLAYER_X_NAME));
-		assertEquals(TictactoeGame.PlayerSymbol.O_PLAYER, testGame.getPlayerSymbol(PLAYER_O_NAME));
+		assertEquals(TictactoeGame.PlayerSymbol.X_PLAYER, game.getPlayerSymbol(PLAYER_X_NAME));
+		assertEquals(TictactoeGame.PlayerSymbol.O_PLAYER, game.getPlayerSymbol(PLAYER_O_NAME));
 
 		// return NONE PlayerSymbol given invalid player name
-		assertEquals(TictactoeGame.PlayerSymbol.NONE, testGame.getPlayerSymbol("notPlaying"));
-		assertEquals(TictactoeGame.PlayerSymbol.NONE, testGame.getPlayerSymbol(""));
+		assertEquals(TictactoeGame.PlayerSymbol.NONE, game.getPlayerSymbol("notPlaying"));
+		assertEquals(TictactoeGame.PlayerSymbol.NONE, game.getPlayerSymbol(""));
 	}
 
 	@Test
@@ -70,26 +64,47 @@ public class TestTictactoeGame
 		//System.out.println("afterTimeout: " + afterTimeout);
 
 		// game times out after failing to start
-		assertEquals(TictactoeGame.GameState.STARTING, testGame.getGameState(beforeTimeout));
-		assertEquals(TictactoeGame.GameState.GAME_OVER_ERROR, testGame.getGameState(afterTimeout));
-		System.out.println("Message: " + testGame.getGameOverMessage());
+		assertEquals(TictactoeGame.GameState.STARTING, game.getGameState(beforeTimeout));
+		assertEquals(TictactoeGame.GameState.GAME_OVER_ERROR, game.getGameState(afterTimeout));
 		String expectGameOverMessage = "Players " + PLAYER_X_NAME + " and " + PLAYER_O_NAME + " failed to join.";
-		assertEquals(expectGameOverMessage, testGame.getGameOverMessage());
+		assertEquals(expectGameOverMessage, game.getGameOverMessage());
 	}
 
 	@Test
-	public void gameStateReturnsTimeoutForSlowPlayer()
+	public void gameStateTimeoutIfPlayerFailsToJoin()
 	{
-		long beforeTimeout = GAME_START_TIME + TictactoeGame.ACTION_TIMEOUT_MS;
 		long afterTimeout = GAME_START_TIME + TictactoeGame.ACTION_TIMEOUT_MS + 1;
-		//System.out.println("beforeTimeout: " + beforeTimeout);
-		//System.out.println("afterTimeout: " + afterTimeout);
+
+		// O player is ready
+		game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER);
 
 		// game times out after failing to start
-		assertEquals(TictactoeGame.GameState.STARTING, testGame.getGameState(beforeTimeout));
-		assertEquals(TictactoeGame.GameState.GAME_OVER_ERROR, testGame.getGameState(afterTimeout));
+		assertEquals(TictactoeGame.GameState.GAME_OVER_ERROR, game.getGameState(afterTimeout));
+
+		// message matches timed out player
+		String expectGameOverMessage = "Player " + PLAYER_X_NAME + " failed to join.";
+		assertEquals(expectGameOverMessage, game.getGameOverMessage());
 	}
 
+	@Test
+	public void gameStateTimeoutIfPlayerSlow()
+	{
+		long afterTimeout = GAME_START_TIME + TictactoeGame.ACTION_TIMEOUT_MS + 1;
+
+		// both players ready
+		game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER);
+		game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER);
+
+		// game state set to X moving after both players check in
+		assertEquals(TictactoeGame.GameState.X_PLAYER_MOVING, game.getGameState(GAME_START_TIME));
+
+		// game times out after X takes too long
+		assertEquals(TictactoeGame.GameState.GAME_OVER_O_WINS, game.getGameState(afterTimeout));
+
+		// message matches timed out player
+		String expectGameOverMessage = "Player " + PLAYER_X_NAME + " took too long to move.";
+		assertEquals(expectGameOverMessage, game.getGameOverMessage());
+	}
 }
 
 
