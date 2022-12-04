@@ -50,6 +50,27 @@ public class TestTictactoeGameStarted
 	}
 
 	@Test
+	public void gameStateTimeoutIfPlayerSlow()
+	{
+		long afterTimeout = GAME_START_TIME + TictactoeGame.ACTION_TIMEOUT_MS + 1;
+
+		// game state set to X moving after both players check in
+		assertEquals(TictactoeGame.GameState.X_PLAYER_MOVING, game.getGameState(GAME_START_TIME));
+
+		// game times out after X takes too long
+		assertEquals(TictactoeGame.GameState.GAME_OVER_O_WINS, game.getGameState(afterTimeout));
+
+		// message matches timed out player
+		String expectGameOverMessage = "Player " + PLAYER_X_NAME + " took too long to move.";
+		assertEquals(expectGameOverMessage, game.getGameOverMessage());
+
+		// X tries to move after timeout
+		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
+
+		assertEquals(expectGameOverMessage, game.getGameOverMessage());
+	}
+
+	@Test
 	public void playerCanOnlyMoveOnTheirTurn()
 	{
 		// O tries to move on X turn
@@ -63,6 +84,21 @@ public class TestTictactoeGameStarted
 
 		// O tries to move on O turn
 		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
+	}
+
+	@Test
+	public void boardRejectsUsedTiles()
+	{
+		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
+		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
+		// X selects space taken by O
+		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1));
+
+		// X chooses valid space
+		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2));
+
+		// O selects space taken by X
+		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 0));
 	}
 
 	@Test

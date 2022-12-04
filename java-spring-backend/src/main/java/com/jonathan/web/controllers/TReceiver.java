@@ -91,32 +91,32 @@ public class TReceiver
 	)
     public void receive(Message message, @RequestBody final TestDto value)
 	{
-        Map<String, Object> headers = message.getMessageProperties().getHeaders();
-		String routingKey = message.getMessageProperties().getReceivedRoutingKey();
-		String routingUsername = routingKey.substring(10);
-		String headerUsername = headers.get("login").toString();
-		String requestToUser = value.getMessage();
-        logger.error(" [x] message headers login: " + headers.get("login"));
-        logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
+        //Map<String, Object> headers = message.getMessageProperties().getHeaders();
+		//String routingKey = message.getMessageProperties().getReceivedRoutingKey();
+		//String routingUsername = routingKey.substring(10);
+		//String headerUsername = headers.get("login").toString();
+		//String requestToUser = value.getMessage();
+        //logger.error(" [x] message headers login: " + headers.get("login"));
+        //logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
 
-		// check if username in header matches routing key format 'user.<username>'
-		if (!routingUsername.equals(headerUsername))
-		{
-			logger.error("routing key username: " + routingUsername);
-			logger.error("Fail username / topic comparison");
-			return;
-		}
+		//// check if username in header matches routing key format 'user.<username>'
+		//if (!routingUsername.equals(headerUsername))
+		//{
+		//	logger.error("routing key username: " + routingUsername);
+		//	logger.error("Fail username / topic comparison");
+		//	return;
+		//}
 
-		//receivedRoutingKey=user.test_user123
-        logger.error("get testDto value: " + value.getMessage());
+		////receivedRoutingKey=user.test_user123
+        //logger.error("get testDto value: " + value.getMessage());
 
-		// update last check in time
-		tictactoeService.userCheckIn(routingUsername);
+		//// update last check in time
+		//tictactoeService.userCheckIn(routingUsername);
 
 
-		// send match request
-		logger.error("userRequestMatch(" + headerUsername + ", " + requestToUser + ")");
-		tictactoeService.userRequestMatch(headerUsername, requestToUser);
+		//// send match request
+		//logger.error("userRequestMatch(" + headerUsername + ", " + requestToUser + ")");
+		//tictactoeService.userRequestMatch(headerUsername, requestToUser);
     }
 
 	//@RabbitListener(bindings = @QueueBinding(

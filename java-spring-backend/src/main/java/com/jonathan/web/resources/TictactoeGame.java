@@ -52,7 +52,7 @@ public class TictactoeGame
 	private boolean xPlayerReady;
 	private boolean oPlayerReady;
 
-	// 3x3 tictactoe game board (row = index/3; col = row%3)
+	// 3x3 tictactoe game board (row = index/3; col = index%3)
 	private char gameBoard[];
 
 	// milliseconds before game times out if no action taken

@@ -80,21 +80,21 @@ public class RSender
     @Scheduled(fixedDelay = 10000, initialDelay = 500)
     public void send() 
 	{
-		String topic = "amq.topic";
-		String key = "playerlist";
-		//TestDto testMessage = new TestDto("test");
-		//logger.error("sent message '" + testMessage.getMessage() + "' to topic: " + topic + " key: " + key);
-		//String[] playerListArr = {"abc", "def", "aaaaoeuao", "oaeuaoeuao"};
-		//TictactoePlayerListDto playerList = new TictactoePlayerListDto(playerListArr);
-		//logger.error("sent message '" + testMessage.toString() + "' to topic: " + topic + " key: " + key);
-		//logger.error("sent message '" + playerList.toString() + "' to topic: " + topic + " key: " + key);
+		//String topic = "amq.topic";
+		//String key = "playerlist";
+		////TestDto testMessage = new TestDto("test");
+		////logger.error("sent message '" + testMessage.getMessage() + "' to topic: " + topic + " key: " + key);
+		////String[] playerListArr = {"abc", "def", "aaaaoeuao", "oaeuaoeuao"};
+		////TictactoePlayerListDto playerList = new TictactoePlayerListDto(playerListArr);
+		////logger.error("sent message '" + testMessage.toString() + "' to topic: " + topic + " key: " + key);
+		////logger.error("sent message '" + playerList.toString() + "' to topic: " + topic + " key: " + key);
 
-		//template.convertAndSend(topic, key, playerList);
-		TictactoePlayerListDto newPlayerList = tictactoeService.getPlayerList();
-		logger.error("Sending player list: " + newPlayerList);
-		
-		// exchange, routingkey, object
-		template.convertAndSend(topic, key, newPlayerList);
-		//template.convertAndSend(topic, key, tictactoeService.getPlayerList());
+		////template.convertAndSend(topic, key, playerList);
+		//TictactoePlayerListDto newPlayerList = tictactoeService.getPlayerList();
+		//logger.error("Sending player list: " + newPlayerList);
+		//
+		//// exchange, routingkey, object
+		//template.convertAndSend(topic, key, newPlayerList);
+		////template.convertAndSend(topic, key, tictactoeService.getPlayerList());
 	}
 }

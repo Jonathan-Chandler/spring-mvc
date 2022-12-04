@@ -19,7 +19,15 @@ public class TictactoePlayerListDto
 	//	Arrays.copyOf(players, players.length);
 	//}
 
-	private String[] usernames;
+	// entire playerlist
+	private String[] playerList;
+
+	// players that this user has requested to play against
+	private String[] requestedUsers;
+
+	// players that have requested to play against this player
+	private String[] requestingUsers;
+
 	//@Override
     //public String toString() {
     //    return String.format("{usernames:%s}", usernames);

@@ -20,6 +20,9 @@ public class TictactoePlayer
 		IN_GAME,
 	}
 
+	// time before user will be removed from the list
+	private static final long PLAYER_TIMEOUT_MS = 15000;
+
 	// user is in lobby/game/game over/not waiting to play
 	private PlayerState state;
 
@@ -29,11 +32,24 @@ public class TictactoePlayer
 	// time that last message was received from user
 	private Long lastCheckin;
 
+	// ID of the game that this player has joined
+	private Long currentGame;
+
 	public TictactoePlayer(Long time)
 	{
 		state = PlayerState.NONE;
 		requestedUsers = new ArrayList<String>();
 		lastCheckin = time;
+	}
+
+	public void setCheckinTime(Long currentTime)
+	{
+		lastCheckin = currentTime;
+	}
+
+	public List<String> getRequestedUsers()
+	{
+		return requestedUsers;
 	}
 
 	public void addRequestedUser(String requestedUser)
@@ -51,7 +67,7 @@ public class TictactoePlayer
 
 	public void clearRequests()
 	{
-		requestedUsers = new ArrayList<String>();
+		requestedUsers.clear();
 	}
 
 	public PlayerState getState()
@@ -59,9 +75,28 @@ public class TictactoePlayer
 		return state;
 	}
 
+	public void joinGame(long currentTime, long gameId)
+	{
+		// set ID for game lookup
+		currentGame = gameId;
+
+		// clear requested users and set state to join game
+		requestedUsers.clear();
+		state = PlayerState.JOINING_GAME;
+	}
+
 	public void setState(PlayerState newState)
 	{
 		state = newState;
+	}
+
+	public boolean isActive(Long currentTime)
+	{
+		if ((currentTime - lastCheckin) > PLAYER_TIMEOUT_MS)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	public boolean isInLobby()

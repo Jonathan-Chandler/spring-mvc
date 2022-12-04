@@ -85,26 +85,6 @@ public class TestTictactoeGameInit
 		String expectGameOverMessage = "Player " + PLAYER_X_NAME + " failed to join.";
 		assertEquals(expectGameOverMessage, game.getGameOverMessage());
 	}
-
-	@Test
-	public void gameStateTimeoutIfPlayerSlow()
-	{
-		long afterTimeout = GAME_START_TIME + TictactoeGame.ACTION_TIMEOUT_MS + 1;
-
-		// both players ready
-		game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER);
-		game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER);
-
-		// game state set to X moving after both players check in
-		assertEquals(TictactoeGame.GameState.X_PLAYER_MOVING, game.getGameState(GAME_START_TIME));
-
-		// game times out after X takes too long
-		assertEquals(TictactoeGame.GameState.GAME_OVER_O_WINS, game.getGameState(afterTimeout));
-
-		// message matches timed out player
-		String expectGameOverMessage = "Player " + PLAYER_X_NAME + " took too long to move.";
-		assertEquals(expectGameOverMessage, game.getGameOverMessage());
-	}
 }
 
 
