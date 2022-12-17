@@ -14,10 +14,14 @@ import javax.validation.constraints.NotEmpty;
 public class TictactoePlayer 
 {
 	public enum PlayerState {
-		NONE,
 		IN_LOBBY,
 		JOINING_GAME,
 		IN_GAME,
+		GAME_OVER,
+	}
+	public enum PlayerResponse {
+		SUCCESS,
+		FAILED_PLAYER_REQUEST_EXISTS,
 	}
 
 	// time before user will be removed from the list
@@ -37,7 +41,7 @@ public class TictactoePlayer
 
 	public TictactoePlayer(Long time)
 	{
-		state = PlayerState.NONE;
+		state = PlayerState.IN_LOBBY;
 		requestedUsers = new ArrayList<String>();
 		lastCheckin = time;
 		currentGameId = Long.valueOf(-1);
@@ -53,12 +57,17 @@ public class TictactoePlayer
 		return requestedUsers;
 	}
 
-	public void addRequestedUser(String requestedUser)
+	public PlayerResponse addRequestedUser(String requestedUser)
 	{
+		// add to player match requests
 		if (!requestedUsers.contains(requestedUser))
 		{
 			requestedUsers.add(requestedUser);
+			return PlayerResponse.SUCCESS;
 		}
+
+		// player was already in the request list
+		return PlayerResponse.FAILED_PLAYER_REQUEST_EXISTS;
 	}
 	
 	public boolean hasRequestedUser(String requestFrom)

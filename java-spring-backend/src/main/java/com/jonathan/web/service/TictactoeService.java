@@ -7,6 +7,20 @@ import com.jonathan.web.resources.TictactoePlayerListDto;
 
 public interface TictactoeService
 {
+	public enum TictactoeServiceResponse 
+	{
+		SUCCESS,
+		START_GAME,
+		ERROR_CURRENT_PLAYER_DOES_NOT_EXIST,
+		ERROR_CURRENT_PLAYER_IS_IN_GAME,
+		ERROR_VERSUS_PLAYER_DOES_NOT_EXIST,
+		ERROR_VERSUS_PLAYER_IS_IN_GAME,
+		ERROR_REQUEST_EXISTS,
+	}
+
+	public TictactoePlayerListDto getPlayerList(long currentTime, String thisPlayerName);
+
+	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
 
   //public List<TictactoePlayerListDto> getPlayerList();
 	//public TictactoePlayerListDto getPlayerList();
