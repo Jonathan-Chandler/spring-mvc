@@ -43,12 +43,84 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		gameList = Collections.synchronizedMap(new HashMap<Long, TictactoeGame>());
 	}
 
-	public GameServiceResponse addGame(long currentTime, String xPlayerName, String oPlayerName)
+	public GameServiceResponse createNewGame(long currentTime, String xPlayerName, String oPlayerName)
 	{
+		long newGameId = createGameId();
+
+		gameList.put(newGameId, new TictactoeGame(currentTime, thisPlayerName, versusPlayerName));
+
 		return GAME_CREATED;
 	}
 
-	public TictactoePlayerListDto getGameList(long currentTime, String thisPlayerName);
+	public TictactoePlayerListDto getPlayersInGame(long currentTime)
+	{
+		// games requests sent by this player
+		List<String> playerList = new ArrayList<String>();
+
+		for ( Long key : gameList.keySet() ) 
+		{
+			TictactoeGame game = gameList.get(key);
+
+			if (game.getGameState(currentTime).ordinal() >= GAME_OVER_ERROR)
+			{
+			}
+		}
+
+		// get list of all players / players requested / requesting a game
+			if (!currentPlayer.isActive(currentTime))
+			{
+				// remove players if they have not checked in within the last 15 seconds (TictactoePlayer.PLAYER_TIMEOUT_MS)
+				deletedPlayers.add(key);
+			}
+			else
+			{
+				// only add to player list if user name isn't this player
+				if (!key.equals(thisPlayerName))
+				{
+					// only add player to list if they aren't in a game already
+					if (currentPlayer.getState() == TictactoePlayer.PlayerState.IN_LOBBY)
+					{
+						currentPlayerList.add(key);
+
+						// add to list if this player requested a game against thisPlayerName
+						if (currentPlayer.hasRequestedUser(thisPlayerName))
+						{
+							currentPlayerRequested.add(key);
+						}
+					}
+				}
+				else
+				{
+					// update last checkin time for user with name matching thisPlayerName
+					currentPlayer.setCheckinTime(currentTime);
+
+					// get list of players that this user already requested to play against
+					currentPlayerRequests = currentPlayer.getRequestedUsers();
+
+					// return the player to their game in progress
+					if (currentPlayer.getState() == TictactoePlayer.PlayerState.JOINING_GAME 
+						|| currentPlayer.getState() == TictactoePlayer.PlayerState.IN_GAME)
+					{
+						// return empty player lists with response that player is already in a game
+						TictactoePlayerListDto playerListDto = 
+							new TictactoePlayerListDto(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME);
+						return playerListDto;
+					}
+				}
+			}
+		}
+
+		// delete timed out players from playerList map
+		for ( String deletedPlayer : deletedPlayers ) 
+		{
+			playerList.remove(deletedPlayer);
+		}
+
+		// return 3 lists: all players, this user's requests, other user requested games
+		TictactoePlayerListDto playerListDto = new TictactoePlayerListDto(currentPlayerList, currentPlayerRequests, currentPlayerRequested);
+
+		return playerListDto;
+	}
 
 	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName)
 	{

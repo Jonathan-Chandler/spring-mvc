@@ -111,6 +111,12 @@ public class TictactoeGame
 		gameOverMessage = "Unknown error";
 	}
 
+	public List<String> getPlayerNames()
+	{
+		List<String> playerNames = new ArrayList<String>(List.of(xPlayerName, oPlayerName));
+		return playerNames;
+	}
+
 	// player failed to join the game
 	private void setGameFailedToStartMessage()
 	{
@@ -200,7 +206,7 @@ public class TictactoeGame
 	}
 
 	// user has checked in and is waiting to start the game
-	public ErrorResponse setPlayerReadyBySymbol(long currentTimeMs, @NonNull PlayerSymbol readyPlayer)
+	public void setPlayerReadyBySymbol(long currentTimeMs, @NonNull PlayerSymbol readyPlayer)
 	{
 		switch (readyPlayer)
 		{
@@ -210,10 +216,6 @@ public class TictactoeGame
 				{
 					xPlayerReady = true;
 					lastMoveTimeMs = currentTimeMs;
-				}
-				else
-				{
-					return 
 				}
 				break;
 			case O_PLAYER:
@@ -226,7 +228,6 @@ public class TictactoeGame
 				break;
 			default:
 				logger.error("Tried to set invalid player symbol as ready: " + readyPlayer.ordinal());
-				return ErrorResponse.
 				break;
 		}
 
@@ -253,9 +254,8 @@ public class TictactoeGame
 
 	public boolean handlePlayerMoveByPlayername(long currentTimeMs, @NonNull String playerName, int location)
 	{
-		PlayerSymbol playerSymbol = getPlayerSymbol();
-		if (playerSymbol == )
-		handlePlayerMoveBySymbol
+		PlayerSymbol playerSymbol = getPlayerSymbol(playerName);
+		return handlePlayerMoveBySymbol(currentTimeMs, playerSymbol, location);
 	}
 
 	public boolean handlePlayerMoveBySymbol(long currentTimeMs, PlayerSymbol symbol, int location)

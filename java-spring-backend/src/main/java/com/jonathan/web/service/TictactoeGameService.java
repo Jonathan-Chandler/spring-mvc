@@ -22,7 +22,6 @@ import java.util.Collections;
 //import java.util.Collections.synchronizedMap;
 import java.util.HashMap;
 
-
 @Service
 public class TictactoeGameService
 {
@@ -35,33 +34,10 @@ public class TictactoeGameService
 	// list of games
 	private Map<Long, TictactoeGame> gameList;
 
-	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName)
+	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
 
-	private TictactoeGame getTictactoeGameByPlayerName(long currentTime, @NonNull String thisPlayerName)
+	public TictactoeGame getGameState(long currentTime, @NonNull String thisPlayerName);
 
-	public TictactoeGame.GameState getGameState(long currentTime, @NonNull String thisPlayerName)
-	{
-		TictactoeGame currentGame = getTictactoeGameByPlayerName(currentTime, thisPlayerName);
-
-		// player is ready if getting game state
-		return currentGame.setPlayerReadyByName(currentTime, thisPlayerName);
-	}
-
-	public TictactoeGame.GameState sendGameMove(long currentTime, @NonNull String thisPlayerName)
-	{
-		TictactoeGame currentGame = getTictactoeGameByPlayerName(currentTime, thisPlayerName)
-		if (currentGame.handlePlayerMove(currentTime, symbol, int location))
-		{
-		}
-	}
-
-	//public TictactoeGame.GameState sendGameRequest(String thisPlayerName)
-	//{
-	//}
-
-	public static synchronized long createGameId()
-	{
-		return gameIdCounter++;
-	}
+	public TictactoeGame.GameState sendGameMove(long currentTime, @NonNull String thisPlayerName);
 }
 
