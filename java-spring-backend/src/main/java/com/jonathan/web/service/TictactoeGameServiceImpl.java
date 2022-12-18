@@ -24,15 +24,12 @@ import java.util.HashMap;
 
 
 @Service
-public class TictactoeServiceImpl implements TictactoeService
+public class TictactoeGameServiceImpl implements TictactoeGameService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private RabbitTemplate template;
-
-	// list of players
-	private Map<String, TictactoePlayer> playerList;
 
 	// id of next created game
 	private static long gameIdCounter = 1;
@@ -40,93 +37,18 @@ public class TictactoeServiceImpl implements TictactoeService
 	// list of games
 	private Map<Long, TictactoeGame> gameList;
 
-	public TictactoeServiceImpl()
+	public TictactoeGameServiceImpl()
 	{
-		// synchronized list of players
-		playerList = Collections.synchronizedMap(new HashMap<String, TictactoePlayer>());
-
 		// synchronized list of games in progress (2 player names mapped to TictactoeGame)
 		gameList = Collections.synchronizedMap(new HashMap<Long, TictactoeGame>());
 	}
 
-	public TictactoePlayerListDto getPlayerList(long currentTime, String thisPlayerName)
+	public GameServiceResponse addGame(long currentTime, String xPlayerName, String oPlayerName)
 	{
-		// expired player names scheduled to be deleted
-		List<String> deletedPlayers = new ArrayList<String>();
-
-		// updated list of players not including this player
-		List<String> currentPlayerList = new ArrayList<String>();
-
-		// games requests sent by this player
-		List<String> currentPlayerRequests = new ArrayList<String>();
-
-		// games requested against this player
-		List<String> currentPlayerRequested = new ArrayList<String>();
-
-		// add to list if list does not contain this player's name
-		if (!playerList.containsKey(thisPlayerName))
-		{
-			playerList.put(thisPlayerName, new TictactoePlayer(currentTime));
-		}
-
-		// get list of all players / players requested / requesting a game
-		for ( String key : playerList.keySet() ) 
-		{
-			TictactoePlayer currentPlayer = playerList.get(key);
-			if (!currentPlayer.isActive(currentTime))
-			{
-				// remove players if they have not checked in within the last 15 seconds (TictactoePlayer.PLAYER_TIMEOUT_MS)
-				deletedPlayers.add(key);
-			}
-			else
-			{
-				// only add to player list if user name isn't this player
-				if (!key.equals(thisPlayerName))
-				{
-					// only add player to list if they aren't in a game already
-					if (currentPlayer.getState() == TictactoePlayer.PlayerState.IN_LOBBY)
-					{
-						currentPlayerList.add(key);
-
-						// add to list if this player requested a game against thisPlayerName
-						if (currentPlayer.hasRequestedUser(thisPlayerName))
-						{
-							currentPlayerRequested.add(key);
-						}
-					}
-				}
-				else
-				{
-					// update last checkin time for user with name matching thisPlayerName
-					currentPlayer.setCheckinTime(currentTime);
-
-					// get list of players that this user already requested to play against
-					currentPlayerRequests = currentPlayer.getRequestedUsers();
-
-					// return the player to their game in progress
-					if (currentPlayer.getState() == TictactoePlayer.PlayerState.JOINING_GAME 
-						|| currentPlayer.getState() == TictactoePlayer.PlayerState.IN_GAME)
-					{
-						// return empty player lists with response that player is already in a game
-						TictactoePlayerListDto playerListDto = 
-							new TictactoePlayerListDto(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME);
-						return playerListDto;
-					}
-				}
-			}
-		}
-
-		// delete timed out players from playerList map
-		for ( String deletedPlayer : deletedPlayers ) 
-		{
-			playerList.remove(deletedPlayer);
-		}
-
-		// return 3 lists: all players, this user's requests, other user requested games
-		TictactoePlayerListDto playerListDto = new TictactoePlayerListDto(currentPlayerList, currentPlayerRequests, currentPlayerRequested);
-
-		return playerListDto;
+		return GAME_CREATED;
 	}
+
+	public TictactoePlayerListDto getGameList(long currentTime, String thisPlayerName);
 
 	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName)
 	{

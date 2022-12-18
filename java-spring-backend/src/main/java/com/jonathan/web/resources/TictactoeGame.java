@@ -30,6 +30,16 @@ public class TictactoeGame
 		GAME_OVER_DRAW,
 	}
 
+	public enum ErrorResponse
+	{
+		NO_ERROR,
+		PLAYER_NOT_IN_GAME,
+		NOT_PLAYERS_TURN,
+		INVALID_MOVE,
+		GAME_ALREADY_OVER,
+		UNKNOWN_ERROR,
+	}
+
 	public enum PlayerSymbol 
 	{
 		X_PLAYER,
@@ -173,21 +183,50 @@ public class TictactoeGame
 		return PlayerSymbol.NONE;
 	}
 
+	public GameState setPlayerReadyByName(long currentTimeMs, @NonNull String playerName)
+	{
+		PlayerSymbol playerSymbol = getPlayerSymbol(playerName);
+
+		// return error if player is not in this game
+		if (playerSymbol == PlayerSymbol.NONE)
+		{
+			return GameState.GAME_OVER_ERROR;
+		}
+
+		// use player's symbol to set ready status
+		setPlayerReadyBySymbol(currentTimeMs, playerSymbol);
+		
+		return getGameState(currentTimeMs);
+	}
+
 	// user has checked in and is waiting to start the game
-	public void setPlayerReadyBySymbol(long currentTimeMs, @NonNull PlayerSymbol readyPlayer)
+	public ErrorResponse setPlayerReadyBySymbol(long currentTimeMs, @NonNull PlayerSymbol readyPlayer)
 	{
 		switch (readyPlayer)
 		{
 			case X_PLAYER:
-				xPlayerReady = true;
-				lastMoveTimeMs = currentTimeMs;
+				// don't let users check in multiple times
+				if (!xPlayerReady)
+				{
+					xPlayerReady = true;
+					lastMoveTimeMs = currentTimeMs;
+				}
+				else
+				{
+					return 
+				}
 				break;
 			case O_PLAYER:
-				oPlayerReady = true;
-				lastMoveTimeMs = currentTimeMs;
+				// don't let users check in multiple times
+				if (!oPlayerReady)
+				{
+					oPlayerReady = true;
+					lastMoveTimeMs = currentTimeMs;
+				}
 				break;
 			default:
 				logger.error("Tried to set invalid player symbol as ready: " + readyPlayer.ordinal());
+				return ErrorResponse.
 				break;
 		}
 
@@ -212,7 +251,14 @@ public class TictactoeGame
 		return new String(gameBoard);
 	}
 
-	public boolean handlePlayerMove(long currentTimeMs, PlayerSymbol symbol, int location)
+	public boolean handlePlayerMoveByPlayername(long currentTimeMs, @NonNull String playerName, int location)
+	{
+		PlayerSymbol playerSymbol = getPlayerSymbol();
+		if (playerSymbol == )
+		handlePlayerMoveBySymbol
+	}
+
+	public boolean handlePlayerMoveBySymbol(long currentTimeMs, PlayerSymbol symbol, int location)
 	{
 		// requested move is out of range
 		if (location >= 0 && location < BOARD_SIZE)

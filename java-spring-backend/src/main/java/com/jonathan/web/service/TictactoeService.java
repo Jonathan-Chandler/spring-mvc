@@ -22,6 +22,8 @@ public interface TictactoeService
 
 	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
 
+	public TictactoeGame.GameState getGameState(long currentTime, String thisPlayerName);
+
   //public List<TictactoePlayerListDto> getPlayerList();
 	//public TictactoePlayerListDto getPlayerList();
 	//public void userCheckIn(String playerName);

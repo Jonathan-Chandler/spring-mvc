@@ -40,16 +40,6 @@ public class TestTictactoeService
 	private static long EXPIRE_TIMEOUT = 30000;
 	private static String[] PLAYER_NAMES = {"player0", "player1", "player2", "player3"};
 
-	//@BeforeEach
-	//public void initGame()
-	//{
-	//	game = new TictactoeGame(GAME_START_TIME, PLAYER_X_NAME, PLAYER_O_NAME);
-	//
-	//	// both players ready
-	//	game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER);
-	//	game.setPlayerReadyBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER);
-	//}
-
 	public void printPlayers(List<String> playerList)
 	{
 		for (int i = 0; i < playerList.size(); i++)
@@ -131,7 +121,7 @@ public class TestTictactoeService
 		// expect player 3 to only see player 2 and vice versa
 		availableUsers = playerListDto.getAvailableUsers();
 		Collections.sort(availableUsers);
-		printPlayers(availableUsers);
+		//printPlayers(availableUsers);
 		assertEquals(1, playerListDto.getAvailableUsersCount());
 		assertEquals(PLAYER_NAMES[2], availableUsers.get(0));
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME+EXPIRE_TIMEOUT, PLAYER_NAMES[2]);
@@ -220,21 +210,37 @@ public class TestTictactoeService
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
 		assertEquals(TictactoeService.TictactoeServiceResponse.START_GAME, response);
 
-		// add another player to check playerlist
-		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[2]);
+		// service responds with player already in game if trying to get player list
+		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
+		assertEquals(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME, playerListDto.getServiceResponse());
+		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
+		assertEquals(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME, playerListDto.getServiceResponse());
+	}
 
-		// getPlayerList should not players already in game
-		assertEquals(0, playerListDto.getAvailableUsersCount());
+	@Test
+	public void playersCanGetGameState()
+	{
+		TictactoeService tictactoeService = new TictactoeServiceImpl();
+		TictactoeService.TictactoeServiceResponse response; 
+		TictactoePlayerListDto playerListDto;
+		List<String> availableUsers;
 
-		// request should be rejected if players are already in game
-		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[2], PLAYER_NAMES[0]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.ERROR_VERSUS_PLAYER_IS_IN_GAME, response);
+		// both players are in the player list
+		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
+		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
 
-		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[2]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.ERROR_CURRENT_PLAYER_IS_IN_GAME, response);
+		// player0 requests a match against player1
+		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
+		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
+		assertEquals(TictactoeService.TictactoeServiceResponse.START_GAME, response);
 
-		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[2], PLAYER_NAMES[1]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.ERROR_VERSUS_PLAYER_IS_IN_GAME, response);
+		// game state is starting until both players check in
+		TictactoeGame.GameState gameState;
+		gameState = tictactoeService.getGameState(CURRENT_TIME, PLAYER_NAMES[0]);
+		assertEquals(TictactoeGame.GameState.STARTING, gameState);
+
+		gameState = tictactoeService.getGameState(CURRENT_TIME, PLAYER_NAMES[1]);
+		assertEquals(TictactoeGame.GameState.STARTING, gameState);
 	}
 }
 
