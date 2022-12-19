@@ -23,21 +23,29 @@ import java.util.Collections;
 import java.util.HashMap;
 
 @Service
-public class TictactoeGameService
+public interface TictactoeGameService
 {
 	public enum GameServiceResponse 
 	{
+		SUCCESS,
 		GAME_CREATED,
 		PLAYER_IN_GAME,
+		INVALID_MOVE,
 	}
 
-	// list of games
-	private Map<Long, TictactoeGame> gameList;
+	// create new game and return ID of created game
+	public long createNewGame(long currentTime, String xPlayerName, String oPlayerName);
 
-	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
+	// get list of players that are in an active game and remove expired games
+	public List<String> getPlayersInGame(long currentTime);
 
-	public TictactoeGame getGameState(long currentTime, @NonNull String thisPlayerName);
+	// get state of this player's game
+	public TictactoeGame.GameState getGameStateByPlayerName(long currentTime, @NonNull String playerName);
 
-	public TictactoeGame.GameState sendGameMove(long currentTime, @NonNull String thisPlayerName);
+	// get a copy of the tictactoe game
+	public TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName);
+
+	// player wants to add a move to the board
+	public GameServiceResponse sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location);
 }
 

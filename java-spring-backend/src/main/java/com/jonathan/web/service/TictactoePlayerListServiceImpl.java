@@ -230,30 +230,5 @@ public class TictactoeServiceImpl implements TictactoeService
 
 		return currentGame;
 	}
-
-	public TictactoeGame.GameState getGameState(long currentTime, @NonNull String thisPlayerName)
-	{
-		TictactoeGame currentGame = getTictactoeGameByPlayerName(currentTime, thisPlayerName);
-
-		// player is ready if getting game state
-		return currentGame.setPlayerReadyByName(currentTime, thisPlayerName);
-	}
-
-	public TictactoeGame.GameState sendGameMove(long currentTime, @NonNull String thisPlayerName)
-	{
-		TictactoeGame currentGame = getTictactoeGameByPlayerName(currentTime, thisPlayerName)
-		if (currentGame.handlePlayerMove(currentTime, symbol, int location))
-		{
-		}
-	}
-
-	//public TictactoeGame.GameState sendGameRequest(String thisPlayerName)
-	//{
-	//}
-
-	public static synchronized long createGameId()
-	{
-		return gameIdCounter++;
-	}
 }
 

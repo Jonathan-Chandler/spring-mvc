@@ -28,6 +28,7 @@ public class TictactoeGame
 		GAME_OVER_X_WINS,
 		GAME_OVER_O_WINS,
 		GAME_OVER_DRAW,
+		CLOSING,
 	}
 
 	public enum ErrorResponse
@@ -68,11 +69,62 @@ public class TictactoeGame
 	// milliseconds before game times out if no action taken
 	public static final long ACTION_TIMEOUT_MS = 15000;
 
+	// milliseconds before game is deleted after ending
+	public static final long ACTION_DELETE_GAME_MS = ACTION_TIMEOUT_MS + 30000;
+
 	// system time (in milliseconds) that last allowed move was received from user
 	private long lastMoveTimeMs;
 
 	// reason the game ended
 	private String gameOverMessage;
+
+	public GameState getGameStateNoUpdate()
+	{
+		return gameState;
+	}
+
+	public String getXPlayerName()
+	{
+		return xPlayerName;
+	}
+
+	public String getOPlayerName()
+	{
+		return oPlayerName;
+	}
+
+	public boolean getXPlayerReady()
+	{
+		return xPlayerReady;
+	}
+
+	public boolean getOPlayerReady()
+	{
+		return oPlayerReady;
+	}
+
+	public char[] getGameBoard()
+	{
+		return Arrays.copyOf(gameBoard, gameBoard.length);
+	}
+
+	public long getLastMoveTimeMs()
+	{
+		return lastMoveTimeMs;
+	}
+
+	// create copy of a tictactoe game
+	public TictactoeGame(TictactoeGame copiedGame)
+	{
+		gameState = copiedGame.getGameStateNoUpdate();
+		xPlayerName = copiedGame.getXPlayerName();
+		oPlayerName = copiedGame.getOPlayerName();
+		xPlayerReady = copiedGame.getXPlayerReady();
+		oPlayerReady = copiedGame.getOPlayerReady();
+		gameBoard = copiedGame.getGameBoard();
+		lastMoveTimeMs = copiedGame.getLastMoveTimeMs();
+		gameOverMessage = copiedGame.getGameOverMessage();
+	}
 
 	// create new game in error state
 	public TictactoeGame(long gameStartTimeMs)
@@ -109,6 +161,12 @@ public class TictactoeGame
 		oPlayerName = oPlayer;
 
 		gameOverMessage = "Unknown error";
+	}
+
+	public boolean playerIsInThisGame(String playerName)
+	{
+		List<String> playerNames = getPlayerNames();
+		return playerNames.contains(playerName);
 	}
 
 	public List<String> getPlayerNames()
@@ -165,6 +223,12 @@ public class TictactoeGame
 		// game already ended
 		if (gameState.ordinal() >= GameState.GAME_OVER_ERROR.ordinal())
 		{
+			// game has ended for at least 30 seconds (ACTION_DELETE_GAME_MS)
+			if ((currentTimeMs - lastMoveTimeMs) > ACTION_DELETE_GAME_MS)
+			{
+				gameState = GameState.CLOSING;
+			}
+
 			return gameState;
 		}
 

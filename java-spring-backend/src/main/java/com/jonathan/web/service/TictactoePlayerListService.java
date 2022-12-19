@@ -5,9 +5,9 @@ import java.util.List;
 import com.jonathan.web.resources.TictactoeGame;
 import com.jonathan.web.resources.TictactoePlayerListDto;
 
-public interface TictactoeService
+public interface TictactoePlayerListService
 {
-	public enum TictactoeServiceResponse 
+	public enum TictactoePlayerListServiceResponse 
 	{
 		SUCCESS,
 		START_GAME,
@@ -20,7 +20,7 @@ public interface TictactoeService
 
 	public TictactoePlayerListDto getPlayerList(long currentTime, String thisPlayerName);
 
-	public TictactoeServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
+	public TictactoePlayerListServiceResponse addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
 
 	public TictactoeGame.GameState getGameState(long currentTime, String thisPlayerName);
 
