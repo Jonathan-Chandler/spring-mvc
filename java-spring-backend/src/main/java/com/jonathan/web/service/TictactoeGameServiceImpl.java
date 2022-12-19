@@ -193,7 +193,13 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		return currentGame.getGameState(currentTime);
 	}
 
-	public TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName)
+	public TictactoeGame getGameCopyByPlayerName(long currentTime, @NonNull String playerName)
+	{
+		// don't return by reference for outside requests
+		return new TictactoeGame(getGameByPlayerName(currentTime, playerName));
+	}
+
+	private TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName)
 	{
 		long gameId = getPlayerGameId(currentTime, playerName);
 		
@@ -213,14 +219,14 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 			activeGame.setPlayerReadyByName(currentTime, playerName);
 
 			// return copy, not reference to map object
-			return new TictactoeGame(activeGame);
+			return activeGame;
 		}
 
 		// found in ending games
 		if (endingGameList.containsKey(gameId))
 		{
 			// return copy, not reference to map object
-			return new TictactoeGame(endingGameList.get(gameId));
+			return endingGameList.get(gameId);
 		}
 
 		// game id was not found in any list, return game in error state

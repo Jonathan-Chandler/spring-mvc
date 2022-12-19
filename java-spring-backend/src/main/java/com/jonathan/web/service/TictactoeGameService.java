@@ -41,7 +41,7 @@ public interface TictactoeGameService
 	public TictactoeGame.GameState getGameStateByPlayerName(long currentTime, @NonNull String playerName);
 
 	// get a copy of the tictactoe game
-	public TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName);
+	public TictactoeGame getGameCopyByPlayerName(long currentTime, @NonNull String playerName);
 
 	// player wants to add a move to the board
 	public GameServiceResponse sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location);
