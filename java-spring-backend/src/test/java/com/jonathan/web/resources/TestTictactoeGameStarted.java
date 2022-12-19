@@ -65,7 +65,7 @@ public class TestTictactoeGameStarted
 		assertEquals(expectGameOverMessage, game.getGameOverMessage());
 
 		// X tries to move after timeout
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
 
 		assertEquals(expectGameOverMessage, game.getGameOverMessage());
 	}
@@ -74,31 +74,31 @@ public class TestTictactoeGameStarted
 	public void playerCanOnlyMoveOnTheirTurn()
 	{
 		// O tries to move on X turn
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 0));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 0));
 
 		// X tries to move on X turn
-		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
+		assertTrue(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
 
 		// X tries to move on O turn
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1));
 
 		// O tries to move on O turn
-		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
+		assertTrue(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
 	}
 
 	@Test
 	public void boardRejectsUsedTiles()
 	{
-		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
-		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
+		assertTrue(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0));
+		assertTrue(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
 		// X selects space taken by O
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1));
 
 		// X chooses valid space
-		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2));
+		assertTrue(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2));
 
 		// O selects space taken by X
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 0));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 0));
 	}
 
 	@Test
@@ -107,13 +107,13 @@ public class TestTictactoeGameStarted
 		String expectedBoardState = "X________";
 
 		// board displays X at top left corner
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
 		assertEquals('X', game.getBoardTile(0));
 		assertEquals(expectedBoardState, game.getBoard());
 
 		// board displays O in top middle column
 		expectedBoardState = "XO_______";
-		assertTrue(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
+		assertTrue(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1));
 		assertEquals('O', game.getBoardTile(1));
 		assertEquals(expectedBoardState, game.getBoard());
 	}
@@ -131,11 +131,11 @@ public class TestTictactoeGameStarted
 		String expectedWinningPlayer = PLAYER_X_NAME;
 
 		// board displays X at top left corner
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 3);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 3);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2);
 
 		// board displays all X in top row
 		assertEquals(expectedBoardState, game.getBoard());
@@ -161,12 +161,12 @@ public class TestTictactoeGameStarted
 		String expectedWinningPlayer = PLAYER_O_NAME;
 
 		// set up game
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 5);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 8);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 5);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 8);
 
 		// board displays O in right column
 		assertEquals(expectedBoardState, game.getBoard());
@@ -192,11 +192,11 @@ public class TestTictactoeGameStarted
 		String expectedWinningPlayer = PLAYER_X_NAME;
 
 		// board displays X at top left corner
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 4);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 8);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 4);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 8);
 
 		// board displays all X in top row
 		assertEquals(expectedBoardState, game.getBoard());
@@ -222,12 +222,12 @@ public class TestTictactoeGameStarted
 		String expectedWinningPlayer = PLAYER_O_NAME;
 
 		// set up game
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 6);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 6);
 
 		// board displays O in right column
 		assertEquals(expectedBoardState, game.getBoard());
@@ -252,15 +252,15 @@ public class TestTictactoeGameStarted
 		String expectedWinningPlayer = "Draw";
 
 		// set up game
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 6);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 5);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 8);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 7);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 1);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 2);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 6);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 5);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 8);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 7);
 
 		// game state shows that game is a draw
 		assertEquals(TictactoeGame.GameState.GAME_OVER_DRAW, game.getGameState(GAME_START_TIME));
@@ -278,19 +278,19 @@ public class TestTictactoeGameStarted
 		//  O |   |  
 
 		// set up game
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
-		game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 6);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 0);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 2);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 1);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 4);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 3);
+		game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 6);
 
 		// game state shows that O player won
 		assertEquals(TictactoeGame.GameState.GAME_OVER_O_WINS, game.getGameState(GAME_START_TIME));
 
 		// both players can't move
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 8));
-		assertFalse(game.handlePlayerMove(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 7));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.X_PLAYER, 8));
+		assertFalse(game.handlePlayerMoveBySymbol(GAME_START_TIME, TictactoeGame.PlayerSymbol.O_PLAYER, 7));
 		assertEquals(TictactoeGame.GameState.GAME_OVER_O_WINS, game.getGameState(GAME_START_TIME));
 	}
 }

@@ -13,12 +13,12 @@ import javax.validation.constraints.NotEmpty;
 
 public class TictactoePlayer 
 {
-	public enum PlayerState {
-		IN_LOBBY,
-		JOINING_GAME,
-		IN_GAME,
-		GAME_OVER,
-	}
+	//public enum PlayerState {
+	//	IN_LOBBY,
+	//	JOINING_GAME,
+	//	IN_GAME,
+	//	GAME_OVER,
+	//}
 	public enum PlayerResponse {
 		SUCCESS,
 		FAILED_PLAYER_REQUEST_EXISTS,
@@ -27,9 +27,6 @@ public class TictactoePlayer
 	// time before user will be removed from the list
 	private static final long PLAYER_TIMEOUT_MS = 15000;
 
-	// user is in lobby/game/game over/not waiting to play
-	private PlayerState state;
-
 	// users that this user has requested a match against
 	private ArrayList<String> requestedUsers;
 
@@ -37,14 +34,13 @@ public class TictactoePlayer
 	private Long lastCheckin;
 
 	// ID of the game that this player has joined
-	private Long currentGameId;
+	//private Long currentGameId;
 
 	public TictactoePlayer(Long time)
 	{
-		state = PlayerState.IN_LOBBY;
 		requestedUsers = new ArrayList<String>();
 		lastCheckin = time;
-		currentGameId = Long.valueOf(-1);
+		//currentGameId = Long.valueOf(-1);
 	}
 
 	public void setCheckinTime(Long currentTime)
@@ -80,32 +76,17 @@ public class TictactoePlayer
 		requestedUsers.clear();
 	}
 
-	public PlayerState getState()
-	{
-		return state;
-	}
-
 	public void joinGame(long currentTime, long gameId)
 	{
 		// set time that player joined game
 		lastCheckin = currentTime;
 
 		// set ID for game lookup
-		currentGameId = gameId;
+		//currentGameId = gameId;
 
 		// clear requested users and set state to join game
 		requestedUsers.clear();
-		state = PlayerState.JOINING_GAME;
-	}
-
-	public Long getGameId()
-	{
-		return currentGameId;
-	}
-
-	public void setState(PlayerState newState)
-	{
-		state = newState;
+		//state = PlayerState.JOINING_GAME;
 	}
 
 	public boolean isActive(Long currentTime)
@@ -117,10 +98,25 @@ public class TictactoePlayer
 		return true;
 	}
 
-	public boolean isInLobby()
-	{
-		return (state == PlayerState.IN_LOBBY);
-	}
+	//public PlayerState getState()
+	//{
+	//	return state;
+	//}
+
+	//public Long getGameId()
+	//{
+	//	return currentGameId;
+	//}
+
+	//public void setState(PlayerState newState)
+	//{
+	//	state = newState;
+	//}
+
+	//public boolean isInLobby()
+	//{
+	//	return (state == PlayerState.IN_LOBBY);
+	//}
 
 
 	//@Override

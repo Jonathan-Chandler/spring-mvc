@@ -46,9 +46,12 @@ public class TictactoePlayerListDto
 	public TictactoePlayerListDto(List<String> available, List<String> requested, List<String> requesting)
 	{
 		serviceResponse = ServiceResponse.SUCCESS;
+		//availableUsers = new ArrayList<String>(available);
+		//requestedUsers = new ArrayList<String>(requested);
+		//requestingUsers = new ArrayList<String>(requesting);
 		availableUsers = available;
 		requestedUsers = requested;
-		requestingUsers = requesting;
+		requestingUsers =requesting;
 	}
 
 	public List<String> getAvailableUsers()

@@ -80,6 +80,10 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.jonathan.web.controllers.RSender;
 import com.jonathan.web.controllers.TReceiver;
+import com.jonathan.web.service.TictactoePlayerListService;
+import com.jonathan.web.service.TictactoePlayerListServiceImpl;
+import com.jonathan.web.service.TictactoeGameService;
+import com.jonathan.web.service.TictactoeGameServiceImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
@@ -92,6 +96,16 @@ public class SecurityConfiguration
 	//static final String topicExchangeName = "hello";
 	static final String topicExchangeName = "amq.topic";
 	static final String queueName = "spring-boot";
+
+	@Bean
+	public TictactoeGameService tictactoeGameService() {
+		return new TictactoeGameServiceImpl();
+	}
+
+	@Bean
+	public TictactoePlayerListService tictactoePlayerListService() {
+		return new TictactoePlayerListServiceImpl(tictactoeGameService());
+	}
 
 	////@Bean
     ////public TopicExchange playerList() {

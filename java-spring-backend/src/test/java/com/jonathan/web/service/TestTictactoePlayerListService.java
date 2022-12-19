@@ -1,6 +1,7 @@
 package com.jonathan.web.service;
 
-import com.jonathan.web.service.TictactoeService;
+import com.jonathan.web.service.TictactoePlayerListService;
+import com.jonathan.web.service.TictactoePlayerListServiceImpl;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import org.slf4j.Logger;
 import com.jonathan.web.resources.TictactoeGame;
 import com.jonathan.web.resources.TictactoePlayerListDto;
 import com.jonathan.web.resources.OnlineUserDto;
-import com.jonathan.web.service.TictactoeService;
+import com.jonathan.web.resources.TictactoeRequestDto;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.ConcurrentMap;
@@ -29,16 +30,26 @@ import org.junit.jupiter.api.BeforeEach;
 import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.runner.RunWith;
+
+
 @ActiveProfiles("test")
 //@ExtendWith(SpringExtension.class)
+//@SpringBootTest(classes = Application.class,
+//    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SpringBootTest
-public class TestTictactoeService
+@RunWith(SpringRunner.class )
+public class TestTictactoePlayerListService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static long CURRENT_TIME = 60000;
 	private static long EXPIRE_TIMEOUT = 30000;
 	private static String[] PLAYER_NAMES = {"player0", "player1", "player2", "player3"};
+
+	//@Autowired
+	//private TictactoePlayerListServiceImpl tictactoeService;
 
 	public void printPlayers(List<String> playerList)
 	{
@@ -51,8 +62,9 @@ public class TestTictactoeService
 	@Test
 	public void getPlayerListAddsPlayers()
 	{
-		TictactoeService tictactoeService = new TictactoeServiceImpl();
+		TictactoePlayerListService tictactoeService = new TictactoePlayerListServiceImpl(new TictactoeGameServiceImpl());
 		tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
+
 		TictactoePlayerListDto playerListDto;
 		List<String> availableUsers;
 
@@ -94,7 +106,7 @@ public class TestTictactoeService
 	@Test
 	public void getPlayerListRemovesPlayersAfterTimeout()
 	{
-		TictactoeService tictactoeService = new TictactoeServiceImpl();
+		TictactoePlayerListService tictactoeService = new TictactoePlayerListServiceImpl(new TictactoeGameServiceImpl());
 		tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
 		TictactoePlayerListDto playerListDto;
 		List<String> availableUsers;
@@ -134,21 +146,22 @@ public class TestTictactoeService
 	@Test
 	public void getGameStateReturnsNewMatchWhenTwoPlayersRequestToPlayTheCompetitiveTictactoeGame()
 	{
-		TictactoeService tictactoeService = new TictactoeServiceImpl();
+		TictactoePlayerListService tictactoeService = new TictactoePlayerListServiceImpl(new TictactoeGameServiceImpl());
 		TictactoePlayerListDto playerListDto;
 		List<String> availableUsers;
+		TictactoeRequestDto response; 
 
 		// both players are in the player list
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
 
 		// player0 requests a match against player1
-		TictactoeService.TictactoeServiceResponse response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.SUCCESS, response);
+		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
+		assertEquals(TictactoeRequestDto.ResponseType.SUCCESS, response.getResponseType());
 
 		// player1 requests a match against player0 and service responds with START_GAME
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.START_GAME, response);
+		assertEquals(TictactoeRequestDto.ResponseType.START_GAME, response.getResponseType());
 
 		// add another player to check playerlist
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME+EXPIRE_TIMEOUT, PLAYER_NAMES[2]);
@@ -160,10 +173,10 @@ public class TestTictactoeService
 	@Test
 	public void playersCantJoinMultipleGames()
 	{
-		TictactoeService tictactoeService = new TictactoeServiceImpl();
+		TictactoePlayerListService tictactoeService = new TictactoePlayerListServiceImpl(new TictactoeGameServiceImpl());
 		TictactoePlayerListDto playerListDto;
 		List<String> availableUsers;
-		TictactoeService.TictactoeServiceResponse response; 
+		TictactoeRequestDto response; 
 
 		// both players are in the player list
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
@@ -172,7 +185,7 @@ public class TestTictactoeService
 		// player0 requests a match against player1
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.START_GAME, response);
+		assertEquals(TictactoeRequestDto.ResponseType.START_GAME, response.getResponseType());
 
 		// add another player to check playerlist
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[2]);
@@ -184,20 +197,20 @@ public class TestTictactoeService
 
 		// request should be rejected if players are already in game
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[2], PLAYER_NAMES[0]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.ERROR_VERSUS_PLAYER_IS_IN_GAME, response);
+		assertEquals(TictactoeRequestDto.ResponseType.ERROR_VERSUS_PLAYER_IS_IN_GAME, response.getResponseType());
 
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[2]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.ERROR_CURRENT_PLAYER_IS_IN_GAME, response);
+		assertEquals(TictactoeRequestDto.ResponseType.ERROR_CURRENT_PLAYER_IS_IN_GAME, response.getResponseType());
 
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[2], PLAYER_NAMES[1]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.ERROR_VERSUS_PLAYER_IS_IN_GAME, response);
+		assertEquals(TictactoeRequestDto.ResponseType.ERROR_VERSUS_PLAYER_IS_IN_GAME, response.getResponseType());
 	}
 
 	@Test
 	public void playersCanRejoinGames()
 	{
-		TictactoeService tictactoeService = new TictactoeServiceImpl();
-		TictactoeService.TictactoeServiceResponse response; 
+		TictactoePlayerListService tictactoeService = new TictactoePlayerListServiceImpl(new TictactoeGameServiceImpl());
+		TictactoeRequestDto response; 
 		TictactoePlayerListDto playerListDto;
 		List<String> availableUsers;
 
@@ -208,39 +221,13 @@ public class TestTictactoeService
 		// player0 requests a match against player1
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
 		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.START_GAME, response);
+		assertEquals(TictactoeRequestDto.ResponseType.START_GAME, response.getResponseType());
 
 		// service responds with player already in game if trying to get player list
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
 		assertEquals(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME, playerListDto.getServiceResponse());
 		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
 		assertEquals(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME, playerListDto.getServiceResponse());
-	}
-
-	@Test
-	public void playersCanGetGameState()
-	{
-		TictactoeService tictactoeService = new TictactoeServiceImpl();
-		TictactoeService.TictactoeServiceResponse response; 
-		TictactoePlayerListDto playerListDto;
-		List<String> availableUsers;
-
-		// both players are in the player list
-		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[0]);
-		playerListDto = tictactoeService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
-
-		// player0 requests a match against player1
-		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
-		response = tictactoeService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
-		assertEquals(TictactoeService.TictactoeServiceResponse.START_GAME, response);
-
-		// game state is starting until both players check in
-		TictactoeGame.GameState gameState;
-		gameState = tictactoeService.getGameState(CURRENT_TIME, PLAYER_NAMES[0]);
-		assertEquals(TictactoeGame.GameState.STARTING, gameState);
-
-		gameState = tictactoeService.getGameState(CURRENT_TIME, PLAYER_NAMES[1]);
-		assertEquals(TictactoeGame.GameState.STARTING, gameState);
 	}
 }
 

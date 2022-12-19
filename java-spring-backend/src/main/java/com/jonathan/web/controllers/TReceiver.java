@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.jonathan.web.service.UserService;
-import com.jonathan.web.service.TictactoeService;
+import com.jonathan.web.service.TictactoePlayerListService;
 import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
@@ -75,7 +75,7 @@ public class TReceiver
 
 
 	@Autowired
-	private TictactoeService tictactoeService;
+	private TictactoePlayerListService tictactoePlayerListService;
 
     //public void receive(@RequestBody final TictactoePlayerListDto playerList)
 

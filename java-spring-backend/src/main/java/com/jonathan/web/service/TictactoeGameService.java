@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 
 import com.jonathan.web.resources.TictactoePlayerListDto;
 import com.jonathan.web.resources.OnlineUserDto;
-import com.jonathan.web.service.TictactoeService;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.ConcurrentMap;
@@ -22,7 +21,6 @@ import java.util.Collections;
 //import java.util.Collections.synchronizedMap;
 import java.util.HashMap;
 
-@Service
 public interface TictactoeGameService
 {
 	public enum GameServiceResponse 
@@ -47,5 +45,7 @@ public interface TictactoeGameService
 
 	// player wants to add a move to the board
 	public GameServiceResponse sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location);
+
+	public long getPlayerGameId(long currentTime, String playerName);
 }
 

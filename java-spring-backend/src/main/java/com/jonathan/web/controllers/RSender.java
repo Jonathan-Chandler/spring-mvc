@@ -12,7 +12,7 @@ import com.jonathan.web.resources.TestDto;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.BindingBuilder;
-import com.jonathan.web.service.TictactoeService;
+import com.jonathan.web.service.TictactoePlayerListService;
 import org.springframework.context.annotation.Profile;
 
 @Profile("production")
@@ -35,7 +35,7 @@ public class RSender
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private TictactoeService tictactoeService;
+	private TictactoePlayerListService tictactoePlayerListService;
 
     //private Queue fanoutQueue;
     //private TopicExchange fanoutExchange;

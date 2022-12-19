@@ -87,6 +87,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.jonathan.web.service.TictactoePlayerListService;
+import com.jonathan.web.service.TictactoePlayerListServiceImpl;
+import com.jonathan.web.service.TictactoeGameService;
+import com.jonathan.web.service.TictactoeGameServiceImpl;
+
+
 @ActiveProfiles("test")
 //@ContextConfiguration
 @Configuration
@@ -119,6 +125,24 @@ public class TestSecurityConfiguration
 	//	rabbitTemplate.setMessageConverter(jsonMessageConverter());
 	//	return rabbitTemplate;
 	//}
+
+	//@Bean
+	//@Scope("singleton")
+	//public TictactoeGameService TictactoeGameServiceSingleton() {
+	//	return new TictactoeGameServiceImpl();
+	//}
+
+	//@Bean
+	//@Scope("singleton")
+	//public TictactoePlayerListService TictactoePlayerListServiceSingleton() {
+	//	return new TictactoePlayerListServiceImpl();
+	//}
+
+	@Autowired
+	private TictactoeGameService tictactoeGameService;
+
+	@Autowired
+	private TictactoePlayerListService tictactoePlayerListService;
 
 	@Bean
 	public MessageConverter jsonMessageConverter() {

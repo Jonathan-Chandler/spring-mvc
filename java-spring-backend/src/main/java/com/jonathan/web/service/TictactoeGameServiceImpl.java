@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 
 import com.jonathan.web.resources.TictactoePlayerListDto;
 import com.jonathan.web.resources.OnlineUserDto;
-import com.jonathan.web.service.TictactoeService;
 import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,13 +23,14 @@ import java.util.Collections;
 import java.util.HashMap;
 
 
-@Service
+//@Service
+@Component
 public class TictactoeGameServiceImpl implements TictactoeGameService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private RabbitTemplate template;
+    //@Autowired
+    //private RabbitTemplate template;
 
 	// id of next created game
 	private static long gameIdCounter = 1;
@@ -46,10 +47,10 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 	// list of games that ended but not queued to be deleted
 	private Map<Long, TictactoeGame> endingGameList;
 
-	public TictactoeGameServiceImpl(long currentTime)
+	public TictactoeGameServiceImpl()
 	{
 		// set start time
-		lastUpdateTime = currentTime;
+		lastUpdateTime = -1;
 
 		// synchronized list of games in progress (2 player names mapped to TictactoeGame)
 		activeGameList = Collections.synchronizedMap(new HashMap<Long, TictactoeGame>());
@@ -74,6 +75,13 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		// games requests sent by this player
 		List<Long> endingGames = new ArrayList<Long>();
 		List<Long> deletedGames = new ArrayList<Long>();
+
+		// don't remove games on first update
+		if (lastUpdateTime < 0)
+		{
+			lastUpdateTime = currentTime;
+			return;
+		}
 
 		// game status should be checked every 5 seconds
 		if ((currentTime - lastUpdateTime) >= GAME_UPDATE_INTERVAL)
