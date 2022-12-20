@@ -100,7 +100,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 		}
 	}
 
-	public TictactoePlayerListDto getPlayerList(long currentTime, String thisPlayerName)
+	public TictactoePlayerListDto getPlayerList(long currentTime, @NonNull String thisPlayerName)
 	{
 		TictactoePlayer thisPlayer;
 
@@ -176,7 +176,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 		return playerListDto;
 	}
 
-	public TictactoeRequestDto addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName)
+	public TictactoeRequestDto addPlayerRequest(long currentTime, @NonNull String thisPlayerName, @NonNull String versusPlayerName)
 	{
 		List<String> playersInGame;
 

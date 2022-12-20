@@ -5,6 +5,7 @@ import java.util.List;
 import com.jonathan.web.resources.TictactoeGame;
 import com.jonathan.web.resources.TictactoePlayerListDto;
 import com.jonathan.web.resources.TictactoeRequestDto;
+import org.springframework.lang.NonNull;
 
 public interface TictactoePlayerListService
 {
@@ -19,9 +20,9 @@ public interface TictactoePlayerListService
 		ERROR_REQUEST_EXISTS,
 	}
 
-	public TictactoePlayerListDto getPlayerList(long currentTime, String thisPlayerName);
+	public TictactoePlayerListDto getPlayerList(long currentTime, @NonNull String thisPlayerName);
 
-	public TictactoeRequestDto addPlayerRequest(long currentTime, String thisPlayerName, String versusPlayerName);
+	public TictactoeRequestDto addPlayerRequest(long currentTime, @NonNull String thisPlayerName, @NonNull String versusPlayerName);
 
   //public List<TictactoePlayerListDto> getPlayerList();
 	//public TictactoePlayerListDto getPlayerList();

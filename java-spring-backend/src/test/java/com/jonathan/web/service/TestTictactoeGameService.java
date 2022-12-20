@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import com.jonathan.web.resources.TictactoeRequestDto;
 
 @ActiveProfiles("test")
@@ -142,5 +143,80 @@ public class TestTictactoeGameService
 		// game moves to closing state
 		gameCopy = gameService.getGameCopyByPlayerName(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT+DELETE_TIMEOUT, PLAYER_NAMES[0]);
 		assertEquals(TictactoeGame.GameState.CLOSING, gameCopy.getGameState(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT+DELETE_TIMEOUT));
+	}
+
+	@Test
+	public void game()
+	{
+		TictactoeGameService gameService = new TictactoeGameServiceImpl();
+		TictactoePlayerListService playerListService = new TictactoePlayerListServiceImpl(gameService);
+		TictactoeRequestDto response; 
+		TictactoePlayerListDto playerListDto;
+		List<String> availableUsers;
+		TictactoeGame.GameState gameState;
+		TictactoeGameService.GameServiceResponse gameResponse;
+		TictactoeGame gameCopy;
+		long currentTime = CURRENT_TIME;
+		long gameIdPlayer0;
+		long gameIdPlayer1;
+		long playerListGameIdPlayer0;
+		long playerListGameIdPlayer1;
+
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[1]);
+		response = playerListService.addPlayerRequest(currentTime, PLAYER_NAMES[0], PLAYER_NAMES[1]);
+		response = playerListService.addPlayerRequest(currentTime, PLAYER_NAMES[1], PLAYER_NAMES[0]);
+
+		// game state is starting until both players check in
+		gameState = gameService.getGameStateByPlayerName(currentTime, PLAYER_NAMES[0]);
+		gameState = gameService.getGameStateByPlayerName(currentTime, PLAYER_NAMES[1]);
+
+		gameResponse = gameService.sendTictactoeMove(currentTime, PLAYER_NAMES[1], 0);
+		assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
+		
+		currentTime += MOVE_TIME;
+		gameResponse = gameService.sendTictactoeMove(currentTime, PLAYER_NAMES[0], 1);
+		assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
+
+		currentTime += MOVE_TIME;
+		gameResponse = gameService.sendTictactoeMove(currentTime, PLAYER_NAMES[1], 2);
+		assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
+
+		// players aren't in list of available players
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[0]);
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[1]);
+		availableUsers = playerListDto.getAvailableUsers();
+		assertEquals(0, availableUsers.size());
+
+		// game id matches for both players
+		gameIdPlayer0 = gameService.getPlayerGameId(currentTime, PLAYER_NAMES[0]);
+		gameIdPlayer1 = gameService.getPlayerGameId(currentTime, PLAYER_NAMES[1]);
+		assertNotEquals(gameIdPlayer0, -1);
+		assertEquals(gameIdPlayer0, gameIdPlayer1);
+
+		// getting player list returns with already in game
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[0]);
+		assertEquals(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME, playerListDto.getServiceResponse());
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[1]);
+		assertEquals(TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME, playerListDto.getServiceResponse());
+
+		// player O moves after timeout
+		currentTime += EXPIRE_TIMEOUT + 1;
+		gameResponse = gameService.sendTictactoeMove(currentTime, PLAYER_NAMES[0], 2);
+		assertEquals(TictactoeGameService.GameServiceResponse.INVALID_MOVE, gameResponse);
+
+		// player X wins by timeout
+		gameCopy = gameService.getGameCopyByPlayerName(currentTime, PLAYER_NAMES[0]);
+		assertEquals(TictactoeGame.GameState.GAME_OVER_X_WINS, gameCopy.getGameState(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT));
+
+		// players can join player list after game ends
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[0]);
+		playerListDto = playerListService.getPlayerList(currentTime, PLAYER_NAMES[1]);
+		availableUsers = playerListDto.getAvailableUsers();
+		assertEquals(1, availableUsers.size());
+
+		// game moves to closing state
+		currentTime += DELETE_TIMEOUT;
+		gameCopy = gameService.getGameCopyByPlayerName(currentTime, PLAYER_NAMES[0]);
+		assertEquals(TictactoeGame.GameState.CLOSING, gameCopy.getGameState(currentTime));
 	}
 }
