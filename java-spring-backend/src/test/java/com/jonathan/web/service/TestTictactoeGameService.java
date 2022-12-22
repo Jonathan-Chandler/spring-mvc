@@ -114,48 +114,6 @@ public class TestTictactoeGameService
 		TictactoeGame.GameState gameState;
 		TictactoeGameService.GameServiceResponse gameResponse;
 		TictactoeGame gameCopy;
-
-		playerListDto = playerListService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
-		response = playerListService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
-		response = playerListService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
-
-		// game state is starting until both players check in
-		gameState = gameService.getGameStateByPlayerName(CURRENT_TIME, PLAYER_NAMES[0]);
-		gameState = gameService.getGameStateByPlayerName(CURRENT_TIME, PLAYER_NAMES[1]);
-
-		gameResponse = gameService.sendTictactoeMove(CURRENT_TIME, PLAYER_NAMES[1], 0);
-		assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
-		
-		gameResponse = gameService.sendTictactoeMove(CURRENT_TIME+(MOVE_TIME), PLAYER_NAMES[0], 1);
-		assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
-
-		gameResponse = gameService.sendTictactoeMove(CURRENT_TIME+(MOVE_TIME*2), PLAYER_NAMES[1], 2);
-		assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
-
-		// player O moves after timeout
-		gameResponse = gameService.sendTictactoeMove(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT, PLAYER_NAMES[0], 2);
-		assertEquals(TictactoeGameService.GameServiceResponse.INVALID_MOVE, gameResponse);
-
-		// player X wins by timeout
-		gameCopy = gameService.getGameCopyByPlayerName(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT, PLAYER_NAMES[0]);
-		assertEquals(TictactoeGame.GameState.GAME_OVER_X_WINS, gameCopy.getGameState(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT));
-
-		// game moves to closing state
-		gameCopy = gameService.getGameCopyByPlayerName(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT+DELETE_TIMEOUT, PLAYER_NAMES[0]);
-		assertEquals(TictactoeGame.GameState.CLOSING, gameCopy.getGameState(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT+DELETE_TIMEOUT));
-	}
-
-	@Test
-	public void game()
-	{
-		TictactoeGameService gameService = new TictactoeGameServiceImpl();
-		TictactoePlayerListService playerListService = new TictactoePlayerListServiceImpl(gameService);
-		TictactoeRequestDto response; 
-		TictactoePlayerListDto playerListDto;
-		List<String> availableUsers;
-		TictactoeGame.GameState gameState;
-		TictactoeGameService.GameServiceResponse gameResponse;
-		TictactoeGame gameCopy;
 		long currentTime = CURRENT_TIME;
 		long gameIdPlayer0;
 		long gameIdPlayer1;
@@ -217,6 +175,56 @@ public class TestTictactoeGameService
 		// game moves to closing state
 		currentTime += DELETE_TIMEOUT;
 		gameCopy = gameService.getGameCopyByPlayerName(currentTime, PLAYER_NAMES[0]);
+		gameService.printGameLists();
 		assertEquals(TictactoeGame.GameState.CLOSING, gameCopy.getGameState(currentTime));
+
+		// game is deleted and returns error if trying to get state
+		currentTime += DELETE_TIMEOUT;
+		gameCopy = gameService.getGameCopyByPlayerName(currentTime, PLAYER_NAMES[0]);
+		gameService.printGameLists();
+		assertEquals(TictactoeGame.GameState.GAME_OVER_ERROR, gameCopy.getGameState(currentTime));
 	}
+
+	//@Test
+	//public void gameTimesOut()
+	//{
+	//	TictactoeGameService gameService = new TictactoeGameServiceImpl();
+	//	TictactoePlayerListService playerListService = new TictactoePlayerListServiceImpl(gameService);
+	//	TictactoeRequestDto response; 
+	//	TictactoePlayerListDto playerListDto;
+	//	List<String> availableUsers;
+	//	TictactoeGame.GameState gameState;
+	//	TictactoeGameService.GameServiceResponse gameResponse;
+	//	TictactoeGame gameCopy;
+
+	//	playerListDto = playerListService.getPlayerList(CURRENT_TIME, PLAYER_NAMES[1]);
+	//	response = playerListService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[0], PLAYER_NAMES[1]);
+	//	response = playerListService.addPlayerRequest(CURRENT_TIME, PLAYER_NAMES[1], PLAYER_NAMES[0]);
+
+	//	// game state is starting until both players check in
+	//	gameState = gameService.getGameStateByPlayerName(CURRENT_TIME, PLAYER_NAMES[0]);
+	//	gameState = gameService.getGameStateByPlayerName(CURRENT_TIME, PLAYER_NAMES[1]);
+
+	//	gameResponse = gameService.sendTictactoeMove(CURRENT_TIME, PLAYER_NAMES[1], 0);
+	//	assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
+	//	
+	//	gameResponse = gameService.sendTictactoeMove(CURRENT_TIME+(MOVE_TIME), PLAYER_NAMES[0], 1);
+	//	assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
+
+	//	gameResponse = gameService.sendTictactoeMove(CURRENT_TIME+(MOVE_TIME*2), PLAYER_NAMES[1], 2);
+	//	assertEquals(TictactoeGameService.GameServiceResponse.SUCCESS, gameResponse);
+
+	//	// player O moves after timeout
+	//	gameResponse = gameService.sendTictactoeMove(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT, PLAYER_NAMES[0], 2);
+	//	assertEquals(TictactoeGameService.GameServiceResponse.INVALID_MOVE, gameResponse);
+
+	//	// player X wins by timeout
+	//	gameCopy = gameService.getGameCopyByPlayerName(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT, PLAYER_NAMES[0]);
+	//	assertEquals(TictactoeGame.GameState.GAME_OVER_X_WINS, gameCopy.getGameState(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT));
+
+	//	// game moves to closing state
+	//	gameCopy = gameService.getGameCopyByPlayerName(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT+DELETE_TIMEOUT, PLAYER_NAMES[0]);
+	//	assertEquals(TictactoeGame.GameState.CLOSING, gameCopy.getGameState(1+CURRENT_TIME+(MOVE_TIME*2)+EXPIRE_TIMEOUT+DELETE_TIMEOUT));
+	//}
+
 }

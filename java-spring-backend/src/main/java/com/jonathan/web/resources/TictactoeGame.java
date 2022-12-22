@@ -224,9 +224,11 @@ public class TictactoeGame
 		if (gameState.ordinal() >= GameState.GAME_OVER_ERROR.ordinal())
 		{
 			// game has ended for at least 30 seconds (ACTION_DELETE_GAME_MS)
-			if ((currentTimeMs - lastMoveTimeMs) > ACTION_DELETE_GAME_MS)
+			if ((currentTimeMs - lastMoveTimeMs) >= ACTION_DELETE_GAME_MS)
 			{
 				gameState = GameState.CLOSING;
+				logger.error("currentTimeMs = " + currentTimeMs);
+				logger.error("lastMoveTimeMs = " + lastMoveTimeMs);
 			}
 
 			return gameState;

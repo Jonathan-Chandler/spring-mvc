@@ -105,6 +105,7 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 			{
 				endingGameList.put(key, activeGameList.get(key));
 				activeGameList.remove(key);
+				logger.error("Remove game ID " + key + " from activeGameList");
 			}
 
 			// update list of ending games
@@ -115,6 +116,7 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 				// remove the game from ending games list
 				if (game.getGameState(currentTime) == TictactoeGame.GameState.CLOSING)
 				{
+					logger.error("Deleting game ID " + key + " from endingGameList");
 					deletedGames.add(key);
 				}
 			}
@@ -122,6 +124,7 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 			// remove expired games
 			for ( Long key : deletedGames ) 
 			{
+				logger.error("Deleted game ID " + key + " from endingGameList");
 				endingGames.remove(key);
 			}
 		}
@@ -209,6 +212,9 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 			// return a new game in error state if not found
 			return new TictactoeGame(currentTime);
 		}
+
+		// update list
+		refreshGameList(currentTime);
 		
 		// found in active games
 		if (activeGameList.containsKey(gameId))
@@ -250,5 +256,10 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 	{
 		return gameIdCounter++;
 	}
-}
 
+	public void printGameLists()
+	{
+		logger.error("Active Games: " + activeGameList.keySet());
+		logger.error("Ending Games: " + endingGameList.keySet());
+	}
+}

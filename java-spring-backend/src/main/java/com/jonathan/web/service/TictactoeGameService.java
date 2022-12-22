@@ -47,5 +47,7 @@ public interface TictactoeGameService
 	public GameServiceResponse sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location);
 
 	public long getPlayerGameId(long currentTime, String playerName);
+
+	public void printGameLists();
 }
 
