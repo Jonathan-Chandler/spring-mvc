@@ -104,7 +104,8 @@ public class SecurityConfiguration
 
 	@Bean
 	public TictactoePlayerListService tictactoePlayerListService() {
-		return new TictactoePlayerListServiceImpl(tictactoeGameService());
+		return new TictactoePlayerListServiceImpl();
+		//return new TictactoePlayerListServiceImpl(tictactoeGameService());
 	}
 
 	////@Bean

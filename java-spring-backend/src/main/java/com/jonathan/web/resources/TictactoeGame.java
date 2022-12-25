@@ -129,6 +129,9 @@ public class TictactoeGame
 	// create new game in error state
 	public TictactoeGame(long gameStartTimeMs)
 	{
+		// no board
+		gameBoard = null;
+
 		// record time for auto delete
 		lastMoveTimeMs = gameStartTimeMs;
 
@@ -489,6 +492,32 @@ public class TictactoeGame
 		}
 
 		return "Draw";
+	}
+
+	public void printBoard()
+	{
+		if (gameBoard != null)
+		{
+			String copyGameBoard = getBoard().replaceAll("_", " ");
+			//copyGameBoard = copyGameBoard.replaceAll("_", " ");
+
+			logger.error("Game board: ");
+			for (int i = 0; i < 3; i++)
+			{
+				logger.error("               " + copyGameBoard.charAt(i*3) + "|" + 
+						copyGameBoard.charAt(i*3+1) + "|" 
+						+ copyGameBoard.charAt((i*3)+2));
+
+				if ( i == 0 || i == 1)
+				{
+					logger.error("              -------");
+				}
+			}
+		}
+		else
+		{
+			logger.error("Game was not created (game is invalid)");
+		}
 	}
 
 	//@Override

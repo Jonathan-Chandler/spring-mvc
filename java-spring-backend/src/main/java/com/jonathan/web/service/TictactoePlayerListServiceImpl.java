@@ -22,6 +22,7 @@ import org.springframework.lang.NonNull;
 import java.util.Collections;
 //import java.util.Collections.synchronizedMap;
 import java.util.HashMap;
+import java.util.Set;
 
 
 @Service
@@ -33,21 +34,22 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 	public static final long PLAYER_LIST_UPDATE_INTERVAL = 5000;
 
 	// time of last update request
-	private long lastUpdateTime;
+	private static long lastUpdateTime;
 
 	// list of players
-	private Map<String, TictactoePlayer> playerList;
+	private static Map<String, TictactoePlayer> playerList;
 
     //@Autowired
     //private RabbitTemplate template;
 
-    //@Autowired
+    @Autowired
     private TictactoeGameService gameService;
 
 	@Autowired
-	public TictactoePlayerListServiceImpl(TictactoeGameService tictactoeGameService)
+	//public TictactoePlayerListServiceImpl(TictactoeGameService tictactoeGameService)
+	public TictactoePlayerListServiceImpl()
 	{
-		gameService = tictactoeGameService;
+		//gameService = tictactoeGameService;
 
 		// time that service was started
 		lastUpdateTime = -1;
@@ -59,7 +61,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 	private void refreshPlayerList(long currentTime)
 	{
 		// players already playing the game that should stay on active list
-		List<String> playersInGame = gameService.getPlayersInGame(currentTime);
+		List<String> playersInGame = gameService.getPlayersInActiveGames(currentTime);
 
 		// games requests sent by this player
 		List<String> deletedPlayers = new ArrayList<String>();
@@ -100,6 +102,14 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 		}
 	}
 
+	// used by sender to get information for each player
+	public List<String> getAllPlayers(long currentTime)
+	{
+		refreshPlayerList(currentTime);
+
+		return new ArrayList<>(playerList.keySet());
+	}
+
 	public TictactoePlayerListDto getPlayerList(long currentTime, @NonNull String thisPlayerName)
 	{
 		TictactoePlayer thisPlayer;
@@ -114,7 +124,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 		List<String> currentPlayerRequested = new ArrayList<String>();
 
 		// players already playing the game that shouldn't be displayed
-		List<String> playersInGame = gameService.getPlayersInGame(currentTime);
+		List<String> playersInGame = gameService.getPlayersInActiveGames(currentTime);
 
 		// player should rejoin their game in progress if they are on list of players in game
 		if (playersInGame.contains(thisPlayerName))
@@ -201,7 +211,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 		refreshPlayerList(currentTime);
 
 		// get list of players already in game
-		playersInGame = gameService.getPlayersInGame(currentTime);
+		playersInGame = gameService.getPlayersInActiveGames(currentTime);
 
 		// requesting player must be in lobby
 		if (playersInGame.contains(thisPlayerName))
@@ -248,6 +258,19 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 			// successfully added to player match requests
 			return new TictactoeRequestDto(TictactoeRequestDto.ResponseType.SUCCESS, thisPlayerName, versusPlayerName);
 		}
+	}
+
+	public void reset()
+	{
+		// time that the game list was last updated
+		lastUpdateTime = -1;
+
+		synchronized(playerList)
+		{
+			playerList.clear();
+		}
+
+		logger.error("Cleared active players: " + playerList.keySet());
 	}
 
 	private void debugPrintList(String listName, List<String> printList)

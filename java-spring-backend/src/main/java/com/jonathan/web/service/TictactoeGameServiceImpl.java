@@ -39,41 +39,81 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 	public static final long GAME_UPDATE_INTERVAL = 5000;
 
 	// time that the game list was last updated
-	private long lastUpdateTime;
+	private static long lastUpdateTime;
 
-	// list of games that are not in end state
-	private Map<Long, TictactoeGame> activeGameList;
-
-	// list of games that ended but not queued to be deleted
-	private Map<Long, TictactoeGame> endingGameList;
+	// list of all active and ending games
+	private static Map<Long, TictactoeGame> gameList;
 
 	public TictactoeGameServiceImpl()
 	{
 		// set start time
 		lastUpdateTime = -1;
 
-		// synchronized list of games in progress (2 player names mapped to TictactoeGame)
-		activeGameList = Collections.synchronizedMap(new HashMap<Long, TictactoeGame>());
-
-		// synchronized list of games that have ended
-		endingGameList = Collections.synchronizedMap(new HashMap<Long, TictactoeGame>());
+		// list of all active and ending games
+		gameList = Collections.synchronizedMap(new HashMap<Long, TictactoeGame>());
 	}
 
-	// create new game and return the ID of the game
+	public static synchronized long createGameId()
+	{
+		return gameIdCounter++;
+	}
+
+	// remove games containing player names
+	public void removeGamesByPlayerName(String xPlayerName, String oPlayerName)
+	{
+		// games requests sent by this player
+		List<Long> deletedGames = new ArrayList<Long>();
+
+		synchronized(gameList)
+		{
+			// remove the any games the players are members of
+			for ( Long key : gameList.keySet() ) 
+			{
+				TictactoeGame game = gameList.get(key);
+
+				synchronized(game)
+				{
+					// remove the game from active list
+					if (game.playerIsInThisGame(xPlayerName) || game.playerIsInThisGame(oPlayerName))
+					{
+						deletedGames.add(key);
+					}
+				}
+			}
+
+
+			// move the ending games to other list
+			for ( Long key : deletedGames ) 
+			{
+				gameList.remove(key);
+				logger.error("Remove game ID " + key + " from gameList");
+			}
+		}
+	}
+
+	// create new game and return the ID of the game (remove players from existing games)
 	public long createNewGame(long currentTime, String xPlayerName, String oPlayerName)
 	{
 		long newGameId = createGameId();
 
-		activeGameList.put(newGameId, new TictactoeGame(currentTime, xPlayerName, oPlayerName));
+		// wait for list before adding
+		synchronized(gameList)
+		{
+			removeGamesByPlayerName(xPlayerName, oPlayerName);
+
+			gameList.put(newGameId, new TictactoeGame(currentTime, xPlayerName, oPlayerName));
+			logger.error("add new game ID " + newGameId + " for " 
+					+ xPlayerName + "(xPlayer) and " 
+					+ oPlayerName + "(oPlayer)");
+		}
 
 		return newGameId;
 	}
 
-	// update maps of active and ending games
+	// update map of games
 	private void refreshGameList(long currentTime)
 	{
 		// games requests sent by this player
-		List<Long> endingGames = new ArrayList<Long>();
 		List<Long> deletedGames = new ArrayList<Long>();
 
 		// don't remove games on first update
@@ -83,71 +123,135 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 			return;
 		}
 
-		// game status should be checked every 5 seconds
-		if ((currentTime - lastUpdateTime) >= GAME_UPDATE_INTERVAL)
+		// lock out while gameList is being updated with new states
+		synchronized(gameList)
 		{
-			lastUpdateTime = currentTime;
-
-			// update list of active games to see if ended
-			for ( Long key : activeGameList.keySet() ) 
+			// game status should be checked every 5 seconds
+			if ((currentTime - lastUpdateTime) >= GAME_UPDATE_INTERVAL)
 			{
-				TictactoeGame game = activeGameList.get(key);
+				lastUpdateTime = currentTime;
 
-				// remove the game from active list
-				if (game.getGameState(currentTime).ordinal() >= TictactoeGame.GameState.GAME_OVER_ERROR.ordinal())
+				// update list of active games to see if closing
+				for ( Long key : gameList.keySet() ) 
 				{
-					endingGames.add(key);
+					TictactoeGame game = gameList.get(key);
+
+					// synchronize game object access
+					synchronized(game)
+					{
+						// remove the game from active list
+						if (game.getGameState(currentTime) == TictactoeGame.GameState.CLOSING)
+						{
+							deletedGames.add(key);
+						}
+					}
 				}
 			}
 
 			// move the ending games to other list
-			for ( Long key : endingGames ) 
-			{
-				endingGameList.put(key, activeGameList.get(key));
-				activeGameList.remove(key);
-				logger.error("Remove game ID " + key + " from activeGameList");
-			}
-
-			// update list of ending games
-			for ( Long key : endingGameList.keySet() ) 
-			{
-				TictactoeGame game = endingGameList.get(key);
-
-				// remove the game from ending games list
-				if (game.getGameState(currentTime) == TictactoeGame.GameState.CLOSING)
-				{
-					logger.error("Deleting game ID " + key + " from endingGameList");
-					deletedGames.add(key);
-				}
-			}
-
-			// remove expired games
 			for ( Long key : deletedGames ) 
 			{
-				logger.error("Deleted game ID " + key + " from endingGameList");
-				endingGames.remove(key);
+				gameList.remove(key);
+				logger.error("Remove game ID " + key + " from gameList");
 			}
 		}
 	}
 
+	// clear the game map (only used for tests)
+	public void reset()
+	{
+		// time that the game list was last updated
+		lastUpdateTime = -1;
+
+		synchronized(gameList)
+		{
+			gameList.clear();
+		}
+		logger.error("Cleared active Games: " + gameList.keySet());
+	}
+
+	// refresh games (return players / game list / copy of games)
+	//
+	// for playerList
+	//		players in active games
+	//
+	// getGameState
+	//		players in ALL games
+	//
+	// get game state (synchronized)
+	//		check in and refresh
+	//		return getGameCopy
+	//
+	// get game (synchronized)
+	//
+	// get game copy
+	//
+	// sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location)
+
 	// get list of players that are in an active game and remove expired games
-	public List<String> getPlayersInGame(long currentTime)
+	public List<String> getPlayersInActiveGames(long currentTime)
 	{
 		List<String> playerList = new ArrayList<String>();
 
-		// update state of games before checking active players
-		refreshGameList(currentTime);
-
-		// add active players from each tictactoe game
-		for ( Long key : activeGameList.keySet() ) 
+		// lock out while searching for players
+		synchronized(gameList)
 		{
-			TictactoeGame game = activeGameList.get(key);
+			// update state of games before checking active players
+			refreshGameList(currentTime);
 
-			// names of players in the game with given ID
-			List<String> playersInCurrentGame = game.getPlayerNames();
+			// add active players from each tictactoe game
+			for ( Long key : gameList.keySet() ) 
+			{
+				TictactoeGame game = gameList.get(key);
 
-			// add to list of players in active games
-			playerList.addAll(playersInCurrentGame);
+				// sync game object
+				synchronized(game)
+				{
+					// gameState should have been updated already by refreshGameList
+					TictactoeGame.GameState gameState = game.getGameStateNoUpdate();
+
+					// add players if game is still active
+					if (gameState.ordinal() < TictactoeGame.GameState.GAME_OVER_ERROR.ordinal())
+					{
+						// names of players in the game with given ID
+						List<String> playersInCurrentGame = game.getPlayerNames();
+
+						// add to list of players in active games
+						playerList.addAll(playersInCurrentGame);
+					}
+				}
+			}
+		}
+
+		return playerList;
+	}
+
+	// get list of players that are in ended and active game and remove expired games
+	public List<String> getPlayersInAllGames(long currentTime)
+	{
+		List<String> playerList = new ArrayList<String>();
+
+		// lock out while searching for players
+		synchronized(gameList)
+		{
+			// update state of games before checking active players
+			refreshGameList(currentTime);
+
+			// add active players from each tictactoe game
+			for ( Long key : gameList.keySet() ) 
+			{
+				TictactoeGame game = gameList.get(key);
+
+				// gameState should have been updated already by refreshGameList
+				TictactoeGame.GameState gameState = game.getGameStateNoUpdate();
+
+				// add players if game is still active
+				// names of players in the game with given ID
+				List<String> playersInCurrentGame = game.getPlayerNames();
+
+				// add to list of players in active games
+				playerList.addAll(playersInCurrentGame);
+			}
 		}
 
 		return playerList;
@@ -156,30 +260,22 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 	// get id of game that player is currently in
 	public long getPlayerGameId(long currentTime, String playerName)
 	{
-		// update state of games before checking active players
-		refreshGameList(currentTime);
-
-		// all active games
-		for ( Long key : activeGameList.keySet() ) 
+		// lock out while searching for players
+		synchronized(gameList)
 		{
-			TictactoeGame game = activeGameList.get(key);
+			// update state of games before checking active players
+			refreshGameList(currentTime);
 
-			// return the id for the game if player is x/o
-			if (game.playerIsInThisGame(playerName))
+			// search all active games
+			for ( Long key : gameList.keySet() ) 
 			{
-				return key;
-			}
-		}
+				TictactoeGame game = gameList.get(key);
 
-		// all ending games
-		for ( Long key : endingGameList.keySet() ) 
-		{
-			TictactoeGame game = endingGameList.get(key);
-
-			// return the id for the game if player is x/o
-			if (game.playerIsInThisGame(playerName))
-			{
-				return key;
+				// return the id for the game if player is x/o
+				if (game.playerIsInThisGame(playerName))
+				{
+					return key;
+				}
 			}
 		}
 
@@ -187,56 +283,42 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		return -1;
 	}
 
-	public TictactoeGame.GameState getGameStateByPlayerName(long currentTime, @NonNull String playerName)
+	public TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName)
 	{
-		// get tictactoe game
-		TictactoeGame currentGame = getGameByPlayerName(currentTime, playerName);
-		
-		// return state of game
-		return currentGame.getGameState(currentTime);
+		synchronized(gameList)
+		{
+			// update list
+			refreshGameList(currentTime);
+
+			// get id
+			long gameId = getPlayerGameId(currentTime, playerName);
+
+			if (gameId > 0)
+			{
+				return gameList.get(gameId);
+			}
+		}
+		return null;
 	}
 
 	public TictactoeGame getGameCopyByPlayerName(long currentTime, @NonNull String playerName)
 	{
-		// don't return by reference for outside requests
-		return new TictactoeGame(getGameByPlayerName(currentTime, playerName));
-	}
+		TictactoeGame game = getGameByPlayerName(currentTime, playerName);
 
-	private TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName)
-	{
-		long gameId = getPlayerGameId(currentTime, playerName);
-		
-		// player was not found
-		if (gameId < 0)
+		if (game != null)
 		{
-			// return a new game in error state if not found
-			return new TictactoeGame(currentTime);
+			synchronized(game)
+			{
+				// player has checked in if requesting state
+				game.setPlayerReadyByName(currentTime, playerName);
+
+				// return a copy of the game if found
+				return new TictactoeGame(game);
+			}
 		}
 
-		// update list
-		refreshGameList(currentTime);
-		
-		// found in active games
-		if (activeGameList.containsKey(gameId))
-		{
-			TictactoeGame activeGame = activeGameList.get(gameId);
-
-			// player has joined game if requesting
-			activeGame.setPlayerReadyByName(currentTime, playerName);
-
-			// return copy, not reference to map object
-			return activeGame;
-		}
-
-		// found in ending games
-		if (endingGameList.containsKey(gameId))
-		{
-			// return copy, not reference to map object
-			return endingGameList.get(gameId);
-		}
-
-		// game id was not found in any list, return game in error state
-		return new TictactoeGame(currentTime);
+		// return a game in error state
+		return new TictactoeGame((currentTime));
 	}
 
 	// player wants to add a move to the board
@@ -244,22 +326,39 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 	{
 		TictactoeGame currentGame = getGameByPlayerName(currentTime, thisPlayerName);
 
-		if (currentGame.handlePlayerMoveByPlayername(currentTime, thisPlayerName, location))
+		if (currentGame != null)
 		{
-			return TictactoeGameService.GameServiceResponse.SUCCESS;
+			synchronized(currentGame)
+			{
+				if (currentGame.handlePlayerMoveByPlayername(currentTime, thisPlayerName, location))
+				{
+					return TictactoeGameService.GameServiceResponse.SUCCESS;
+				}
+			}
 		}
 
 		return TictactoeGameService.GameServiceResponse.INVALID_MOVE;
 	}
 
-	public static synchronized long createGameId()
+	public void printGameIds()
 	{
-		return gameIdCounter++;
+		logger.error("Active Games: " + gameList.keySet());
 	}
 
-	public void printGameLists()
+	public void printGameById(long id)
 	{
-		logger.error("Active Games: " + activeGameList.keySet());
-		logger.error("Ending Games: " + endingGameList.keySet());
+		// lock out while searching for players
+		synchronized(gameList)
+		{
+			TictactoeGame game = gameList.get(id);
+			if (game != null)
+			{
+				game.printBoard();
+			}
+			else
+			{
+				logger.error("Game id " + id + " did not exist");
+			}
+		}
 	}
 }

@@ -61,6 +61,7 @@ import org.springframework.amqp.core.Message;
 import com.jonathan.web.resources.TestDto;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import com.jonathan.web.frontend.RequestDto;
 
 //import org.springframework.amqp.core.ExchangeTypes.*;
 
@@ -72,7 +73,6 @@ public class TReceiver
 	//@Autowired
 	//Logger logger;
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 
 	@Autowired
 	private TictactoePlayerListService tictactoePlayerListService;
@@ -91,13 +91,13 @@ public class TReceiver
 	)
     public void receive(Message message, @RequestBody final TestDto value)
 	{
-        //Map<String, Object> headers = message.getMessageProperties().getHeaders();
-		//String routingKey = message.getMessageProperties().getReceivedRoutingKey();
-		//String routingUsername = routingKey.substring(10);
-		//String headerUsername = headers.get("login").toString();
-		//String requestToUser = value.getMessage();
-        //logger.error(" [x] message headers login: " + headers.get("login"));
-        //logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
+        Map<String, Object> headers = message.getMessageProperties().getHeaders();
+		String routingKey = message.getMessageProperties().getReceivedRoutingKey();
+		String routingUsername = routingKey.substring(10);
+		String headerUsername = headers.get("login").toString();
+		String requestToUser = value.getMessage();
+        logger.error(" [x] message headers login: " + headers.get("login"));
+        logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
 
 		//// check if username in header matches routing key format 'user.<username>'
 		//if (!routingUsername.equals(headerUsername))

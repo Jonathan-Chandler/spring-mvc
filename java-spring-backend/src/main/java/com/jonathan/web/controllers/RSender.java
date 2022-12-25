@@ -14,6 +14,7 @@ import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.BindingBuilder;
 import com.jonathan.web.service.TictactoePlayerListService;
 import org.springframework.context.annotation.Profile;
+import java.util.List;
 
 @Profile("production")
 public class RSender 
@@ -35,7 +36,7 @@ public class RSender
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private TictactoePlayerListService tictactoePlayerListService;
+	private TictactoePlayerListService playerListService;
 
     //private Queue fanoutQueue;
     //private TopicExchange fanoutExchange;
@@ -80,7 +81,11 @@ public class RSender
     @Scheduled(fixedDelay = 10000, initialDelay = 500)
     public void send() 
 	{
-		//String topic = "amq.topic";
+		String topic = "amq.topic";
+		long currentTime = java.lang.System.currentTimeMillis();
+
+		List<String> allPlayers = playerListService.getAllPlayers(currentTime);
+
 		//String key = "playerlist";
 		////TestDto testMessage = new TestDto("test");
 		////logger.error("sent message '" + testMessage.getMessage() + "' to topic: " + topic + " key: " + key);

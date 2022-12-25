@@ -35,10 +35,10 @@ public interface TictactoeGameService
 	public long createNewGame(long currentTime, String xPlayerName, String oPlayerName);
 
 	// get list of players that are in an active game and remove expired games
-	public List<String> getPlayersInGame(long currentTime);
+	public List<String> getPlayersInActiveGames(long currentTime);
 
-	// get state of this player's game
-	public TictactoeGame.GameState getGameStateByPlayerName(long currentTime, @NonNull String playerName);
+	// get list of players that are in ended and active game and remove expired games
+	public List<String> getPlayersInAllGames(long currentTime);
 
 	// get a copy of the tictactoe game
 	public TictactoeGame getGameCopyByPlayerName(long currentTime, @NonNull String playerName);
@@ -48,6 +48,8 @@ public interface TictactoeGameService
 
 	public long getPlayerGameId(long currentTime, String playerName);
 
-	public void printGameLists();
+	public void printGameIds();
+
+	public void reset();
 }
 

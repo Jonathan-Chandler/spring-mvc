@@ -43,6 +43,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.jonathan.web.service.UserService;
 import com.jonathan.web.service.TictactoePlayerListService;
+import com.jonathan.web.service.TictactoeGameService;
 import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
@@ -83,17 +84,27 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 public class TictactoeController 
 {
 	@Autowired
-	private TictactoePlayerListService tictactoePlayerListService;
+	private TictactoePlayerListService playerListService;
+
+	@Autowired
+	private TictactoeGameService gameService;
 
 	//@Autowired
-	//Logger logger;
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@GetMapping(value="/greetings")
-	public void getMessages()
-	{
-		logger.info("sent test message to rsend");
-	}
+	//public getPlayerList(long currentTime, @NonNull String thisPlayerName)
+	//{
+	//	TictactoePlayerListDto 
+	//}
+
+	//public void getPlayerList()
+	//{
+	//}
+	//@GetMapping(value="/greetings")
+	//public void getMessages()
+	//{
+	//	logger.info("sent test message to rsend");
+	//}
 
 	//// bind 
 	//@RabbitListener(bindings = @QueueBinding(
