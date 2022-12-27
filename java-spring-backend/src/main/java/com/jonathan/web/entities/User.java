@@ -27,7 +27,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
+@Table(name = "user")
 public class User implements UserDetails
 {
 	@Id

@@ -47,7 +47,7 @@
 # 8080 - java spring
 sudo docker run -i -t		\
 	--user mysql:mysql		\
-	--ip 172.17.0.2			\
+	--ip 172.17.0.3			\
 	-p 3000:3000			\
 	-p 8080:8080			\
 	-v $(pwd)/../..:/home/user \

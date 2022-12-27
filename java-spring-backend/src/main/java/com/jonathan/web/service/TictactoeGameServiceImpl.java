@@ -21,10 +21,12 @@ import org.springframework.lang.NonNull;
 import java.util.Collections;
 //import java.util.Collections.synchronizedMap;
 import java.util.HashMap;
+import org.springframework.context.annotation.Primary;
 
 
 //@Service
 @Component
+@Primary
 public class TictactoeGameServiceImpl implements TictactoeGameService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -283,7 +285,7 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		return -1;
 	}
 
-	public TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName)
+	private TictactoeGame getGameByPlayerName(long currentTime, @NonNull String playerName)
 	{
 		synchronized(gameList)
 		{

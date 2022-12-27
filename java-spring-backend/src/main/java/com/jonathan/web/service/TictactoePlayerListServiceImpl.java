@@ -10,6 +10,7 @@ import com.jonathan.web.resources.TictactoePlayerListDto;
 import com.jonathan.web.resources.OnlineUserDto;
 import com.jonathan.web.service.TictactoePlayerListService;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Primary;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ import java.util.Set;
 
 
 @Service
+@Primary
 public class TictactoePlayerListServiceImpl implements TictactoePlayerListService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -44,6 +46,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 
     @Autowired
     private TictactoeGameService gameService;
+    //private TictactoeGameServiceImpl gameService;
 
 	@Autowired
 	//public TictactoePlayerListServiceImpl(TictactoeGameService tictactoeGameService)

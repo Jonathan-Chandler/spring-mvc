@@ -321,7 +321,7 @@ export function AuthProvider({
 			const toUsernameTopic = '/topic/to.user.' + username;
 
 			stompClientSession.configure({
-				brokerURL: "ws://172.17.0.3:61611/ws",
+				brokerURL: "ws://172.17.0.2:61611/ws",
 				connectHeaders: stompHeaders,
 				onConnect: () => 
 					{

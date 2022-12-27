@@ -83,11 +83,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 @Controller
 public class TictactoeController 
 {
-	@Autowired
-	private TictactoePlayerListService playerListService;
+	//@Autowired
+	//private TictactoePlayerListService playerListService;
 
-	@Autowired
-	private TictactoeGameService gameService;
+	//@Autowired
+	//private TictactoeGameService gameService;
 
 	//@Autowired
 	final Logger logger = LoggerFactory.getLogger(this.getClass());

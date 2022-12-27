@@ -81,10 +81,10 @@ public class RSender
     @Scheduled(fixedDelay = 10000, initialDelay = 500)
     public void send() 
 	{
-		String topic = "amq.topic";
-		long currentTime = java.lang.System.currentTimeMillis();
+		//String topic = "amq.topic";
+		//long currentTime = java.lang.System.currentTimeMillis();
 
-		List<String> allPlayers = playerListService.getAllPlayers(currentTime);
+		//List<String> allPlayers = playerListService.getAllPlayers(currentTime);
 
 		//String key = "playerlist";
 		////TestDto testMessage = new TestDto("test");

@@ -83,6 +83,34 @@ export default function TictactoeAmqpTest()
 		console.log("send body: " + JSON.stringify(data))
 	};
 
+	const sendRequestDto = () => 
+	{
+		let stompSession = getStompSession();
+		const data = {requestType: 0}
+		//const data = "test";
+		console.log("send " + data)
+
+		// Additional headers
+		//client.publish({
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  //body: "{\"message\":\"data\"}",
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+		  //body: JSON.stringify(data),
+		console.log("send body: " + JSON.stringify(data))
+	};
+
 	return (
 		<div>
 			amqp test
@@ -107,6 +135,7 @@ export default function TictactoeAmqpTest()
 			<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
 			<p /><button className="btn btn-success" onClick={() => sendRequest("test_user123")}>req test_user123</button>
 			<p /><button className="btn btn-success" onClick={() => sendRequest("test_user1234")}>req test_user1234</button>
+			<p /><button className="btn btn-success" onClick={() => sendRequestDto()}>send requestDto</button>
 		</div>
 	);
 
