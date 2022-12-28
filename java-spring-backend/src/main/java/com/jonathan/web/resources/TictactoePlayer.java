@@ -25,36 +25,37 @@ public class TictactoePlayer
 	}
 
 	// time before user will be removed from the list
-	private static final long PLAYER_TIMEOUT_MS = 15000;
+	private static final long PLAYER_TIMEOUT_MS = 20000;
 
 	// users that this user has requested a match against
 	private ArrayList<String> requestedUsers;
 
 	// time that last message was received from user
-	private Long lastCheckin;
+	private long lastCheckin;
 
-	// ID of the game that this player has joined
-	//private Long currentGameId;
-
-	public TictactoePlayer(Long time)
+	public TictactoePlayer(long time)
 	{
 		requestedUsers = new ArrayList<String>();
 		lastCheckin = time;
-		//currentGameId = Long.valueOf(-1);
 	}
 
-	public void setCheckinTime(Long currentTime)
+	public void setCheckinTime(long currentTime)
 	{
 		lastCheckin = currentTime;
 	}
 
-	public List<String> getRequestedUsers()
+	public List<String> getRequestedUsers(long currentTime)
 	{
+		lastCheckin = currentTime;
+
 		return requestedUsers;
 	}
 
-	public PlayerResponse addRequestedUser(String requestedUser)
+	public PlayerResponse addRequestedUser(long currentTime, String requestedUser)
 	{
+		// update time
+		lastCheckin = currentTime;
+
 		// add to player match requests
 		if (!requestedUsers.contains(requestedUser))
 		{
@@ -89,7 +90,7 @@ public class TictactoePlayer
 		//state = PlayerState.JOINING_GAME;
 	}
 
-	public boolean isActive(Long currentTime)
+	public boolean isActive(long currentTime)
 	{
 		if ((currentTime - lastCheckin) > PLAYER_TIMEOUT_MS)
 		{
@@ -101,11 +102,6 @@ public class TictactoePlayer
 	//public PlayerState getState()
 	//{
 	//	return state;
-	//}
-
-	//public Long getGameId()
-	//{
-	//	return currentGameId;
 	//}
 
 	//public void setState(PlayerState newState)

@@ -14,6 +14,7 @@ public class RequestDto implements Serializable
 		REFRESH_GAME,
 	}
 
+	// message type
 	private Type requestType;
 
 	// user that is being requested to play against

@@ -8,7 +8,6 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 import com.jonathan.web.resources.UserRegistrationDto;
 import com.jonathan.web.resources.UserLoginDto;
-import com.jonathan.web.resources.OnlineUserDto;
 
 public interface UserService
 {
@@ -18,6 +17,5 @@ public interface UserService
 
   public void deleteById(String id);
 
-	public List<OnlineUserDto> getOnlineUsers();
 }
 

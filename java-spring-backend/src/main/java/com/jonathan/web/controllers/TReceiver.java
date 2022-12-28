@@ -68,6 +68,7 @@ import org.springframework.lang.NonNull;
 import com.jonathan.web.resources.TictactoeRequestDto;
 import com.jonathan.web.resources.TictactoeGame;
 
+import org.springframework.stereotype.Component;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 //import Java.lang.System;
@@ -77,6 +78,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Profile;
 
 @Profile("production")
+@Component
 public class TReceiver 
 {
 	//@Autowired
@@ -107,6 +109,7 @@ public class TReceiver
 		// message wasn't a request or routing didn't match login username
 		if (!messageIsValid(message, "com.jonathan.web.frontend.RequestDto", usernameFromRoutingKey))
 		{
+			logger.error("Message was not valid for user: " + usernameFromRoutingKey);
 			return;
 		}
 
@@ -117,19 +120,25 @@ public class TReceiver
 		switch (requestType)
 		{
 			case GET_PLAYERLIST:
+				logger.error("GET_PLAYERLIST for user: " + usernameFromRoutingKey);
 				sendPlayerList(usernameFromRoutingKey);
 				break;
 			case REQUEST_GAME:
+				logger.error("REQUEST_GAME for user: " + usernameFromRoutingKey);
 				requestGame(usernameFromRoutingKey, request);
 				break;
 			case REFRESH_GAME:
+				logger.error("REFRESH_GAME for user: " + usernameFromRoutingKey);
 				sendGame(usernameFromRoutingKey);
 				break;
 			case REQUEST_MOVE:
+				logger.error("REQUEST_MOVE for user: " + usernameFromRoutingKey);
 				sendMove(usernameFromRoutingKey, request);
 				break;
 			default:
-				logger.error("Unknown requestType: " + requestType);
+				logger.error("Unknown requestType: '" + requestType + "' for user: " + usernameFromRoutingKey);
+				//logger.error("Unknown requestType: " + requestType);
+				break;
 		};
     }
 
@@ -176,19 +185,23 @@ public class TReceiver
 
 		switch (requestDto.getResponseType())
 		{
-			//case TictactoeRequestDto.ResponseType.START_GAME:
 			case START_GAME:
 				// send both players to game if both have requested
 				sendGame(requestedUser);
+				sendGame(requestingUser);
+				break;
 
-				// fall through
-			//case TictactoeRequestDto.ResponseType.ERROR_CURRENT_PLAYER_IS_IN_GAME:
 			case ERROR_CURRENT_PLAYER_IS_IN_GAME:
 				// send this player to game if in progress
 				sendGame(requestingUser);
 				break;
+
 			default:
+				logger.error("Player " + requestingUser + " attempts add user " + requestedUser);
+				logger.error("Response: " + requestDto.getResponseType());
+
 				// refresh player list in all other cases
+				sendPlayerList(requestingUser);
 				break;
 		}
 	}
@@ -205,11 +218,16 @@ public class TReceiver
 		// send game information if already joined a game
 		if (playerListDto.getServiceResponse() == TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME)
 		{
+			logger.error("sendPlayerList sends PLAYER_IN_GAME for user " + username);
+
 			// send this player to game if in progress instead of the player list
 			sendGame(username);
 		}
 		else
 		{
+			logger.error("get playerListDto request for user " + username);
+			logger.error("routingKeyToUser: " + routingKeyToUser);
+			logger.error("playerListDto: " + playerListDto.toString());
 			template.convertAndSend("amq.topic", routingKeyToUser, playerListDto);
 		}
 	}
@@ -248,32 +266,36 @@ public class TReceiver
 		TictactoeGame currentGame = gameService.getGameCopyByPlayerName(currentTime, username);
 		String routingKeyToUser = "to.user." + username;
 
+		logger.error("sendGame to user " + username);
+		logger.error("sendGame routing key " + routingKeyToUser);
+		logger.error("sendGame currentGame: " + currentGame.toString());
+
 		// send game information to this user
 		template.convertAndSend("amq.topic", routingKeyToUser, currentGame);
 	}
 
-	@RabbitListener(bindings = @QueueBinding(
-		value = @Queue(value = "playerQueue", durable = "true"),
-        exchange = @Exchange(value = "amq.topic", type = "topic"),
-        key = "from.user.*")
-	)
-    public void receiveTestDto(Message message, @RequestBody final TestDto value)
-	{
-		String routingKey = message.getMessageProperties().getReceivedRoutingKey();
-		String routingUsername = routingKey.substring(10);
-		if (messageIsValid(message, "com.jonathan.web.resources.TestDto", routingUsername))
-		{
-			Map<String, Object> headers = message.getMessageProperties().getHeaders();
-			String headerUsername = headers.get("login").toString();
-			String messageValue = value.getMessage();
-			logger.error("Headers: " + headers.keySet());
-			logger.error("__TypeId__: " + headers.get("__TypeId__"));
+	//@RabbitListener(bindings = @QueueBinding(
+	//	value = @Queue(value = "playerQueue", durable = "true"),
+    //    exchange = @Exchange(value = "amq.topic", type = "topic"),
+    //    key = "from.user.*")
+	//)
+    //public void receiveTestDto(Message message, @RequestBody final TestDto value)
+	//{
+	//	String routingKey = message.getMessageProperties().getReceivedRoutingKey();
+	//	String routingUsername = routingKey.substring(10);
+	//	if (messageIsValid(message, "com.jonathan.web.resources.TestDto", routingUsername))
+	//	{
+	//		Map<String, Object> headers = message.getMessageProperties().getHeaders();
+	//		String headerUsername = headers.get("login").toString();
+	//		String messageValue = value.getMessage();
+	//		logger.error("Headers: " + headers.keySet());
+	//		logger.error("__TypeId__: " + headers.get("__TypeId__"));
 
-			logger.error(" [x] message headers login: " + headers.get("login"));
-			logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
-			logger.error(" [x] getMessage = " + messageValue);
-		}
-	}
+	//		logger.error(" [x] message headers login: " + headers.get("login"));
+	//		logger.error(" [x] message headers routingKey: " + message.getMessageProperties().getReceivedRoutingKey());
+	//		logger.error(" [x] getMessage = " + messageValue);
+	//	}
+	//}
 
     //public void receive(@RequestBody final TictactoePlayerListDto playerList)
 

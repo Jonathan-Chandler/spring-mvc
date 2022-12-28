@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import com.jonathan.web.resources.TictactoePlayerListDto;
-import com.jonathan.web.resources.OnlineUserDto;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.ConcurrentMap;

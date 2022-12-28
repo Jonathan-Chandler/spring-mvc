@@ -98,11 +98,13 @@ public class SecurityConfiguration
 	static final String queueName = "spring-boot";
 
 	@Bean
+	@Scope("singleton")
 	public TictactoeGameService tictactoeGameService() {
 		return new TictactoeGameServiceImpl();
 	}
 
 	@Bean
+	@Scope("singleton")
 	public TictactoePlayerListService tictactoePlayerListService() {
 		return new TictactoePlayerListServiceImpl();
 		//return new TictactoePlayerListServiceImpl(tictactoeGameService());

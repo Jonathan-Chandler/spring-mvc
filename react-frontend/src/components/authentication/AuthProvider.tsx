@@ -5,12 +5,12 @@ import { IMessage, ActivationState, Stomp, Client } from '@stomp/stompjs';
 //import { RxStomp } from '@stomp/rx-stomp';
 //import { Client } from '@stomp/stompjs';
 
-//interface PlayerListEntry
-//{
-//	username: String;
-//	myRequest: boolean;
-//	theirRequest: boolean;
-//}
+interface PlayerListEntry
+{
+	username: String;
+	myRequest: boolean;
+	theirRequest: boolean;
+}
 
 // atuh context vars/functions
 interface AuthContextType {
@@ -23,7 +23,8 @@ interface AuthContextType {
 	logout: () => void;
 	getSession: () => Axios;
 	getStompSession: () => Client;
-	playerList: any;
+	playerList: PlayerListEntry[];
+	//playerList: {"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]};
 	error?: any;
 }
 
@@ -44,7 +45,11 @@ export function AuthProvider({
 	const [error, setError] = useState<any>();
 	const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
 	//const [stompSession, setStompSession] = useState(null);
-	const [playerList, setPlayerList] = useState([]);
+	const [playerList, setPlayerList] = useState<PlayerListEntry[]>([]);
+	//const [playerList, setPlayerList] = useState<{"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]}>({"availableUsers": [], "requestingUsers": [], "requestedUsers": []});
+	const [availablePlayers, setAvailablePlayers] = useState([]);
+	const [requestedPlayers, setRequestedPlayers] = useState([]);
+	const [requestingPlayers, setRequestingPlayers] = useState([]);
 	//const [playerlistSubscription, setPlayerlistSubscription] = useState(null);
 	//const [userSubscription, setUserSubscription] = useState(null);
 	const [stompClientSession, setStompClientSession] = useState<Client>(new Client());
@@ -215,7 +220,6 @@ export function AuthProvider({
 		console.log("handleplayerlistrx: " + message);
 		let messageBody = JSON.parse(message.body);
 		let stringMessageBody = JSON.stringify(messageBody);
-		//let newPlayerListParse = JSON.parse(messageBody);
 		let newPlayerListParse = JSON.parse(stringMessageBody);
 		let newStringPlayerListParse = JSON.stringify(newPlayerListParse);
 		console.log("newPlayerListParse: " + newPlayerListParse)
@@ -238,7 +242,7 @@ export function AuthProvider({
 			console.log("new player list: " + newPlayerList)
 		}
 
-		setPlayerList(newPlayerList);
+		//setPlayerList(newPlayerList);
 		// console.log("jsonparse newPlayerList: " + JSON.parse(newPlayerList)); - not valid json
 
 		//setPlayerList(JSON.stringify(newPlayerList));
@@ -254,24 +258,56 @@ export function AuthProvider({
 	},[username]);
 
 	const handleUserRx = useCallback(async (message: IMessage) => {
+		console.log("receive message");
 		let loginHeader = message.headers["login"];
 		let messageType = message.headers["__TypeId__"];
 		console.log("loginHeader: " + loginHeader);
 		console.log("handleUserRx: message: " + message);
+		console.log("messageType: " + messageType);
 
-		if (loginHeader === username)
+		if (messageType === "com.jonathan.web.resources.TictactoePlayerListDto")
 		{
-			console.log("outgoing message");
-			console.log("messageType: " + messageType);
-			return;
+			console.log("get player list");
+			let messageBody = JSON.parse(message.body);
+			setAvailablePlayers(messageBody.availableUsers);
+			setRequestedPlayers(messageBody.requestedUsers);
+			setRequestingPlayers(messageBody.requestingUsers);
+			let newPlayerList = [];
+			for (let i = 0; i < messageBody.availableUsers.length; i++)
+			{
+				let currentPlayer = {username: messageBody.availableUsers[i], myRequest: false, theirRequest: false};
+
+				// this user's request to play against current player
+				if (messageBody.requestedUsers.includes(currentPlayer.username))
+				{
+
+					currentPlayer.myRequest = true;
+				}
+
+				// other player has request to play against this user
+				if (messageBody.requestingUsers.includes(currentPlayer.username))
+				{
+					currentPlayer.theirRequest = true;
+				}
+
+				console.log("currentPlayer: " + JSON.stringify(currentPlayer));
+				newPlayerList.push(currentPlayer)
+			}
+
+			console.log("newPlayerList: " + JSON.stringify(newPlayerList));
+			setPlayerList(newPlayerList);
+			console.log("Message body: " + JSON.stringify(messageBody));
 		}
 
-		console.log("messageType: " + messageType);
-		//{
-		console.log("incoming message: " + message);
-		//}
-
 	},[username]);
+
+//interface PlayerListEntry
+//{
+//	username: String;
+//	myRequest: boolean;
+//	theirRequest: boolean;
+//}
+
 
 	useEffect(() =>
 	{
@@ -337,12 +373,12 @@ export function AuthProvider({
 						handleUserRx,
 						stompHeaders,
 					)
-					stompClientSession.subscribe
-					(
-						'/topic/playerlist', 
-						handlePlayerlistRx,
-						stompHeaders,
-					)
+					//stompClientSession.subscribe
+					//(
+					//	'/topic/playerlist', 
+					//	handlePlayerlistRx,
+					//	stompHeaders,
+					//)
 				},
 				onStompError: (frame) => {
 					console.log("stompError: " + frame);
@@ -354,31 +390,56 @@ export function AuthProvider({
 
 			stompClientSession.activate();
 
-			// check in every 15 seconds for playerlist
+			// check in every 5 seconds for playerlist
 			const interval = setInterval(() => 
 				{
-					const data = {message: "test_message"}
-					//const data = "test";
-					console.log("send " + data)
+					//const data = {message: "test_message"}
+					////const data = "test";
+					//console.log("send " + data)
 
+					//// Additional headers
+					//let pass = token.split(' ')[1]
+					//const msg_destination = "/topic/from.user." + username
+					////stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
+					//stompClientSession.publish({
+					//	destination: msg_destination,
+					//	body: JSON.stringify(data),
+					//	//body: "{\"message\":\"data\"}",
+					//	headers: {
+					//		login: username, 
+					//		passcode: pass, 
+					//		"content-type":"application/json", 
+					//		"content-encoding":"UTF-8", "__TypeId__":"com.jonathan.web.resources.TestDto"
+					//	}
+					//});
+					////body: JSON.stringify(data),
+					//console.log("send body: " + JSON.stringify(data))
+
+					// request
+					//let stompSession = getStompSession();
 					// Additional headers
+					//client.publish({
+					//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
+					//stompSession.publish({
+
+					const data = {requestType: 0, requestedUser: "", moveLocation: -1}
+
 					let pass = token.split(' ')[1]
 					const msg_destination = "/topic/from.user." + username
-					//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
 					stompClientSession.publish({
-						destination: msg_destination,
-						body: JSON.stringify(data),
-						//body: "{\"message\":\"data\"}",
-						headers: {
-							login: username, 
-							passcode: pass, 
-							"content-type":"application/json", 
-							"content-encoding":"UTF-8", "__TypeId__":"com.jonathan.web.resources.TestDto"
-						}
+					  destination: msg_destination,
+					  body: JSON.stringify(data),
+					  //body: "{\"message\":\"data\"}",
+					  headers: {
+						  login: username, 
+						  passcode: pass, 
+						  "content-type":"application/json", 
+						  "content-encoding":"UTF-8", 
+						  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+					  }
 					});
-					//body: JSON.stringify(data),
-					console.log("send body: " + JSON.stringify(data))
-				}, 15000);
+					console.log("send playerlist refresh to '" + msg_destination + "' - body: " + JSON.stringify(data))
+				}, 5000);
 			return () => {
 				clearInterval(interval);
 			};

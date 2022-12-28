@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 
 import com.jonathan.web.resources.TictactoeGame;
 import com.jonathan.web.resources.TictactoePlayerListDto;
-import com.jonathan.web.resources.OnlineUserDto;
 import com.jonathan.web.resources.TictactoeRequestDto;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;

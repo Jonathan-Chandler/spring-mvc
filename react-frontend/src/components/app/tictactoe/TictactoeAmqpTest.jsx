@@ -25,7 +25,34 @@ export default function TictactoeAmqpTest()
 		//setState({...state, convertedPlayerList: ["aoeu","oaeu"]})
 		console.log("playerList: " + playerList);
 		console.log("convertedPlayerList: " + state.convertedPlayerList);
+		let newPlayerList = []
+		//if( typeof playerList !== 'undefined' && playerList !== null )
+		//{
+		//	if( typeof playerList.availableUsers !== 'undefined' && playerList.availableUsers !== null )
+		//	{
+		//		//for (let i = 0; i < playerList.avalableUsers.length; i++)
+		//		//{
+		//		//	let currentPlayer = {"name": playerList.availableUsers[i], "requested": false, "requesting": false};
+
+		//		//	if (playerList.requestedUsers.includes(currentPlayer.name))
+		//		//		{
+		//		//			console.log("includes requested");
+		//		//			currentPlayer.requested = true;
+		//		//		}
+
+		//		//		if (playerList.requestingUsers.includes(currentPlayer.name))
+		//		//			{
+		//		//				console.log("includes requesting");
+		//		//				currentPlayer.requesting = true;
+		//		//			}
+		//		//			console.log("Add player: " + JSON.stringify(currentPlayer));
+		//		//			newPlayerList.push(currentPlayer)
+		//		//}
+		//	}
+		//}
+		console.log("newPlayerList: " + JSON.stringify(newPlayerList));
 		//setState({...state, convertedPlayerList: playerList})
+		//
 	},[state, playerList])
 
 	const sendMessage = () => 
@@ -58,9 +85,10 @@ export default function TictactoeAmqpTest()
 	const sendRequest = (name) => 
 	{
 		let stompSession = getStompSession();
-		const data = {message: name}
+		//const data = {message: name}
+		const data = {requestType: 1, requestedUser: name, moveLocation: -1}
 		//const data = "test";
-		console.log("send " + data)
+		console.log("send request: " + JSON.stringify(data))
 
 		// Additional headers
 		//client.publish({
@@ -76,11 +104,10 @@ export default function TictactoeAmqpTest()
 			  passcode: pass, 
 			  "content-type":"application/json", 
 			  "content-encoding":"UTF-8", 
-			  "__TypeId__":"com.jonathan.web.resources.TestDto"
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
 		  }
 		});
 		  //body: JSON.stringify(data),
-		console.log("send body: " + JSON.stringify(data))
 	};
 
 	const sendRequestDto = () => 
@@ -119,13 +146,18 @@ export default function TictactoeAmqpTest()
 				<table className="table">
 					<tr>
 						<th>Name</th>
+						<th>You Requested</th>
+						<th>They Requested</th>
+						<th>Send Request</th>
 					</tr>
 					<tbody>
 						{
 							playerList.map((item) => (
-								<tr key={item}>
-									<td>{item}</td>
-									<td><button className="btn btn-success" onClick={() => sendRequest(item)}>Message</button></td>
+								<tr key={item.username}>
+									<td>{item.username}</td>
+									<td>{item.myRequest ? "Yes" : "No"}</td>
+									<td>{item.theirRequest ? "Yes" : "No"}</td>
+									<td><button className="btn btn-success" onClick={() => sendRequest(item.username)}>Request</button></td>
 								</tr>
 							))
 						}

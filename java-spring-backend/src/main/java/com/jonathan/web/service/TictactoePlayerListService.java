@@ -20,7 +20,7 @@ public interface TictactoePlayerListService
 		ERROR_REQUEST_EXISTS,
 	}
 
-	public List<String> getAllPlayers(long currentTime);
+	//public List<String> getAllPlayers(long currentTime);
 
 	public TictactoePlayerListDto getPlayerList(long currentTime, @NonNull String thisPlayerName);
 
