@@ -15,6 +15,8 @@ import java.util.Map;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.jonathan.web.resources.TictactoePlayer;
 import com.jonathan.web.resources.TictactoeGame;
+import com.jonathan.web.resources.TictactoeGameDto;
+
 import org.springframework.lang.NonNull;
 import java.util.Collections;
 //import java.util.Collections.synchronizedMap;
@@ -40,10 +42,16 @@ public interface TictactoeGameService
 	public List<String> getPlayersInAllGames(long currentTime);
 
 	// get a copy of the tictactoe game
-	public TictactoeGame getGameCopyByPlayerName(long currentTime, @NonNull String playerName);
+	public TictactoeGameDto getGameCopyByPlayerName(long currentTime, @NonNull String playerName);
+
+	// check in the player and return a copy of the game state
+	public TictactoeGameDto checkInPlayer(long currentTime, @NonNull String playerName);
 
 	// player wants to add a move to the board
 	public GameServiceResponse sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location);
+
+	// player wants to surrender
+	public TictactoeGameDto sendTictactoeForfeit(long currentTime, @NonNull String thisPlayerName);
 
 	public long getPlayerGameId(long currentTime, String playerName);
 

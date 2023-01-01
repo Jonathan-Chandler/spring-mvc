@@ -2,13 +2,9 @@ package com.jonathan.web.frontend;
 import java.io.Serializable;
 import lombok.Data;
 
-//public class TestDto extends Serializable
-//public class RequestDto implements Serializable
-//@SuppressWarnings("serial")
-//public class ResponseDto implements Serializable
-
 @Data
-public class ResponseDto
+@SuppressWarnings("serial")
+public class ResponseDto implements Serializable
 {
 	public enum Type
 	{

@@ -10,8 +10,10 @@ import java.util.ArrayList;
 
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
-public class TictactoePlayerListDto 
+@SuppressWarnings("serial")
+public class TictactoePlayerListDto implements Serializable
 {
 	public enum ServiceResponse {
 		SUCCESS,
@@ -51,7 +53,7 @@ public class TictactoePlayerListDto
 		//requestingUsers = new ArrayList<String>(requesting);
 		availableUsers = available;
 		requestedUsers = requested;
-		requestingUsers =requesting;
+		requestingUsers = requesting;
 	}
 
 	public List<String> getAvailableUsers()

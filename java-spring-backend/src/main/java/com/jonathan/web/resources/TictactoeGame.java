@@ -19,10 +19,11 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 
 import lombok.Data;
+import java.io.Serializable;
 
-//public class TictactoeGame implements Serializable
 @Data
-public class TictactoeGame
+@SuppressWarnings("serial")
+public class TictactoeGame implements Serializable
 {
 	public enum GameState 
 	{
@@ -88,26 +89,6 @@ public class TictactoeGame
 		return gameState;
 	}
 
-	public String getXPlayerName()
-	{
-		return xPlayerName;
-	}
-
-	public String getOPlayerName()
-	{
-		return oPlayerName;
-	}
-
-	public boolean getXPlayerReady()
-	{
-		return xPlayerReady;
-	}
-
-	public boolean getOPlayerReady()
-	{
-		return oPlayerReady;
-	}
-
 	public char[] getGameBoard()
 	{
 		return Arrays.copyOf(gameBoard, gameBoard.length);
@@ -134,8 +115,12 @@ public class TictactoeGame
 	// create new game in error state
 	public TictactoeGame(long gameStartTimeMs)
 	{
-		// no board
-		gameBoard = null;
+		// empty board
+		gameBoard = new char[BOARD_SIZE];
+		Arrays.fill(gameBoard, '_');
+
+		xPlayerName = "";
+		oPlayerName = "";
 
 		// record time for auto delete
 		lastMoveTimeMs = gameStartTimeMs;
@@ -522,6 +507,46 @@ public class TictactoeGame
 		else
 		{
 			logger.error("Game was not created (game is invalid)");
+		}
+	}
+
+	public String getXPlayerName()
+	{
+		return xPlayerName;
+	}
+
+	public String getOPlayerName()
+	{
+		return oPlayerName;
+	}
+
+	public boolean getXPlayerReady()
+	{
+		return xPlayerReady;
+	}
+
+	public boolean getOPlayerReady()
+	{
+		return oPlayerReady;
+	}
+
+	public boolean handleForfeitGame(@NonNull String playerName)
+	{
+		PlayerSymbol playerSymbol = getPlayerSymbol(playerName);
+
+		switch (playerSymbol)
+		{
+			case X_PLAYER:
+				// X Player forfeits
+				setWinner(PlayerSymbol.O_PLAYER);
+				return true;
+			case O_PLAYER:
+				// O Player forfeits
+				setWinner(PlayerSymbol.X_PLAYER);
+				return true;
+			default:
+				// player is not in this game
+				return false;
 		}
 	}
 

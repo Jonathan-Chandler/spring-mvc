@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TictactoeGameResponseDto 
+@SuppressWarnings("serial")
+public class TictactoeGameResponseDto implements Serializable
 {
 	private int game_id;
 

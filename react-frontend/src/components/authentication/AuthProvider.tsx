@@ -14,10 +14,14 @@ interface PlayerListEntry
 
 interface TictactoeGame
 {
-	xPlayer: String;
-	oPlayer: String;
+	lastMoveTimeMs: Number;
+	xPlayerName: String;
+	oPlayerName: String;
+	xPlayerReady: boolean;
+	oPlayerReady: boolean;
+	gameState: String;
 	gameBoard: String;
-	
+	gameOverMessage: String;
 }
 
 // atuh context vars/functions
@@ -55,11 +59,11 @@ export function AuthProvider({
 	const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
 	//const [stompSession, setStompSession] = useState(null);
 	const [playerList, setPlayerList] = useState<PlayerListEntry[]>([]);
-	const [tictactoeGame, setTictactoeGame] = useState<TictactoeGame>();
+	const [tictactoeGame, setTictactoeGame] = useState<TictactoeGame>({lastMoveTimeMs: 0, xPlayerName: "", oPlayerName: "", xPlayerReady: true, oPlayerReady: true, gameState: "GAME_OVER_ERROR", gameBoard: "_________", gameOverMessage: ""});
 	//const [playerList, setPlayerList] = useState<{"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]}>({"availableUsers": [], "requestingUsers": [], "requestedUsers": []});
-	const [availablePlayers, setAvailablePlayers] = useState([]);
-	const [requestedPlayers, setRequestedPlayers] = useState([]);
-	const [requestingPlayers, setRequestingPlayers] = useState([]);
+	//const [availablePlayers, setAvailablePlayers] = useState([]);
+	//const [requestedPlayers, setRequestedPlayers] = useState([]);
+	//const [requestingPlayers, setRequestingPlayers] = useState([]);
 	//const [playerlistSubscription, setPlayerlistSubscription] = useState(null);
 	//const [userSubscription, setUserSubscription] = useState(null);
 	const [stompClientSession, setStompClientSession] = useState<Client>(new Client());
@@ -269,8 +273,8 @@ export function AuthProvider({
 
 	const handleUserRx = useCallback(async (message: IMessage) => {
 		console.log("receive message");
-		let loginHeader = message.headers["login"];
-		let messageType = message.headers["__TypeId__"];
+		const loginHeader = message.headers["login"];
+		const messageType = message.headers["__TypeId__"];
 		console.log("loginHeader: " + loginHeader);
 		console.log("handleUserRx: message: " + message);
 		console.log("messageType: " + messageType);
@@ -278,11 +282,22 @@ export function AuthProvider({
 		if (messageType === "com.jonathan.web.resources.TictactoePlayerListDto")
 		{
 			console.log("get player list");
-			let messageBody = JSON.parse(message.body);
-			setAvailablePlayers(messageBody.availableUsers);
-			setRequestedPlayers(messageBody.requestedUsers);
-			setRequestingPlayers(messageBody.requestingUsers);
 			let newPlayerList = [];
+			let messageBody = JSON.parse(message.body);
+
+			//// clear the list
+			//if (messageBody.availableUsersCount === 0)
+			//{
+			//	//let currentPlayer = {};
+			//	//setPlayerList(newPlayerList);
+			//	//newPlayerList.push(currentPlayer)
+			//	setPlayerList(newPlayerList);
+			//	return;
+			//}
+
+			//setAvailablePlayers(messageBody.availableUsers);
+			//setRequestedPlayers(messageBody.requestedUsers);
+			//setRequestingPlayers(messageBody.requestingUsers);
 			for (let i = 0; i < messageBody.availableUsers.length; i++)
 			{
 				let currentPlayer = {username: messageBody.availableUsers[i], myRequest: false, theirRequest: false};
@@ -308,8 +323,43 @@ export function AuthProvider({
 			setPlayerList(newPlayerList);
 			console.log("Message body: " + JSON.stringify(messageBody));
 		}
+		else if (messageType === "com.jonathan.web.resources.TictactoeGameDto")
+		{
+			// server sent game information
+			console.log("get game state");
+			let messageBody = JSON.parse(message.body);
+
+			if (messageBody)
+			{
+				let currentGame = {
+					lastMoveTimeMs: messageBody.lastMoveTimeMs,
+					xPlayerName: messageBody.xplayerName,
+					oPlayerName: messageBody.oplayerName,
+					xPlayerReady: messageBody.xplayerReady,
+					oPlayerReady: messageBody.oplayerReady,
+					gameState: messageBody.gameState,
+					gameBoard: messageBody.gameBoard,
+					gameOverMessage: messageBody.gameOverMessage,
+				};
+
+				// converted information
+				setTictactoeGame(currentGame);
+				console.log("converted game information: " + JSON.stringify(currentGame));
+			}
+
+			// message information
+			console.log("receive game information: " + JSON.stringify(messageBody));
+		}
 
 	},[username]);
+
+//interface TictactoeGame
+//{
+//	xPlayer: String;
+//	oPlayer: String;
+//	gameBoard: String;
+//	joinGame: boolean
+//}
 
 //interface PlayerListEntry
 //{
@@ -370,25 +420,13 @@ export function AuthProvider({
 				brokerURL: "ws://172.17.0.2:61611/ws",
 				connectHeaders: stompHeaders,
 				onConnect: () => 
-					{
-					//stompClientSession.subscribe
-					//(
-					//	fromUsernameTopic,
-					//	handleUserRx,
-					//	stompHeaders2,
-					//)
+				{
 					stompClientSession.subscribe
 					(
 						toUsernameTopic,
 						handleUserRx,
 						stompHeaders,
 					)
-					//stompClientSession.subscribe
-					//(
-					//	'/topic/playerlist', 
-					//	handlePlayerlistRx,
-					//	stompHeaders,
-					//)
 				},
 				onStompError: (frame) => {
 					console.log("stompError: " + frame);
@@ -403,35 +441,6 @@ export function AuthProvider({
 			// check in every 5 seconds for playerlist
 			const interval = setInterval(() => 
 				{
-					//const data = {message: "test_message"}
-					////const data = "test";
-					//console.log("send " + data)
-
-					//// Additional headers
-					//let pass = token.split(' ')[1]
-					//const msg_destination = "/topic/from.user." + username
-					////stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
-					//stompClientSession.publish({
-					//	destination: msg_destination,
-					//	body: JSON.stringify(data),
-					//	//body: "{\"message\":\"data\"}",
-					//	headers: {
-					//		login: username, 
-					//		passcode: pass, 
-					//		"content-type":"application/json", 
-					//		"content-encoding":"UTF-8", "__TypeId__":"com.jonathan.web.resources.TestDto"
-					//	}
-					//});
-					////body: JSON.stringify(data),
-					//console.log("send body: " + JSON.stringify(data))
-
-					// request
-					//let stompSession = getStompSession();
-					// Additional headers
-					//client.publish({
-					//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
-					//stompSession.publish({
-
 					const data = {requestType: 0, requestedUser: "", moveLocation: -1}
 
 					let pass = token.split(' ')[1]

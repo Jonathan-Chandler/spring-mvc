@@ -12,13 +12,14 @@ import { Stomp, Client } from '@stomp/stompjs';
 
 export default function TictactoeAmqpTest()
 {
-	const { username, token, isAuthenticated, getStompSession, playerList } = useAuth();
+	const { username, token, isAuthenticated, getStompSession, playerList, tictactoeGame } = useAuth();
 	const data = ["A", "B", "C", "D"]
     const [state, setState] = useState({
       convertedPlayerList: [],
       message: "",
       loadedTodos: false,
     });
+    const navigate = useNavigate();
 
 	useEffect(() =>
 	{
@@ -54,6 +55,16 @@ export default function TictactoeAmqpTest()
 		//setState({...state, convertedPlayerList: playerList})
 		//
 	},[state, playerList])
+
+	useEffect(() =>
+	{
+		// game has not ended with error or winner
+		if (tictactoeGame.gameState === "X_PLAYER_MOVING" || tictactoeGame.gameState === "O_PLAYER_MOVING" || tictactoeGame.gameState === "STARTING");
+		{
+			console.log("Joining Game (gameState = " + tictactoeGame.gameState + ")");
+			navigate("/tictactoe/game/online")
+		}
+	},[tictactoeGame])
 
 	const sendMessage = () => 
 	{
@@ -138,38 +149,59 @@ export default function TictactoeAmqpTest()
 		console.log("send body: " + JSON.stringify(data))
 	};
 
-	return (
-		<div>
-			amqp test
-			<p />
-			<div className="container">
-				<table className="table">
-					<tr>
-						<th>Name</th>
-						<th>You Requested</th>
-						<th>They Requested</th>
-						<th>Send Request</th>
-					</tr>
-					<tbody>
-						{
-							playerList.map((item) => (
-								<tr key={item.username}>
-									<td>{item.username}</td>
-									<td>{item.myRequest ? "Yes" : "No"}</td>
-									<td>{item.theirRequest ? "Yes" : "No"}</td>
-									<td><button className="btn btn-success" onClick={() => sendRequest(item.username)}>Request</button></td>
-								</tr>
-							))
-						}
-					</tbody>
-				</table>
+	if (playerList && playerList.length >= 1)
+	{
+		return (
+			<div>
+				amqp test
+				<p />
+				<div className="container">
+					<table className="table">
+						<tbody>
+							<tr>
+								<th>Name</th>
+								<th>You Requested</th>
+								<th>They Requested</th>
+								<th>Send Request</th>
+							</tr>
+							{
+								playerList.map((item) => (
+									<tr key={item.username}>
+										<td>{item.username}</td>
+										<td>{item.myRequest ? "Yes" : "No"}</td>
+										<td>{item.theirRequest ? "Yes" : "No"}</td>
+										<td><button className="btn btn-success" onClick={() => sendRequest(item.username)}>Request</button></td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+				<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
+				<p /><button className="btn btn-success" onClick={() => sendRequest("test_user123")}>req test_user123</button>
+				<p /><button className="btn btn-success" onClick={() => sendRequest("test_user1234")}>req test_user1234</button>
+				<p /><button className="btn btn-success" onClick={() => sendRequestDto()}>send requestDto</button>
 			</div>
-			<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
-			<p /><button className="btn btn-success" onClick={() => sendRequest("test_user123")}>req test_user123</button>
-			<p /><button className="btn btn-success" onClick={() => sendRequest("test_user1234")}>req test_user1234</button>
-			<p /><button className="btn btn-success" onClick={() => sendRequestDto()}>send requestDto</button>
-		</div>
-	);
+		);
+	}
+	else
+	{
+		return (
+			<div>
+				amqp test
+				<p />
+				<div className="container">
+					<table className="table">
+						<p />No other players are online.
+					</table>
+				</div>
+				<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
+				<p /><button className="btn btn-success" onClick={() => sendRequest("test_user123")}>req test_user123</button>
+				<p /><button className="btn btn-success" onClick={() => sendRequest("test_user1234")}>req test_user1234</button>
+				<p /><button className="btn btn-success" onClick={() => sendRequestDto()}>send requestDto</button>
+			</div>
+		);
+	}
 
 }
 ////				<div className="container">

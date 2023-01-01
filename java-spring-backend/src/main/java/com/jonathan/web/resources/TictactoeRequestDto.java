@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
 @Data
-public class TictactoeRequestDto 
+@SuppressWarnings("serial")
+public class TictactoeRequestDto implements Serializable
 {
 	public enum ResponseType
 	{

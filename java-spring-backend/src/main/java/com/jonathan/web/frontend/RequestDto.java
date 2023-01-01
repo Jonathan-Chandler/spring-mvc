@@ -1,19 +1,19 @@
 package com.jonathan.web.frontend;
 import lombok.Data;
+import java.io.Serializable;
 
-//public class TestDto extends Serializable
-//public class RequestDto implements Serializable
-//@SuppressWarnings("serial")
-//public class RequestDto implements Serializable
 @Data
-public class RequestDto
+@SuppressWarnings("serial")
+public class RequestDto implements Serializable
 {
 	public enum Type
 	{
 		GET_PLAYERLIST,
 		REQUEST_GAME,
+		CHECK_IN_GAME,
 		REQUEST_MOVE,
 		REFRESH_GAME,
+		FORFEIT_GAME,
 	}
 
 	// message type

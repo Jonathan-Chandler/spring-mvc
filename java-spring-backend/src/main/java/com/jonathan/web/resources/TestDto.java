@@ -1,7 +1,8 @@
 package com.jonathan.web.resources;
+import java.io.Serializable;
 
-//public class TestDto extends Serializable
-public class TestDto
+@SuppressWarnings("serial")
+public class TestDto implements Serializable
 {
   private String message;
 

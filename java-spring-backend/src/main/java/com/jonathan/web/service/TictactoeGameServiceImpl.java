@@ -16,6 +16,7 @@ import java.util.Map;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.jonathan.web.resources.TictactoePlayer;
 import com.jonathan.web.resources.TictactoeGame;
+import com.jonathan.web.resources.TictactoeGameDto;
 import org.springframework.lang.NonNull;
 import java.util.Collections;
 //import java.util.Collections.synchronizedMap;
@@ -23,8 +24,8 @@ import java.util.HashMap;
 import org.springframework.context.annotation.Primary;
 
 
-//@Service
-@Component
+//@Component
+@Service
 @Primary
 public class TictactoeGameServiceImpl implements TictactoeGameService
 {
@@ -302,7 +303,7 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		return null;
 	}
 
-	public TictactoeGame getGameCopyByPlayerName(long currentTime, @NonNull String playerName)
+	public TictactoeGameDto getGameCopyByPlayerName(long currentTime, @NonNull String playerName)
 	{
 		TictactoeGame game = getGameByPlayerName(currentTime, playerName);
 
@@ -310,16 +311,34 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		{
 			synchronized(game)
 			{
-				// player has checked in if requesting state
-				game.setPlayerReadyByName(currentTime, playerName);
-
 				// return a copy of the game if found
-				return new TictactoeGame(game);
+				return new TictactoeGameDto(game);
 			}
 		}
 
 		// return a game in error state
-		return new TictactoeGame((currentTime));
+		return new TictactoeGameDto(new TictactoeGame((currentTime)));
+	}
+
+	public TictactoeGameDto checkInPlayer(long currentTime, @NonNull String playerName)
+	{
+		TictactoeGame currentGame = getGameByPlayerName(currentTime, playerName);
+
+		// check in if player is in a game
+		if (currentGame != null)
+		{
+			synchronized(currentGame)
+			{
+				// player is ready to start the game
+				currentGame.setPlayerReadyByName(currentTime, playerName);
+
+				// return a copy of the game after checking in
+				return new TictactoeGameDto(currentGame);
+			}
+		}
+
+		// return error if the game didn't exist
+		return new TictactoeGameDto(new TictactoeGame(currentTime));
 	}
 
 	// player wants to add a move to the board
@@ -339,6 +358,25 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		}
 
 		return TictactoeGameService.GameServiceResponse.INVALID_MOVE;
+	}
+
+	// player wants to forfeit
+	public TictactoeGameDto sendTictactoeForfeit(long currentTime, @NonNull String thisPlayerName)
+	{
+		TictactoeGame currentGame = getGameByPlayerName(currentTime, thisPlayerName);
+
+		if (currentGame != null)
+		{
+			synchronized(currentGame)
+			{
+				if (currentGame.handleForfeitGame(thisPlayerName))
+				{
+					return new TictactoeGameDto(currentGame);
+				}
+			}
+		}
+
+		return new TictactoeGameDto(new TictactoeGame(0));
 	}
 
 	public void printGameIds()
