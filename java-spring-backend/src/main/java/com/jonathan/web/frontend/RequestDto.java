@@ -1,10 +1,12 @@
 package com.jonathan.web.frontend;
-import java.io.Serializable;
+import lombok.Data;
 
 //public class TestDto extends Serializable
 //public class RequestDto implements Serializable
-@SuppressWarnings("serial")
-public class RequestDto implements Serializable
+//@SuppressWarnings("serial")
+//public class RequestDto implements Serializable
+@Data
+public class RequestDto
 {
 	public enum Type
 	{
@@ -29,20 +31,5 @@ public class RequestDto implements Serializable
 
 	public RequestDto(Type requestType) {
 		this.requestType = requestType;
-	}
-
-	public Type getRequestType()
-	{
-		return requestType;
-	}
-
-	public String getRequestedUser()
-	{
-		return requestedUser;
-	}
-
-	public int getMoveLocation()
-	{
-		return moveLocation;
 	}
 }

@@ -12,6 +12,14 @@ interface PlayerListEntry
 	theirRequest: boolean;
 }
 
+interface TictactoeGame
+{
+	xPlayer: String;
+	oPlayer: String;
+	gameBoard: String;
+	
+}
+
 // atuh context vars/functions
 interface AuthContextType {
 	username: string;
@@ -24,6 +32,7 @@ interface AuthContextType {
 	getSession: () => Axios;
 	getStompSession: () => Client;
 	playerList: PlayerListEntry[];
+	tictactoeGame: TictactoeGame;
 	//playerList: {"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]};
 	error?: any;
 }
@@ -46,6 +55,7 @@ export function AuthProvider({
 	const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
 	//const [stompSession, setStompSession] = useState(null);
 	const [playerList, setPlayerList] = useState<PlayerListEntry[]>([]);
+	const [tictactoeGame, setTictactoeGame] = useState<TictactoeGame>();
 	//const [playerList, setPlayerList] = useState<{"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]}>({"availableUsers": [], "requestingUsers": [], "requestedUsers": []});
 	const [availablePlayers, setAvailablePlayers] = useState([]);
 	const [requestedPlayers, setRequestedPlayers] = useState([]);
@@ -487,9 +497,10 @@ export function AuthProvider({
 			//getPlayerList,
 			//getPlayerListSession,
 			playerList,
+			tictactoeGame,
 			error,
 		}),
-		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, error ]
+		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, tictactoeGame, error ]
 	);
 
 	// render components after initialization

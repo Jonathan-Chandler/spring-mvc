@@ -16,8 +16,13 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.lang.NonNull;
 import org.slf4j.LoggerFactory;
+import java.io.Serializable;
 
-public class TictactoeGame 
+import lombok.Data;
+
+//public class TictactoeGame implements Serializable
+@Data
+public class TictactoeGame
 {
 	public enum GameState 
 	{

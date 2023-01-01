@@ -1,10 +1,14 @@
 package com.jonathan.web.frontend;
 import java.io.Serializable;
+import lombok.Data;
 
 //public class TestDto extends Serializable
 //public class RequestDto implements Serializable
-@SuppressWarnings("serial")
-public class ResponseDto implements Serializable
+//@SuppressWarnings("serial")
+//public class ResponseDto implements Serializable
+
+@Data
+public class ResponseDto
 {
 	public enum Type
 	{
@@ -22,15 +26,5 @@ public class ResponseDto implements Serializable
 
 	public ResponseDto(Type responseType) {
 		this.responseType = responseType;
-	}
-
-	public Type getRequestType()
-	{
-		return responseType;
-	}
-
-	public Type setResponseType(Type responseType)
-	{
-		return responseType;
 	}
 }

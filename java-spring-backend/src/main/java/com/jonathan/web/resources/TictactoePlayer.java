@@ -10,7 +10,9 @@ import java.util.List;
 
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
+import lombok.Data;
 
+@Data
 public class TictactoePlayer 
 {
 	//public enum PlayerState {
@@ -28,25 +30,20 @@ public class TictactoePlayer
 	private static final long PLAYER_TIMEOUT_MS = 20000;
 
 	// users that this user has requested a match against
-	private ArrayList<String> requestedUsers;
+	private List<String> requestedUsers;
 
 	// time that last message was received from user
-	private long lastCheckin;
+	private long checkInTime;
 
 	public TictactoePlayer(long time)
 	{
 		requestedUsers = new ArrayList<String>();
-		lastCheckin = time;
-	}
-
-	public void setCheckinTime(long currentTime)
-	{
-		lastCheckin = currentTime;
+		checkInTime = time;
 	}
 
 	public List<String> getRequestedUsers(long currentTime)
 	{
-		lastCheckin = currentTime;
+		checkInTime = currentTime;
 
 		return requestedUsers;
 	}
@@ -54,7 +51,7 @@ public class TictactoePlayer
 	public PlayerResponse addRequestedUser(long currentTime, String requestedUser)
 	{
 		// update time
-		lastCheckin = currentTime;
+		checkInTime = currentTime;
 
 		// add to player match requests
 		if (!requestedUsers.contains(requestedUser))
@@ -80,7 +77,7 @@ public class TictactoePlayer
 	public void joinGame(long currentTime, long gameId)
 	{
 		// set time that player joined game
-		lastCheckin = currentTime;
+		checkInTime = currentTime;
 
 		// set ID for game lookup
 		//currentGameId = gameId;
@@ -92,7 +89,7 @@ public class TictactoePlayer
 
 	public boolean isActive(long currentTime)
 	{
-		if ((currentTime - lastCheckin) > PLAYER_TIMEOUT_MS)
+		if ((currentTime - checkInTime) > PLAYER_TIMEOUT_MS)
 		{
 			return false;
 		}

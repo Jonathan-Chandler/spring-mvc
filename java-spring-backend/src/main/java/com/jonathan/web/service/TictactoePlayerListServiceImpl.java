@@ -197,7 +197,7 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 
 			// update time of last received message for requesting player
 			TictactoePlayer thisPlayer = playerList.get(thisPlayerName);
-			thisPlayer.setCheckinTime(currentTime);
+			thisPlayer.setCheckInTime(currentTime);
 
 			// update player list adding request
 			refreshPlayerList(currentTime);
