@@ -98,6 +98,10 @@ public class TictactoeGameDto implements Serializable
 		return oPlayerReady;
 	}
 
+	public char[] getBoard()
+	{
+		return Arrays.copyOf(gameBoard, 9);
+	}
 }
 
 

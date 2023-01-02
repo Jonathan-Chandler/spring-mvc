@@ -120,26 +120,32 @@ public class TReceiver
 		switch (requestType)
 		{
 			case GET_PLAYERLIST:
+				// requestType == 0
 				logger.error("GET_PLAYERLIST for user: " + usernameFromRoutingKey);
 				sendPlayerList(usernameFromRoutingKey);
 				break;
 			case REQUEST_GAME:
+				// requestType == 1
 				logger.error("REQUEST_GAME for user: " + usernameFromRoutingKey);
 				requestGame(usernameFromRoutingKey, request);
 				break;
 			case CHECK_IN_GAME:
+				// requestType == 2
 				logger.error("CHECK_IN_GAME for user: " + usernameFromRoutingKey);
 				playerCheckIn(usernameFromRoutingKey);
 				break;
-			case REFRESH_GAME:
-				logger.error("REFRESH_GAME for user: " + usernameFromRoutingKey);
-				sendGame(usernameFromRoutingKey);
-				break;
 			case REQUEST_MOVE:
+				// requestType == 3
 				logger.error("REQUEST_MOVE for user: " + usernameFromRoutingKey);
 				sendMove(usernameFromRoutingKey, request);
 				break;
+			case REFRESH_GAME:
+				// requestType == 4
+				logger.error("REFRESH_GAME for user: " + usernameFromRoutingKey);
+				sendGame(usernameFromRoutingKey);
+				break;
 			case FORFEIT_GAME:
+				// requestType == 5
 				logger.error("FORFEIT_GAME for user: " + usernameFromRoutingKey);
 				playerForfeit(usernameFromRoutingKey);
 				break;
@@ -320,12 +326,6 @@ public class TReceiver
 	public void broadcastGameState(@NonNull String requestingUser, @NonNull TictactoeGameDto currentGame)
 	{
 		List<String> playersInGame = currentGame.getPlayerNames();
-
-		//if (playersInGame.length <= 0)
-		//{
-		//	sendGame(requestingUser);
-		//	return;
-		//}
 
 		for (String playerName : playersInGame)
 		{
