@@ -78,8 +78,6 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-//import com.jonathan.web.controllers.RSender;
-//import com.jonathan.web.controllers.TReceiver;
 import com.jonathan.web.service.TictactoePlayerListService;
 import com.jonathan.web.service.TictactoePlayerListServiceImpl;
 import com.jonathan.web.service.TictactoeGameService;
@@ -93,8 +91,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Profile("production")
 public class SecurityConfiguration
 {
-	//static final String topicExchangeName = "spring-boot-exchange";
-	//static final String topicExchangeName = "hello";
 	static final String topicExchangeName = "amq.topic";
 	static final String queueName = "spring-boot";
 
@@ -108,24 +104,7 @@ public class SecurityConfiguration
 	@Scope("singleton")
 	public TictactoePlayerListService tictactoePlayerListService() {
 		return new TictactoePlayerListServiceImpl();
-		//return new TictactoePlayerListServiceImpl(tictactoeGameService());
 	}
-
-	////@Bean
-    ////public TopicExchange playerList() {
-    ////    return new TopicExchange("tut.topic");
-    ////}
-
-	////@Bean
-	////public Queue autoDeleteQueue1() {
-	////	return new AnonymousQueue();
-	////}
-
-	//@Bean
-    //public DirectExchange direct() 
-	//{
-    //    return new DirectExchange("tut.direct");
-    //}
 
 	@Bean
 	public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory)
@@ -140,32 +119,6 @@ public class SecurityConfiguration
 		return new Jackson2JsonMessageConverter();
 	}
 
-	//@Bean public Queue hello() 
-	//{
-	//	return new Queue(queueName, false);
-	//}
-
-	//@Bean
-	//TopicExchange exchange() 
-	//{
-	//	return new TopicExchange(topicExchangeName);
-	//}
-
-	//@Bean
-	//Binding binding(Queue queue, TopicExchange exchange) 
-	//{
-	//	return BindingBuilder.bind(queue).to(exchange).with("user.#");
-	//}
-
-	////@Bean
-	////public RSender sender() {
-    ////    return new RSender();
-    ////}
-	////@Bean
-	////public TReceiver receiver() {
-    ////    return new TReceiver();
-    ////}
-
 	@Bean
 	public TictactoeController receiver() {
         return new TictactoeController();
@@ -173,13 +126,6 @@ public class SecurityConfiguration
 
 	@Autowired
 	private UserDetailsService userDetailsService;
-
-	//@Bean
-	//@Scope("prototype")
-	//public Logger produceLogger(InjectionPoint injectionPoint) {
-	//	Class<?> classOnWired = injectionPoint.getMember().getDeclaringClass();
-	//	return LoggerFactory.getLogger(classOnWired);
-	//}
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {

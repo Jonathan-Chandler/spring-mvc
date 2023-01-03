@@ -16,7 +16,7 @@
 //import org.springframework.util.ObjectUtils;
 //import org.springframework.web.filter.OncePerRequestFilter;
 // 
-//import com.jonathan.web.service.JwtTokenService;
+//import com.jonathan.web.service.JwtService;
 //import com.jonathan.web.entities.User;
 //import com.jonathan.web.dao.UserRepository;
 //import org.slf4j.Logger;
@@ -26,7 +26,7 @@
 //public class JwtTokenFilter extends OncePerRequestFilter 
 //{
 //  @Autowired
-//  private JwtTokenService jwtTokenService;
+//  private JwtService jwtService;
 //
 //  @Autowired
 //  private UserRepository userRepository;
@@ -51,14 +51,14 @@
 //
 //      // read JWT from header
 //      String token = getRequestHeaderJwt(request);
-//      if (!jwtTokenService.validateJwtToken(token)) 
+//      if (!jwtService.validateToken(token)) 
 //      {
 //        filterChain.doFilter(request, response);
 //        return;
 //      }
 //
 //      // get JWT from 
-//      String username = jwtTokenService.getUsernameFromToken(token);
+//      String username = jwtService.getUsernameFromToken(token);
 //      if (username == null)
 //      {
 //        logger.info("Failed to get username from token");
@@ -67,7 +67,7 @@
 //      }
 //
 //      // generate refresh JWT from username in current JWT
-//      String refreshToken = jwtTokenService.generateJwtToken(username);
+//      String refreshToken = jwtService.generateToken(username);
 //      if (refreshToken == null)
 //      {
 //        logger.error("Failed to refresh token");
@@ -134,7 +134,7 @@
 //
 //  private UserDetails getUserDetails(String token) 
 //  {
-//    String username = jwtTokenService.getUsernameFromToken(token);
+//    String username = jwtService.getUsernameFromToken(token);
 //    logger.info("Return username from token: " + username);
 //
 //    User userDetails = userRepository.findOneByUsername(username).orElse(null);

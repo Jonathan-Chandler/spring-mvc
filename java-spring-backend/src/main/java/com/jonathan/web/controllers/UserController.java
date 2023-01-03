@@ -47,7 +47,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.jonathan.web.service.JwtTokenService;
+import com.jonathan.web.service.JwtService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -57,7 +57,7 @@ public class UserController
 	private UserService userService;
 
 	@Autowired
-	private JwtTokenService jwtTokenService;
+	private JwtService jwtService;
 
 	//@Autowired
 	//Logger logger;
@@ -150,15 +150,15 @@ public class UserController
 		try 
 		{
 			// auth failed
-			if (!jwtTokenService.validateJwtToken(password) 
-					|| !jwtTokenService.validateJwtTokenUsername(password, username))
+			if (!jwtService.validateToken(password) 
+					|| !jwtService.validateTokenUsername(password, username))
 			{
 
 				logger.error("validation fails for user: " + username + " token: " + password);
-				if (!jwtTokenService.validateJwtToken(password))
+				if (!jwtService.validateToken(password))
 					logger.error("validation fails to validate jwt token");
 
-				if (!jwtTokenService.validateJwtTokenUsername(password, username))
+				if (!jwtService.validateTokenUsername(password, username))
 					logger.error("validation fails to validate username in jwt token");
 
 				logger.error("/rabbitmq/user denies request: username:" + username + " password:" + password);

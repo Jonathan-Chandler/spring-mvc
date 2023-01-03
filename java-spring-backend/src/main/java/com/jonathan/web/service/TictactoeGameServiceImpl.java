@@ -19,20 +19,15 @@ import com.jonathan.web.resources.TictactoeGame;
 import com.jonathan.web.resources.TictactoeGameDto;
 import org.springframework.lang.NonNull;
 import java.util.Collections;
-//import java.util.Collections.synchronizedMap;
 import java.util.HashMap;
 import org.springframework.context.annotation.Primary;
 
 
-//@Component
 @Service
 @Primary
 public class TictactoeGameServiceImpl implements TictactoeGameService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    //@Autowired
-    //private RabbitTemplate template;
 
 	// id of next created game
 	private static long gameIdCounter = 1;
@@ -171,24 +166,6 @@ public class TictactoeGameServiceImpl implements TictactoeGameService
 		}
 		logger.error("Cleared active Games: " + gameList.keySet());
 	}
-
-	// refresh games (return players / game list / copy of games)
-	//
-	// for playerList
-	//		players in active games
-	//
-	// getGameState
-	//		players in ALL games
-	//
-	// get game state (synchronized)
-	//		check in and refresh
-	//		return getGameCopy
-	//
-	// get game (synchronized)
-	//
-	// get game copy
-	//
-	// sendTictactoeMove(long currentTime, @NonNull String thisPlayerName, int location)
 
 	// get list of players that are in an active game and remove expired games
 	public List<String> getPlayersInActiveGames(long currentTime)

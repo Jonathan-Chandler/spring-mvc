@@ -20,20 +20,10 @@ public interface TictactoePlayerListService
 		ERROR_REQUEST_EXISTS,
 	}
 
-	//public List<String> getAllPlayers(long currentTime);
-
 	public TictactoePlayerListDto getPlayerList(long currentTime, @NonNull String thisPlayerName);
 
 	public TictactoeRequestDto addPlayerRequest(long currentTime, @NonNull String thisPlayerName, @NonNull String versusPlayerName);
 
 	public void reset();
-
-  //public List<TictactoePlayerListDto> getPlayerList();
-	//public TictactoePlayerListDto getPlayerList();
-	//public void userCheckIn(String playerName);
-	//public void userRequestMatch(String requestFrom, String requestTo);
-//  public Tictactoe findByPlayer(String username);
-//
-//  public void deleteById(int id);
 }
 

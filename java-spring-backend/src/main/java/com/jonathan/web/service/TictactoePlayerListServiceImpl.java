@@ -40,19 +40,12 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 	// list of players
 	private static Map<String, TictactoePlayer> playerList;
 
-    //@Autowired
-    //private RabbitTemplate template;
-
     @Autowired
     private TictactoeGameService gameService;
-    //private TictactoeGameServiceImpl gameService;
 
 	@Autowired
-	//public TictactoePlayerListServiceImpl(TictactoeGameService tictactoeGameService)
 	public TictactoePlayerListServiceImpl()
 	{
-		//gameService = tictactoeGameService;
-
 		// time that service was started
 		lastUpdateTime = -1;
 
@@ -192,7 +185,6 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 			if (!playerList.containsKey(thisPlayerName))
 			{
 				playerList.put(thisPlayerName, new TictactoePlayer(currentTime));
-				//return TictactoePlayerListService.ERROR_CURRENT_PLAYER_DOES_NOT_EXIST;
 			}
 
 			// update time of last received message for requesting player
@@ -226,7 +218,6 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 				//logger.error("Player " + versusPlayerName + " is already in game ID " + gameId);
 				logger.error("Player " + versusPlayerName + " is already in game");
 				return new TictactoeRequestDto(TictactoeRequestDto.ResponseType.ERROR_VERSUS_PLAYER_IS_IN_GAME, thisPlayerName, versusPlayerName);
-				//return new TictactoeRequestDto(TictactoeRequestDto.ResponseType.ERROR_UNKNOWN);
 			}
 
 			// other player has already requested and both should join a game
@@ -242,7 +233,6 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 
 				// return response that both players should join game with given id
 				return new TictactoeRequestDto(TictactoeRequestDto.ResponseType.START_GAME, newGameId, thisPlayerName, versusPlayerName);
-				//return new TictactoeRequestDto(TictactoeRequestDto.ResponseType.ERROR_UNKNOWN);
 			}
 			else
 			{
@@ -281,14 +271,5 @@ public class TictactoePlayerListServiceImpl implements TictactoePlayerListServic
 			index += 1;
 		}
 	}
-
-	//// used by sender to get information for each player
-	//public List<String> getAllPlayers(long currentTime)
-	//{
-	//	refreshPlayerList(currentTime);
-
-	//	return new ArrayList<>(playerList.keySet());
-	//}
-
 }
 

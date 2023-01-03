@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-public class JwtTokenService
+public class JwtService
 {
   //private int secondsToExpire = 300;
 
@@ -27,10 +27,10 @@ public class JwtTokenService
   private JWSSigner signer;
   private JWSVerifier verifier;
 
-  //private static final Logger logger = LoggerFactory.getLogger(JwtTokenService.class);
+  //private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  JwtTokenService() throws KeyLengthException, JOSEException
+  JwtService() throws KeyLengthException, JOSEException
   {
     // generate JWS key on initialization
     SecureRandom random = new SecureRandom();
@@ -44,7 +44,7 @@ public class JwtTokenService
     this.issuer = "com.jonathan.web";
   }
 
-  public String generateJwtToken(String username) 
+  public String generateToken(String username) 
   {
     try 
     {
@@ -61,7 +61,7 @@ public class JwtTokenService
       String token = signedJWT.serialize();
 
       // check that valid token is returned
-      if (!validateJwtToken(token))
+      if (!validateToken(token))
       {
         logger.info("Failed to validate generated token for user " + username);
         return "";
@@ -76,7 +76,7 @@ public class JwtTokenService
     }
   }
 
-  public Boolean validateJwtToken(String token) 
+  public Boolean validateToken(String token) 
   {
     try {
       // token is not empty
@@ -110,7 +110,7 @@ public class JwtTokenService
     return true;
   }
 
-  public Boolean validateJwtTokenUsername(String token, String username) 
+  public Boolean validateTokenUsername(String token, String username) 
   {
     String tokenUsername = getUsernameFromToken(token);
     if (!username.equals(tokenUsername))

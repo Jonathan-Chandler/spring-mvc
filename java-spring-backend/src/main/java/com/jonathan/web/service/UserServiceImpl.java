@@ -17,7 +17,7 @@ import com.jonathan.web.entities.User;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.jonathan.web.service.JwtTokenService;
+import com.jonathan.web.service.JwtService;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.crypto.password.*;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService
 	PasswordEncoder passwordEncoder;
 
 	@Autowired
-	JwtTokenService jwtTokenService;
+	JwtService jwtService;
 
 	public String login(UserLoginDto loginCredentials) throws JOSEException, RuntimeException
 	{
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService
 			throw new RuntimeException("Bad authentication token");
 		}
 
-		String generatedToken = jwtTokenService.generateJwtToken(loginCredentials.getUsername());
+		String generatedToken = jwtService.generateToken(loginCredentials.getUsername());
 		if (generatedToken == null || generatedToken == "")
 		{
 			logger.info("Failed to generate token for user " + loginCredentials.getUsername());
