@@ -119,10 +119,10 @@ public class TReceiver
 		// call response functions based on request type
 		switch (requestType)
 		{
-			case GET_PLAYERLIST:
+			case REFRESH:
 				// requestType == 0
 				logger.error("GET_PLAYERLIST for user: " + usernameFromRoutingKey);
-				sendPlayerList(usernameFromRoutingKey);
+				handleRefresh(usernameFromRoutingKey);
 				break;
 			case REQUEST_GAME:
 				// requestType == 1
@@ -142,7 +142,7 @@ public class TReceiver
 			case REFRESH_GAME:
 				// requestType == 4
 				logger.error("REFRESH_GAME for user: " + usernameFromRoutingKey);
-				sendGame(usernameFromRoutingKey);
+				handleGameRefresh(usernameFromRoutingKey);
 				break;
 			case FORFEIT_GAME:
 				// requestType == 5
@@ -173,12 +173,12 @@ public class TReceiver
 			if (playerName != null && !playerName.isEmpty())
 			{
 				// game is in a valid state
-				sendGame(playerName);
+				handleGameRefresh(playerName);
 			}
 			else
 			{
 				// player is checking in to an invalid game, respond with game in error state and return
-				sendGame(requestingUser);
+				handleGameRefresh(requestingUser);
 				return;
 			}
 		}
@@ -230,14 +230,14 @@ public class TReceiver
 			case START_GAME:
 				// send both players to game if both have requested
 				logger.error("RequestGame returns START_GAME for " + requestingUser + " and " + requestedUser);
-				sendGame(requestedUser);
-				sendGame(requestingUser);
+				handleGameRefresh(requestedUser);
+				handleGameRefresh(requestingUser);
 				break;
 
 			case ERROR_CURRENT_PLAYER_IS_IN_GAME:
 				// send this player to game if in progress
 				logger.error("RequestGame returns ERROR " + requestingUser + " is in game");
-				sendGame(requestingUser);
+				handleGameRefresh(requestingUser);
 				break;
 
 			default:
@@ -245,12 +245,12 @@ public class TReceiver
 				logger.error("Response: " + requestDto.getResponseType());
 
 				// refresh player list in all other cases
-				sendPlayerList(requestingUser);
+				handleRefresh(requestingUser);
 				break;
 		}
 	}
 
-	public void sendPlayerList(@NonNull String username)
+	public void handleRefresh(@NonNull String username)
 	{
 		String routingKeyToUser = "to.user." + username;
 		long currentTime = java.lang.System.currentTimeMillis();
@@ -262,10 +262,10 @@ public class TReceiver
 		// send game information if already joined a game
 		if (playerListDto.getServiceResponse() == TictactoePlayerListDto.ServiceResponse.PLAYER_IN_GAME)
 		{
-			logger.error("sendPlayerList sends PLAYER_IN_GAME for user " + username);
+			logger.error("handleRefresh sends PLAYER_IN_GAME for user " + username);
 
 			// send this player to game if in progress instead of the player list
-			sendGame(username);
+			handleGameRefresh(username);
 		}
 		else
 		{
@@ -302,7 +302,7 @@ public class TReceiver
 				else
 				{
 					// player is in an invalid game, respond with game in error state
-					sendGame(username);
+					handleGameRefresh(username);
 					return;
 				}
 			}
@@ -310,7 +310,7 @@ public class TReceiver
 		else
 		{
 			// user is out of sync with game state or tried to make an invalid move
-			sendGame(username);
+			handleGameRefresh(username);
 		}
 	}
 
@@ -338,21 +338,21 @@ public class TReceiver
 			else
 			{
 				// player is in an invalid game, only send requestingUser the game in error state
-				sendGame(requestingUser);
+				handleGameRefresh(requestingUser);
 				return;
 			}
 		}
 	}
 
-	public void sendGame(@NonNull String username)
+	public void handleGameRefresh(@NonNull String username)
 	{
 		long currentTime = java.lang.System.currentTimeMillis();
 		TictactoeGameDto currentGame = gameService.getGameCopyByPlayerName(currentTime, username);
 		String routingKeyToUser = "to.user." + username;
 
-		logger.error("sendGame to user " + username);
-		logger.error("sendGame routing key " + routingKeyToUser);
-		logger.error("sendGame currentGame: " + currentGame.toString());
+		logger.error("handleGameRefresh to user " + username);
+		logger.error("handleGameRefresh routing key " + routingKeyToUser);
+		logger.error("handleGameRefresh currentGame: " + currentGame.toString());
 
 		// send game information to this user
 		template.convertAndSend("amq.topic", routingKeyToUser, currentGame);

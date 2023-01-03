@@ -26,7 +26,7 @@ export default function HeaderComponent(...params) {
 								<NavLink className="nav-link" to="/todos">Todos</NavLink>
 							</li>
 							<li className="nav-item">
-								<NavLink className="nav-link" to="/tictactoe/amqp">AMQP</NavLink>
+								<NavLink className="nav-link" to="/tictactoe/playerlist">Player List</NavLink>
 							</li>
 							<li className="nav-item">
 								<NavLink className="nav-link" to="/tictactoe/game/online">Online Game</NavLink>
@@ -61,7 +61,7 @@ export default function HeaderComponent(...params) {
 								<NavLink className="nav-link" to="/tictactoe">Tic-Tac-Toe</NavLink>
 							</li>
 							<li className="nav-item">
-								<NavLink className="nav-link" to="/tictactoe/amqp">AMQP test</NavLink>
+								<NavLink className="nav-link" to="/tictactoe/playerlist">Player List</NavLink>
 							</li>
 						</ul>
 					</div>

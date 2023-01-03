@@ -14,7 +14,7 @@ interface PlayerListEntry
 
 interface TictactoeGame
 {
-	lastMoveTimeMs: Number;
+	//lastMoveTimeMs: Number;
 	xPlayerName: String;
 	oPlayerName: String;
 	xPlayerReady: boolean;
@@ -37,6 +37,10 @@ interface AuthContextType {
 	getStompSession: () => Client;
 	playerList: PlayerListEntry[];
 	tictactoeGame: TictactoeGame;
+	sendGameCheckIn: () => void;
+	sendGameRefresh: () => void;
+	sendGameMove: (index: Number) => void;
+	sendGameForfeit: () => void;
 	//playerList: {"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]};
 	error?: any;
 }
@@ -59,7 +63,8 @@ export function AuthProvider({
 	const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
 	//const [stompSession, setStompSession] = useState(null);
 	const [playerList, setPlayerList] = useState<PlayerListEntry[]>([]);
-	const [tictactoeGame, setTictactoeGame] = useState<TictactoeGame>({lastMoveTimeMs: 0, xPlayerName: "", oPlayerName: "", xPlayerReady: true, oPlayerReady: true, gameState: "GAME_OVER_ERROR", gameBoard: "_________", gameOverMessage: ""});
+	const [tictactoeGame, setTictactoeGame] = useState<TictactoeGame>({xPlayerName: "", oPlayerName: "", xPlayerReady: true, oPlayerReady: true, gameState: "GAME_OVER_ERROR", gameBoard: "_________", gameOverMessage: ""});
+	//const [tictactoeGame, setTictactoeGame] = useState<TictactoeGame>({lastMoveTimeMs: 0, xPlayerName: "", oPlayerName: "", xPlayerReady: true, oPlayerReady: true, gameState: "GAME_OVER_ERROR", gameBoard: "_________", gameOverMessage: ""});
 	//const [playerList, setPlayerList] = useState<{"availableUsers": string[], "requestingUsers": string[], "requestedUsers": string[]}>({"availableUsers": [], "requestingUsers": [], "requestedUsers": []});
 	//const [availablePlayers, setAvailablePlayers] = useState([]);
 	//const [requestedPlayers, setRequestedPlayers] = useState([]);
@@ -256,19 +261,6 @@ export function AuthProvider({
 			console.log("new player list: " + newPlayerList)
 		}
 
-		//setPlayerList(newPlayerList);
-		// console.log("jsonparse newPlayerList: " + JSON.parse(newPlayerList)); - not valid json
-
-		//setPlayerList(JSON.stringify(newPlayerList));
-		
-
-		//for (var i = 0; i < newPlayerList.counters.length; i++) {
-		//	var counter = newPlayerList.counters[i];
-		//	console.log(counter.counter_name);
-		//}
-
-		//console.log("rx playerlist: " + JSON.stringify(newPlayerList))
-		//console.log("rx playerlist: " + newPlayerList)
 	},[username]);
 
 	const handleUserRx = useCallback(async (message: IMessage) => {
@@ -285,19 +277,6 @@ export function AuthProvider({
 			let newPlayerList = [];
 			let messageBody = JSON.parse(message.body);
 
-			//// clear the list
-			//if (messageBody.availableUsersCount === 0)
-			//{
-			//	//let currentPlayer = {};
-			//	//setPlayerList(newPlayerList);
-			//	//newPlayerList.push(currentPlayer)
-			//	setPlayerList(newPlayerList);
-			//	return;
-			//}
-
-			//setAvailablePlayers(messageBody.availableUsers);
-			//setRequestedPlayers(messageBody.requestedUsers);
-			//setRequestingPlayers(messageBody.requestingUsers);
 			for (let i = 0; i < messageBody.availableUsers.length; i++)
 			{
 				let currentPlayer = {username: messageBody.availableUsers[i], myRequest: false, theirRequest: false};
@@ -331,8 +310,8 @@ export function AuthProvider({
 
 			if (messageBody)
 			{
+				//lastMoveTimeMs: messageBody.lastMoveTimeMs,
 				let currentGame = {
-					lastMoveTimeMs: messageBody.lastMoveTimeMs,
 					xPlayerName: messageBody.xplayerName,
 					oPlayerName: messageBody.oplayerName,
 					xPlayerReady: messageBody.xplayerReady,
@@ -351,7 +330,7 @@ export function AuthProvider({
 			console.log("receive game information: " + JSON.stringify(messageBody));
 		}
 
-	},[username]);
+	},[]);
 
 //interface TictactoeGame
 //{
@@ -468,6 +447,95 @@ export function AuthProvider({
 		}
 	},[stompClientSession, username, token, loading, loadingInitial, handleUserRx, handlePlayerlistRx]);
 
+	const sendGameRefresh = useCallback(() => 
+	{
+		console.log("requesting refresh");
+		let stompSession = stompClientSession
+		//let stompSession = getStompSession();
+		const data = {requestType: 4, requestedUser: username, moveLocation: -1}
+		console.log("send request: " + JSON.stringify(data))
+
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+	}, [stompClientSession, username, token]);
+
+	const sendGameCheckIn = useCallback(() => 
+	{
+		let stompSession = stompClientSession
+		const data = {requestType: 2, requestedUser: username, moveLocation: -1}
+		console.log("send request: " + JSON.stringify(data))
+
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+	}, [stompClientSession, username, token]);
+
+	const sendGameMove = useCallback((index) => 
+	{
+		console.log("requesting move index: " + index);
+		//let stompSession = getStompSession();
+		let stompSession = stompClientSession;
+		const data = {requestType: 3, requestedUser: username, moveLocation: index}
+		console.log("send request: " + JSON.stringify(data))
+
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+	},[stompClientSession, token, username]);
+
+	const sendGameForfeit = useCallback(() => 
+	{
+		console.log("requesting forfeit for user: " + username);
+		//let stompSession = getStompSession();
+		let stompSession = stompClientSession;
+		const data = {requestType: 5, requestedUser: username, moveLocation: -1}
+		console.log("send request: " + JSON.stringify(data))
+
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+	},[stompClientSession, token, username]);
 
 	const getStompSession = useCallback(() =>
 	{
@@ -503,13 +571,15 @@ export function AuthProvider({
 			logout,
 			getSession,
 			getStompSession,
-			//getPlayerList,
-			//getPlayerListSession,
 			playerList,
 			tictactoeGame,
+			sendGameCheckIn,
+			sendGameRefresh,
+			sendGameMove,
+			sendGameForfeit,
 			error,
 		}),
-		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, tictactoeGame, error ]
+		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, tictactoeGame, sendGameCheckIn, sendGameRefresh, sendGameMove, sendGameForfeit, error ]
 	);
 
 	// render components after initialization

@@ -3,858 +3,428 @@ import React, { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from '../../authentication/AuthProvider.tsx';
 import { PLAYER_LIST_API_URL } from '../../../Constants';
-//import SockJsClient from 'react-stomp';
-//import SockJS from 'sockjs-client';
-//import Stomp from 'stompjs';
-import useTictactoe from './TictactoeProvider.tsx'
-//import {StompSessionProvider, useSubscription} from 'react-stomp';
-//import { Stomp, Client } from 'stompjs';
 
-//import { Client } from '@stomp/stompjs';
+//import Stomp from 'stompjs'
+//import useWebSocket, { ReadyState } from 'react-use-websocket';
+
+import { Stomp, Client } from '@stomp/stompjs';
+//import SockJS from 'sockjs-client';
 
 export default function TictactoePlayerList()
 {
-	return (<div>
-		</div>
+	const { username, token, isAuthenticated, getStompSession, playerList, tictactoeGame } = useAuth();
+	const data = ["A", "B", "C", "D"]
+    const [state, setState] = useState({
+      convertedPlayerList: [],
+      message: "",
+      loadedTodos: false,
+    });
+    const navigate = useNavigate();
+
+	useEffect(() =>
+	{
+		//setState({...state, convertedPlayerList: ["aoeu","oaeu"]})
+		console.log("playerList: " + playerList);
+		console.log("convertedPlayerList: " + state.convertedPlayerList);
+		let newPlayerList = []
+		//if( typeof playerList !== 'undefined' && playerList !== null )
+		//{
+		//	if( typeof playerList.availableUsers !== 'undefined' && playerList.availableUsers !== null )
+		//	{
+		//		//for (let i = 0; i < playerList.avalableUsers.length; i++)
+		//		//{
+		//		//	let currentPlayer = {"name": playerList.availableUsers[i], "requested": false, "requesting": false};
+
+		//		//	if (playerList.requestedUsers.includes(currentPlayer.name))
+		//		//		{
+		//		//			console.log("includes requested");
+		//		//			currentPlayer.requested = true;
+		//		//		}
+
+		//		//		if (playerList.requestingUsers.includes(currentPlayer.name))
+		//		//			{
+		//		//				console.log("includes requesting");
+		//		//				currentPlayer.requesting = true;
+		//		//			}
+		//		//			console.log("Add player: " + JSON.stringify(currentPlayer));
+		//		//			newPlayerList.push(currentPlayer)
+		//		//}
+		//	}
+		//}
+		console.log("newPlayerList: " + JSON.stringify(newPlayerList));
+		//setState({...state, convertedPlayerList: playerList})
+		//
+	},[state, playerList])
+
+	useEffect(() =>
+	{
+		// game has not ended with error or winner
+		if (tictactoeGame.gameState === "X_PLAYER_MOVING" 
+			|| tictactoeGame.gameState === "O_PLAYER_MOVING" 
+			|| tictactoeGame.gameState === "STARTING")
+		{
+			console.log("Joining Game (gameState = " + tictactoeGame.gameState + ")");
+			//navigate("/tictactoe/game/online")
+		}
+	},[tictactoeGame.gameState, navigate])
+
+	const sendRequest = (name) => 
+	{
+		let stompSession = getStompSession();
+		//const data = {message: name}
+		const data = {requestType: 1, requestedUser: name, moveLocation: -1}
+		//const data = "test";
+		console.log("send request: " + JSON.stringify(data))
+
+		// Additional headers
+		//client.publish({
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  //body: "{\"message\":\"data\"}",
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+		  //body: JSON.stringify(data),
+	};
+
+	const sendRequestDto = () => 
+	{
+		let stompSession = getStompSession();
+		const data = {requestType: 0}
+		//const data = "test";
+		console.log("send " + data)
+
+		// Additional headers
+		//client.publish({
+		let pass = token.split(' ')[1]
+		const msg_destination = "/topic/from.user." + username
+		//stompSession.send("/topic/user."+username, {}, JSON.stringify(data));
+		stompSession.publish({
+		  destination: msg_destination,
+		  body: JSON.stringify(data),
+		  //body: "{\"message\":\"data\"}",
+		  headers: {
+			  login: username, 
+			  passcode: pass, 
+			  "content-type":"application/json", 
+			  "content-encoding":"UTF-8", 
+			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+		  }
+		});
+		  //body: JSON.stringify(data),
+		console.log("send body: " + JSON.stringify(data))
+	};
+
+	if (playerList && playerList.length >= 1)
+	{
+		return (
+			<div>
+				Player List
+				<p />
+				<div className="container">
+					<table className="table">
+						<tbody>
+							<tr>
+								<th>Name</th>
+								<th>You Requested</th>
+								<th>They Requested</th>
+								<th>Send Request</th>
+							</tr>
+							{
+								playerList.map((item) => (
+									<tr key={item.username}>
+										<td>{item.username}</td>
+										<td>{item.myRequest ? "Yes" : "No"}</td>
+										<td>{item.theirRequest ? "Yes" : "No"}</td>
+										<td><button className="btn btn-success" onClick={() => sendRequest(item.username)}>Request</button></td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
 		);
-//	//const navigate = useNavigate();
-//	const { username, token } = useAuth();
-//	const [localMessage, setLocalMessage] = useState("");
-//	const [messages, setMessages] = useState("");
-//	const [stompSession, setStompSession] = useState(null);
-//	const [playerList, setPlayerList] = useState(null)
-//	const [initialLoad, setInitialLoad] = useState(true)
-//
-//	useEffect(() => 
-//    {
-//		if (initialLoad)
-//		{
-//			setInitialLoad(false);
-//
-//			var _client = new Client();
-//			var headerValues = {
-//				login: username,
-//				passcode: token,
-//				'Authorization': token
-//			}
-//
-//			_client.configure({
-//				brokerURL: 'ws://localhost:8080/stomp',
-//				connectHeaders: headerValues,
-//				onConnect: () => 
-//					{
-//						_client.subscribe
-//						(
-//							'/topic/playerList', 
-//							playerListMessageHandler,
-//							headerValues,
-//						)
-//					},
-//				onStompError: (frame) => {
-//					console.log("stompError: " + frame);
-//				},
-//				// debug messages
-//				//debug: (str) => {
-//				//	console.log(new Date(), str);
-//				//}
-//			});
-//
-//			_client.activate();
-//			setStompSession(_client);
-//		}
-//	}, [initialLoad, stompSession, username, token])
-//
-//	const refreshPlayerListClicked = () => {
-//		stompSession.publish({destination: '/app/playerList', body: 'test playerList'});
-//	}
-//
-//	const playerListMessageHandler = (message) =>
-//	{
-//		let newPlayerList = null;
-//
-//		try {
-//			newPlayerList = JSON.parse(message.body)
-//			console.log("Recv playerlist: " + newPlayerList);
-//		}
-//		catch (e) {
-//			console.log("Invalid PlayerList response: " + e)
-//		}
-//
-//		setPlayerList(newPlayerList);
-//	}
-//
-//
-//	return (
-//		<div>
-//			<div>
-//				<h1>Player List</h1>
-//				<p /><button className="btn btn-success" onClick={refreshPlayerListClicked}>Refresh</button>
-//				<div className="container">
-//					<table className="table">
-//						<thead>
-//							<tr>
-//								<th>Username</th>
-//								<th>IsRequesting</th>
-//								<th>YouRequested</th>
-//								<th>InitiateRequest</th>
-//							</tr>
-//						</thead>
-//						<tbody>
-//							{
-//								playerList && playerList.map(
-//									player =>
-//										<tr key={player.username}>
-//											<td>{player.username}</td>
-//											<td>{player.myRequest ? "Yes" : "No"}</td>
-//											<td>{player.theirRequest ? "Yes" : "No"}</td>
-//										</tr>
-//								)
-//							}
-//						</tbody>
-//					</table>
-//				</div>
-//			</div>
-//		</div>
-//	)
+	}
+	else
+	{
+		return (
+			<div>
+				Player List
+				<p />
+				<div className="container">
+					<p />No other players are online.
+				</div>
+			</div>
+		);
+	}
+
+//				<p /><button className="btn btn-success" onClick={() => sendRequest("test_user123")}>req test_user123</button>
+//				<p /><button className="btn btn-success" onClick={() => sendRequest("test_user1234")}>req test_user1234</button>
+//				<p /><button className="btn btn-success" onClick={() => sendRequestDto()}>send requestDto</button>
 }
+//				<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
+////				<div className="container">
+////					<table className="table">
+////						<thead>
+////							<tr>
+////								<th>Username</th>
+////							</tr>
+////						</thead>
+////						<tbody>
+////							{
+////								createTable()
+////							}
+////						</tbody>
+////					</table>
+////				</div>
+////			<p /><button className="btn btn-success" onClick={sendMessage}>Message</button>
+	//const {sendMessage, lastMessage, readyState} = useWebSocket(socketUrl)
 
-//
-//	useEffect(() => {
-//		console.log('Component did mount');
-//		// The compat mode syntax is totally different, converting to v5 syntax
-//		// Client is imported from '@stomp/stompjs'
-//		var client = new Client();
-//
-//		client.configure({
-//			brokerURL: 'ws://localhost:8080/stomp',
-//			onConnect: () => {
-//				console.log('onConnect');
-//
-//				//client.subscribe('/queue/now', message => {
-//				client.subscribe('/topic/messages', message => {
-//					console.log(message);
-//					//setState({mess: message.body});
-//				});
-//
-//				//client.subscribe('/topic/greetings', message => {
-//				//	console.log(message.body);
-//				//});
-//			},
-//			// Helps during debugging, remove in production
-//			debug: (str) => {
-//				console.log(new Date(), str);
-//			}
-//		});
-//
-//		client.activate();
-//	}, [])
-//				<SockJsClient 
-//					url='http://localhost:8080/stomp' 
-//					topics={['/topic/messages']}
-//					headers={customHeaders}
-//					subscribeHeaders={customHeaders}
-//					onMessage={onMessageReceive}
-//					onConnect={onConnect}
-//					onDisconnect={onDisconnect}
-//					ref={ (client) => { this.clientRef = client }}
-//					/>
-				//message.appendChild(document.createTextNode(JSON.parse(payload.body).message));
-				//message_list.appendChild(message);
-//
-//	useEffect(() =>
-//	{
-//		//if (socketConnected)
-//		//{
-//		//	socket.onopen = function() {
-//		//		console.log('open');
-//		//		socket.send('test');
-//		//	};
-//
-//		//	socket.onmessage = function(e) {
-//		//		console.log('message', e.data);
-//		//		socket.close();
-//		//	};
-//
-//		//	socket.onclose = function() {
-//		//		console.log('close socket');
-//		//	};
-//		//}
-//		//else
-//		//{
-//		//let newStompClient = Stomp.Client("ws://localhost:8080/tictactoe/playerlist")
-//
-//		if (!socketConnected)
-//		{
-//		setSocketConnected(true);
-//		//let newSocket = new SockJS("gs-guide-websocket");
-//		let newSocket = new SockJS("http://localhost:8080/stomp");
-//		let newStompClient = Stomp.over(newSocket)
-//
-//		//let newStompClient = Stomp.client("ws://localhost:8080/tictactoe/playerlist");
-//
-//		//setCustomHeaders({"Authorization": token});
-//		console.log("create new socket")
-//		newStompClient.connect(
-//		{},
-//		frame => {
-//		  //connected = true;
-//			console.log("connect success");
-//		  newStompClient.subscribe("/topic/greeting", function (test_text) {
-//
-//			  console.log("get message:")
-//			  console.log(test_text)
-//			  console.log(JSON.parse(test_text.body.content))
-//		  });
-//		},
-//		error => {
-//			console.log("connect fails");
-//		  console.log(error);
-//		  //connected = false;
-//		})
-//
-//		//setSocket(newSocket)
-//		setStompClient(newStompClient)
-//		}
-//		//}
-//
-//	}, [customHeaders, socket, socketConnected]);
+	//////useEffect(() => {
+	//////}, []);
 
-	//useEffect(() => 
+	//////const onMessage = useCallback((d) =>
+	//////{
+	//////	try 
+	//////	{
+	//////		var parsed = JSON.parse(d.body);
+	//////		var message = parsed.message;
+	//////		setStompMessage(stompMessage.push(message));
+	//////		setPlayerList((playerList) => [...playerList, parsed]);
+	//////	}
+	//////	catch (err)
+	//////	{
+	//////		console.log("Failed to get message: " + err);
+	//////	}
+	//////},[stompMessage, playerList])
+
+	//////useEffect(() => 
+	//////{
+	//////	const ws = new WebSocket(socketUrl);
+	//////	const client = Stomp.over(ws);
+	//////	var on_error;
+
+	//////	// subscribe to stomp topic on web socket connection
+	//////	var on_connect = function(x) 
+	//////	{
+	//////		client.subscribe(
+	//////			stompTopic, 
+	//////			onMessage, 
+	//////			stomp_subscribe_header);
+	//////	};
+
+	//////	var on_close = function()
+	//////	{
+	//////		console.log("close connection");
+	//////	};
+
+	//////	if (debugStompEnabled)
+	//////	{
+	//////		// error logging to console
+	//////		on_error = function(err) 
+	//////		{
+	//////			console.log("STOMP Error: " + err);
+	//////		};
+	//////	}
+	//////	else
+	//////	{
+	//////		// disable error logging
+	//////		on_error = null;
+	//////	}
+
+	//////	if (debugWsEnabled)
+	//////	{
+	//////		// web socket debug logging
+	//////		client.debug = function(msg) 
+	//////		{
+	//////			console.log("client.debug: " + msg);
+	//////		}
+	//////	}
+	//////	else
+	//////	{
+	//////		// disable debug logging
+	//////		client.debug = function(){};
+	//////	}
+
+	//////	// connect using guest credentials in header
+	//////	client.connect('test_user123', 'password123', on_connect, on_error, '/');
+
+	//////	// set ws/stomp session after initialized
+	//////	setWebSockSession(ws);
+	//////	setStompSession(client);
+	//////},[debugWsEnabled, debugStompEnabled, socketUrl, stompTopic, onMessage, stomp_headers, stomp_subscribe_header])
+
+	//////// send message to stomp topic
+	//////const sendMessage = () => 
+	//////{
+	//////	const data = {message: "test_message"}
+	//////	console.log("send " + data)
+
+	//////	//stompSession.send(stompTopic, {}, JSON.stringify(data));
+	//////	stompSession.send(stompTopic, stomp_subscribe_header, JSON.stringify(data));
+	//////};
+	//const onMessage = useCallback((d) =>
 	//{
-	//	const socket = new SockJS("http://localhost:8080/tictactoe/playerlist");
-	//	const stompClient = Stomp.over(socket);
-	//	const headers = {}
-	//	//const headers = {Authorization: token}
-	//	//stompClient.connect({}, onConnect, onError);
-
-	//	stompClient.connect(headers, () => {
-	//		stompClient.subscribe(
-	//			'/tictactoe/playerlist', console.log, headers,
-	//		);
-	//	});
-
-	//	return () => stompClient && stompClient.disconnect();
-	//}, [token]);
-
-	////if (!connected)
-	////{
-	////	client.activate();
-	////}
-	//stompClient.connect({}, function () {
-	//	setConnected(true)
-	//	stompClient.subscribe("", function (message) {
-	//	});
-	//});
-	//}
-
-//export const PLAYER_LIST_API_URL = 'http://localhost:8080/tictactoe/playerlist'
-
-////				<SockJsClient 
-////					url='http://localhost:8080/ws' 
-////					topics={['/tictactoe/playerlist']}
-////					headers={customHeaders}
-////					subscribeHeaders={customHeaders}
-////					onMessage={onMessageReceive}
-////					onConnect={onConnect}
-////					onDisconnect={onDisconnect}
-////					/>
-//					ref={ (client) => { this.clientRef = client }} />
-
-
-	//function sendName() {
-	//	stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
-	//}
-
-	//function showGreeting(message) {
-	//	$("#greetings").append("<tr><td>" + message + "</td></tr>");
-	//}
-
-//	const clientConnect = () => {
-//		console.log("connected");
-//		setConnected(true)
-//	}
-//
-//	const clientDisconnect = () => {
-//		console.log("disconnected");
-//		setConnected(false)
-//	}
-//
-//	const onMessageReceive = (msg, topic) => {
-//		console.log("topic: " + topic)
-//		console.log("msg:" + msg)
-//		setPlayerList(msg)
-//	}
-	
-//	//const client = new StompJs.Client(
-//	const client = new Stomp.overWS(
-//	{
-//		brokerURL: 'ws://localhost:8080/ws',
-//		connectHeaders: {
-//			Authorization: {token},
-//		},
-//		debug: function (str) {
-//			console.log(str);
-//		},
-//		reconnectDelay: 5000,
-//		heartbeatIncoming: 3000,
-//		heartbeatOutgoing: 3000,
-//	});
-//
-//	client.onConnect = function(frame) {
-//		// subscribe
-//	};
-//
-//	client.onStompError = function(frame) {
-//		console.log('Broker reported error: ' + frame.headers['message']);
-//		console.log('Additional details: ' + frame.body);
-//	};
-
-	////return (
-	////	<div>
-	////		<SockJsClient 
-	////			url={"http://localhost:8080/"} 
-	////			topics={["tictactoe/playerlist"]}
-	////			onMessage={onMessageReceive}
-	////			ref={ (client) => { this.clientRef = client }}
-	////			onConnect={clientConnect} 
-	////			onDisconnect={clientDisconnect} 
-	////			debug={false}
-	////		/>
-	////	</div>
-	////)
-	//function setConnected(connected) {
-	//	$("#connect").prop("disabled", connected);
-	//	$("#disconnect").prop("disabled", !connected);
-	//	if (connected) {
-	//		$("#conversation").show();
-	//	}
-	//	else {
-	//		$("#conversation").hide();
-	//	}
-	//	$("#greetings").html("");
-	//}
-
-	//function connect() {
-	//	var socket = new SockJS('/gs-guide-websocket');
-	//	stompClient = Stomp.over(socket);
-	//	stompClient.connect({}, function (frame) {
-	//		setConnected(true);
-	//		console.log('Connected: ' + frame);
-	//		stompClient.subscribe('/topic/greetings', function (greeting) {
-	//			showGreeting(JSON.parse(greeting.body).content);
-	//		});
-	//	});
-	//}
-
-	//function disconnect() {
-	//	if (stompClient !== null) {
-	//		stompClient.disconnect();
-	//	}
-	//	setConnected(false);
-	//	console.log("Disconnected");
-	//}
-
-	//	useEffect(() => {
-	//		if (eventSource === undefined)
-	//		{
-	//			setEventSource(new EventSource(PLAYER_LIST_API_URL))
-	//		}
-	//	}, [eventSource])
-	//
-	//	eventSource.onmessage = (event) => {
-	//		const 
-
-
-	//useEffect(() => 
-	//{
-	//	if (!listening) 
+	//	try 
 	//	{
-	//		let eventSource = undefined;
-	//		eventSource = new EventSource(PLAYER_LIST_API_URL)
-
-	//		eventSource.onopen = (event) => {
-	//			console.log("connection opened");
-	//		}
-
-	//		eventSource.onmessage = (event) => {
-	//			let currentResult = JSON.parse(event.data)
-	//			console.log("current: " + currentResult);
-	//			setPlayerList(currentResult)
-	//			setLoadedPlayers(true);
-	//			console.log("loaded players");
-	//			//eventSource.close()
-	//		}
-
-	//		eventSource.onerror = (event) => 
-	//		{
-	//			console.log(event.target.readyState)
-	//			if (event.target.readyState === EventSource.CLOSED) 
-	//			{
-	//				console.log('eventsource closed (' + event.target.readyState + ')')
-	//			}
-	//			eventSource.close();
-	//		}
-
-	//		setListening(true);
-
-	//		//// cleanup
-	//		//return () => {
-	//		//	console.log('CLEANUP');
-	//		//	eventSource.close();
-	//		//};
+	//		var parsed = JSON.parse(d.body);
+	//		var message = parsed.message;
+	//		setStompMessage(stompMessage.push(message));
+	//		setPlayerList((playerList) => [...playerList, parsed]);
 	//	}
-
-	//	// cleanup
-	//	//return () => {
-	//	//	console.log('CLEANUP');
-	//	//	eventSource.close();
-	//	//};
-	//}, [listening])
-
-    //if (loadedPlayers && playerList)
-    //{
-	//	console.log("playerList: " + playerList)
-    //    return (
-    //        <div>
-    //            <h1>Player List</h1>
-    //            {data.message && <div class="alert alert-success">{data.message}</div>}
-    //            <div className="container">
-    //                <table className="table">
-    //                    <thead>
-    //                        <tr>
-    //                            <th>Username</th>
-    //                            <th>IsRequesting</th>
-    //                            <th>YouRequested</th>
-    //                            <th>InitiateRequest</th>
-    //                        </tr>
-    //                    </thead>
-    //                    <tbody>
-    //                        {
-    //                            playerList.map(
-    //                                player =>
-    //                                    <tr key={player.id}>
-    //                                        <td>{player.username}</td>
-	//										<td>{player.myRequest ? "Yes" : "No"}</td>
-    //                                        <td>{player.theirRequest ? "Yes" : "No"}</td>
-    //                                    </tr>
-    //                            )
-    //                        }
-    //                    </tbody>
-    //                </table>
-	//				<button className="btn btn-success" onClick={refreshPlayersClicked}>Update</button>
-    //            </div>
-    //        </div>
-    //    )
-    //}
-    //else
-    //    return (
-    //        <>
-    //            <div className="container">
-	//				<p>No other players are online</p>
-	//				<p><button className="btn btn-success" onClick={refreshPlayersClicked}>Update Player List</button></p>
-    //            </div>
-    //        </>
-    //    )        
-//                                        <tr key={player.id}>
-//                                            <td>
-//												{!player.theirRequest && <button className="btn btn-warning" onClick={() => requestMatchClicked(player.username)}>Request</button>}
-//												{player.theirRequest && <button className="btn btn-warning" onClick={() => requestMatchClicked(player.username)}>Accept Request</button>}
-//											</td>
-
-//    const navigate = useNavigate();
-//    const { isAuthenticated, getSession, username } = useAuth();
-//    const [state, setState] = useState({
-//      players: [],
-//      message: "",
-//      loadedPlayers: false,
-//    });
-//
-//    const getPlayers = useCallback(async () =>
-//    {
-//        let axiosSession = getSession();
-//        const data = await axiosSession.get(PLAYER_LIST_API_URL)
-//        .then( response => 
-//        {
-//			console.log("response: " + response);
-//            return response.data;
-//        }
-//        )
-//        .catch(err => {
-//			console.log("error: " + err);
-//            return null
-//        })
-//
-//        if (data !== null)
-//        {
-//            setState({players: data});
-//        }
-//    }, [getSession]);
-//
-//    useEffect(() => 
-//    {
-//        // check if auth
-//        if (!isAuthenticated())
-//        {
-//            navigate("/login");
-//        }
-//    }, [navigate, isAuthenticated]);
-//
-//    useEffect(() => 
-//    {
-//        // empty players
-//        if (state.loadedPlayers === false)
-//        {
-//            console.log("useEffect(getplayers)")
-//            // async update players list
-//            getPlayers();
-//            setState({...state, loadedPlayers: true});
-//        }
-//
-//    }, [getPlayers, getSession, state]);
-//
-//	const refreshPlayersClicked = () =>
-//	{
-//		getPlayers();
-//	}
-//
-//	const requestMatchClicked = (username) =>
-//	{
-//		let thisUser = username
-//	}
-//
-//    if (state.players)
-//    {
-//        return (
-//            <div>
-//                <h1>Player List</h1>
-//                {state.message && <div class="alert alert-success">{state.message}</div>}
-//                <div className="container">
-//                    <table className="table">
-//                        <thead>
-//                            <tr>
-//                                <th>Username</th>
-//                                <th>IsRequesting</th>
-//                                <th>YouRequested</th>
-//                                <th>InitiateRequest</th>
-//                            </tr>
-//                        </thead>
-//                        <tbody>
-//                            {
-//                                state.players.map(
-//                                    player =>
-//                                        <tr key={player.id}>
-//                                            <td>{player.username}</td>
-//                                            <td>{player.theirRequest ? "Yes" : "No"}</td>
-//											<td>{player.myRequest ? "Yes" : "No"}</td>
-//                                            <td>
-//												{!player.theirRequest && <button className="btn btn-warning" onClick={() => requestMatchClicked(player.username)}>Request</button>}
-//												{player.theirRequest && <button className="btn btn-warning" onClick={() => requestMatchClicked(player.username)}>Accept Request</button>}
-//											</td>
-//                                        </tr>
-//                                )
-//                            }
-//                        </tbody>
-//                    </table>
-//					<button className="btn btn-success" onClick={refreshPlayersClicked}>Update</button>
-//                </div>
-//            </div>
-//        )
-//    }
-//    else
-//        return (
-//            <>
-//                <div className="container">
-//					<p>No other players are online</p>
-//					<p><button className="btn btn-success" onClick={refreshPlayersClicked}>Update Player List</button></p>
-//                </div>
-//            </>
-//        )        
-//}
-//
-
-	//useEffect(() =>
-	//{
-	//	setCustomHeaders({"Authorization": token});
-	//}, [token])
-	//const [data, setData] = useState([]);
-	//const [state, setState] = useState({
-	//  players: [],
-	//  message: "",
-	//  loadedPlayers: false,
-	//});
-
-	//const refreshPlayersClicked = () =>
-	//{
-	//	//getPlayers();
-	//	setListening(false);
-	//}
-
-	///const requestMatchClicked = (username) =>
-	///{
-	///}
-	//sendMessage = (msg, selfMsg) => {
-	//	setState(SockJsClient
-
-	// randomUserId is used to emulate a unique user id for this demo usage
-
-	//const onMessageReceive = (msg) => {
-	//	console.log("msg: " + msg)
-	//	//console.log("topic: " + topic)
-	//	setMessage(msg);
-	//}
-
-	//const sendMessage = (msg) => {
-	//	this.clientRef.sendMessage('topics/all', msg)
-	//}
-
-	//const sendMessage = (msg, selfMsg) => {
-	//	try {
-	//		this.clientRef.sendMessage("/app/all", JSON.stringify(selfMsg));
-	//		return true;
-	//	} catch(e) {
-	//		return false;
+	//	catch (err)
+	//	{
+	//		console.log("Failed to get message: " + err);
 	//	}
-	//}
+	//},[stompMessage, playerList])
 
-	//componentWillMount() {
-	//	Fetch("/history", {
-	//		method: "GET"
-	//	}).then((response) => {
-	//		this.setState({ messages: response.body });
-	//	});
-	//}
-
-	//const onConnect = () => 
-	//{
-	//	console.log("Connected");
-	//}
-
-	//const onDisconnect = () => 
-	//{
-	//	console.log("disconnected");
-	//}
-
-	//const onError = () => 
-	//{
-	//	console.log("error");
-	//}
-
-	//const { isAuthenticated, getSession, username, token } = useAuth();
-	//const [listening, setListening] = useState(false);
-    //const [data, setData] = useState({
-    //  message: "",
-    //  loadedPlayers: false,
-    //});
-    //const [playerList, setPlayerList] = useState([])
-	//const [loadedPlayers, setLoadedPlayers] = useState(false);
-	//const [connected, setConnected] = useState(false);
-	//const [message, setMessage] = useState("");
-	//const [customHeaders, setCustomHeaders] = useState({});
-
-	//const [socket, setSocket] = useState();
-	//const [socketConnected, setSocketConnected] = useState(false);
-	//const [stompClient, setStompClient] = useState();
-	//const [messageBox, setMessageBox] = useState("");
-	//const { } = useAuth();
-	//const { loading, client, getMessages, sendMessage, getPlayerList, playerList, messages, error } = useTictactoe();
-	//const { getPlayerListSession, playerList } = useAuth();
 	//useEffect(() => 
 	//{
-	//	if (messages)
-	//		setLocalMessage(messages);
-	//},[messages]);
+	//	const ws = new WebSocket(socketUrl);
+	//	const client = Stomp.over(ws);
+	//	var on_error;
 
+	//	// subscribe to stomp topic on web socket connection
+	//	var on_connect = function(x) 
+	//	{
+	//		client.subscribe(
+	//			stompTopic, 
+	//			onMessage, 
+	//			stomp_subscribe_header);
+	//	};
 
-	////const onMessageReceived = (payload) => {
-	////	console.log("onmessagerecv");
-	////	var message = JSON.parse(payload.body);
-	////	console.log("message: " + message)
-	////}
+	//	var on_close = function()
+	//	{
+	//		console.log("close connection");
+	//	};
 
-	////const onConnected = () => {
-	////	stompClient.subscribe("/topic/messages", onMessageReceived)
-	////}
+	//	if (debugStompEnabled)
+	//	{
+	//		// error logging to console
+	//		on_error = function(err) 
+	//		{
+	//			console.log("STOMP Error: " + err);
+	//		};
+	//	}
+	//	else
+	//	{
+	//		// disable error logging
+	//		on_error = null;
+	//	}
 
-	////const onError = (error) => {
-	////	console.log("error: " + error)
-	////}
+	//	if (debugWsEnabled)
+	//	{
+	//		// web socket debug logging
+	//		client.debug = function(msg) 
+	//		{
+	//			console.log("client.debug: " + msg);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		// disable debug logging
+	//		client.debug = function(){};
+	//	}
 
-	////// working-connect
-	////useEffect(() =>
+	//	// connect using guest credentials in header
+	//	client.connect('test_user123', 'password123', on_connect, on_error, '/');
+
+	//	// set ws/stomp session after initialized
+	//	setWebSockSession(ws);
+	//	setStompSession(client);
+	//},[debugWsEnabled, debugStompEnabled, socketUrl, stompTopic, onMessage, stomp_headers, stomp_subscribe_header])
+
+	//// send message to stomp topic
+	//const sendMessage = () => 
+	//{
+	//	const data = {message: "test_message"}
+	//	console.log("send " + data)
+
+	//	//stompSession.send(stompTopic, {}, JSON.stringify(data));
+	//	stompSession.send(stompTopic, stomp_subscribe_header, JSON.stringify(data));
+	//};
+	////const onMessage = useCallback((d) =>
 	////{
-	////	if (!connected)
+	////	try 
 	////	{
-	////		// Try to set up WebSocket connection with the handshake at "http://localhost:8080/stomp"
-	////		let newSocket = new SockJS("http://localhost:8080/stomp")
-	////		console.log("setSocket")
-
-	////		// Create a new StompClient object with the WebSocket endpoint
-	////		//setStompClient(Stomp.over(socket))
-	////		let newStompClient = Stomp.over(newSocket)
-	////		setStompClient(newStompClient);
-	////		newStompClient.connect({},  onConnected, onError)
-	////		//newStompClient.connect({}, (() => onConnected), (() => onError))
-	////		console.log("setStomp")
-	////		setConnected(true);
+	////		var parsed = JSON.parse(d.body);
+	////		var message = parsed.message;
+	////		setStompMessage(stompMessage.push(message));
+	////		setPlayerList((playerList) => [...playerList, parsed]);
 	////	}
+	////	catch (err)
+	////	{
+	////		console.log("Failed to get message: " + err);
+	////	}
+	////},[stompMessage])
+	//////},[stompMessage, playerList])
 
-	//////		//let newStompClient = Stomp.Client("ws://localhost:8080/stomp")
+	////useEffect(() => 
+	////{
+	////	//const client = new StompJs.Client({
+	////	const client = new Client({
+	////		brokerURL: 'ws://172.17.0.3:61611/ws',
+	////		connectHeaders: {
+	////			login: 'test_user123',
+	////			passcode: 'password123',
+	////			//'heart-beat': '4000,4000'
+	////		},
 
-	//////		// Start the STOMP communications, provide a callback for when the CONNECT frame arrives.
-	//////		newStompClient.connect({}, frame => {
-	//////			let messageBox = "test";
-	//////			newStompClient.send('/app/chat', {}, JSON.stringify({message: messageBox}));
-	//////			newStompClient.send('/app/chat', "test123");
-	//////			console.log("connected")
-	//////			// Subscribe to "/topic/messages". Whenever a message arrives add the text in a list-item element in the unordered list.
-	//////			newStompClient.subscribe("/topic/messages", payload => {
-	//////				console.log("payload body: " + payload.body)
-	//////				//setMessage(message,JSON.parse(payload.body).message);
-	//////			})
-	//////		})
-	//////		//}, error => {
-	//////		//	console.log("connect fails");
-	//////		//	console.log(error);
-	//////		//	//connected = false;
-	//////		//});
-	//////		setSocket(newSocket)
-	//////		setStompClient(newStompClient)
-	//////		setConnected(true);
-	////}, [connected]);
+	////		debug: function (str) 
+	////		{
+	////			console.log(str);
+	////		},
+	////		reconnectDelay: 5000,
+	////		//heartbeatIncoming: 4000,
+	////		//heartbeatOutgoing: 4000,
+	////	});
 
-	//// working-connect
-	//const connectClicked = () => 
-	//{
-	//	if (connected)
-	//	{
-	//		let messageBox = "test";
-	//		stompClient.send('/app/chat', {}, JSON.stringify({message: messageBox}));
-	//		//stompClient.send('/app/chat', {}, JSON.stringify({message: messageBox}));
-	//	}
-	//}
-	//useEffect(() =>
-	//{
-	//	if (!connected)
-	//	{
-	//		// Try to set up WebSocket connection with the handshake at "http://localhost:8080/stomp"
-	//		let newSocket = new SockJS("http://localhost:8080/stomp")
-	//		console.log("setSocket")
+	////	client.onConnect = function (frame) 
+	////	{
+	////		console.log("onConnect")
 
-	//		// Create a new StompClient object with the WebSocket endpoint
-	//		//setStompClient(Stomp.over(socket))
-	//		let newStompClient = Stomp.over(newSocket)
-	//		console.log("setStomp")
+	////		// all subscribes must be done here for reconnect
+	////  		client.subscribe(
+	////  			stompTopic, 
+	////  			onMessage, 
+	////  			stomp_headers
+	////		);
+	////	};
 
-	//		//let newStompClient = Stomp.Client("ws://localhost:8080/stomp")
+	////	client.onStompError = function (frame) {
+	////		// error encountered at Broker
+	////		console.log('Broker reported error: ' + frame.headers['message']);
+	////		console.log('Additional details: ' + frame.body);
+	////	};
 
-	//		// Start the STOMP communications, provide a callback for when the CONNECT frame arrives.
-	//		newStompClient.connect({}, frame => {
-	//			let messageBox = "test";
-	//			newStompClient.send('/app/chat', {}, JSON.stringify({message: messageBox}));
-	//			newStompClient.send('/app/chat', "test123");
-	//			console.log("connected")
-	//			// Subscribe to "/topic/messages". Whenever a message arrives add the text in a list-item element in the unordered list.
-	//			newStompClient.subscribe("/topic/messages", payload => {
-	//				console.log("payload body: " + payload.body)
-	//				//setMessage(message,JSON.parse(payload.body).message);
-	//			})
-	//		})
-	//		//}, error => {
-	//		//	console.log("connect fails");
-	//		//	console.log(error);
-	//		//	//connected = false;
-	//		//});
-	//		setSocket(newSocket)
-	//		setStompClient(newStompClient)
-	//		setConnected(true);
-	//	}
-	//}, [connected]);
+	////	// init and save stomp session
+	////	client.activate();
+	////	setStompSession(client);
+	////},[stompTopic, onMessage, stomp_headers])
 
-	// Take the value in the ‘message-input’ text field and send it to the server with empty headers.
-	//function sendMessage(){
-	//	if (stompClient)
-	//	{
-	//		//let input = messageBox;
-	//		stompClient.send('/app/chat', {}, JSON.stringify({message: messageBox}));
-	//	}
-	//	
-	//}
+	////// send message to stomp topic
+	////const sendMessage = () => 
+	////{
+	////	const data = {message: "test_message"}
+	////	console.log("send " + data)
 
-    // handle login form data update
-    //const handleMessageBox = (e) => 
-    //{
-	//	//e.preventDefault();
+	////	// Additional headers
+	////	//client.publish({
+	////	stompSession.publish({
+	////	  destination: '/topic/hello',
+	////	  body: JSON.stringify(data),
+	////	  headers: stomp_headers,
+	////	});
+	////};
 
-    //    //const value = e.target.value
-	//	//setMessageBox(value)
-    //}
-
-		//const client = new Client({
-		//	brokerURL: 'http://localhost:8080/stomp',
-		//	connectHeaders: {}, 
-		//	debug: function (str) {
-		//			console.log(str)
-		//		},
-		//	reconnectDelay: 5000,
-		//	heartbeatIncoming: 4000,
-		//	heartbeatOutgoing: 4000,
-		//});
-		//setStompClient(client)
-//				<p><button className="btn btn-success" onClick={sendMessage}>Send Message</button></p>
-//				<p>Message: <input type="text" name="message" value={messageBox} onChange={handleMessageBox} /></p>
-//	const onConnect = () => 
-//	{
-//		console.log("Connected");
-//	}
-//
-//	const onDisconnect = () => 
-//	{
-//		console.log("disconnected");
-//	}
-//
-//	const onError = () => 
-//	{
-//		console.log("error");
-//	}
-//
-//	const onMessageReceive = (msg) => {
-//		//console.log("topic: " + topic)
-//		console.log("msg:" + msg)
-//		//setPlayerList(msg)
-//	}
-//
-	//const getPlayerListSession = useCallback(async () => 
-	//{
-	//	if (stompSession == null)
-	//	{
-	//		var _client = new Client();
-	//		var headerValues = {
-	//			Authorization: token
-	//		}
-
-	//		_client.configure({
-	//			brokerURL: 'ws://localhost:8080/stomp',
-	//			connectHeaders: headerValues,
-	//			onConnect: () => 
-	//				{
-	//					_client.subscribe
-	//					(
-	//						'/topic/playerList', 
-	//						playerListMessageHandler,
-	//						headerValues,
-	//					)
-	//				},
-	//			onStompError: (frame) => {
-	//				console.log("stompError: " + frame);
-	//			},
-	//			// debug messages
-	//			//debug: (str) => {
-	//			//	console.log(new Date(), str);
-	//			//}
-	//		});
-
-	//		_client.activate();
-	//		setStompSession(_client);
-	//	}
-	//}, [token, stompSession])
 

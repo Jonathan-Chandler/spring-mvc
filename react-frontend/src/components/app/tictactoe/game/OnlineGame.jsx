@@ -2,63 +2,44 @@ import React, {useState, useEffect, useCallback} from 'react'
 //import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom'
 import useAuth from '../../../authentication/AuthProvider.tsx';
 import { useNavigate } from "react-router-dom";
+import _ from "lodash";
 import './Tictactoe.css';
 
 export default function OnlineGame () {
-	const { username, token, isAuthenticated, getStompSession, playerList, tictactoeGame } = useAuth();
-	//const {movingPlayer, setMovingPlayer} = useState("");
-	//const {gameOver, setGameOver} = useState(false);
+	const { username, isAuthenticated, getStompSession, playerList, tictactoeGame, sendGameCheckIn, sendGameRefresh, sendGameMove, sendGameForfeit} = useAuth();
+
+	const [movingPlayer, setMovingPlayer] = useState("");
+	const [winningPlayer, setWinningPlayer] = useState("");
 	const [boardSquares, setBoardSquares] = useState(Array(9).fill('_'));
-	const [state, setState] = useState({
-		gameOver: false,
-		movingPlayer: "None",
+	const [statusMessage, setStatusMessage] = useState("");
+	const [gameOver, setGameOver] = useState(false);
+	const [gameOverMessage, setGameOverMessage] = useState("");
+
+	const [gameBufferIsValid, setGameBufferIsValid] = useState(false)
+	const [gameBuffer, setGameBuffer] = useState({
+		xPlayerName: "",
+		oPlayerName: "",
+		xPlayerReady: false,
+		oPlayerReady: false,
+		gameState: "",
+		gameBoard: "_________",
+		gameOverMessage: ""
 	});
     const navigate = useNavigate();
 
-	//const updateMovingPlayer = (game) =>
-	//{
-	//	if (game)
-	//	{
-	//		if (game.gameState === "X_PLAYER_MOVING")
-	//		{
-	//			setMovingPlayer(game.xPlayerName);
-	//		}
+	// copy to buffer
+	useEffect(() => {
+		// create a copy of tictactoe game
+		let newTictactoeGame = JSON.parse(JSON.stringify(tictactoeGame));
 
-	//		if (game.gameState === "O_PLAYER_MOVING")
-	//		{
-	//			setMovingPlayer(game.oPlayerName);
-	//		}
-	//	}
-
-	//	setMovingPlayer("");
-	//}
-
-	useEffect(() =>
-	{
-		// update game state
-		setBoardSquares(Array.from(tictactoeGame.gameBoard));
-	},[tictactoeGame.gameBoard])
-
-	useEffect(() => 
-	{
-		if (!state.gameOver)
+		// update only if values aren't the same
+		if (!_.isEqual(newTictactoeGame, gameBuffer))
 		{
-			console.log("gamestate: " + tictactoeGame.gameState);
-			if (tictactoeGame.gameState === "X_PLAYER_MOVING")
-			{
-				setState({...state, movingPlayer: tictactoeGame.xPlayerName});
-			}
+			// update game state
+			setBoardSquares(Array.from(tictactoeGame.gameBoard));
+			setGameBuffer(newTictactoeGame);
 
-			if (tictactoeGame.gameState === "O_PLAYER_MOVING")
-			{
-				setState({...state, movingPlayer: tictactoeGame.oPlayerName});
-			}
-
-			//if (gameStateIsActive(tictactoeGame.gameState))
-			//{
-			//	console.log("Game is active (gameState = " + tictactoeGame.gameState + ")");
-			//}
-
+			// update local game over state to stop sending refresh requests to backend
 			if (tictactoeGame.gameState === "GAME_OVER_ERROR"
 				|| tictactoeGame.gameState === "GAME_OVER_X_WINS"
 				|| tictactoeGame.gameState === "GAME_OVER_O_WINS"
@@ -66,152 +47,176 @@ export default function OnlineGame () {
 				|| tictactoeGame.gameState === "CLOSING"
 			)
 			{
-				setState({...state, gameOver: true});
-				console.log("Game ended (gameState = " + tictactoeGame.gameState + ")");
-				navigate("/tictactoe/amqp");
-			}
-
-			// exit to playerlist if in error state
-			if (tictactoeGame.gameState === "GAME_OVER_ERROR")
-			{
-				console.log("Navigate to playerlist");
-				navigate("/tictactoe/amqp");
+				setGameOver(true);
 			}
 		}
+	}, [tictactoeGame, gameBuffer])
 
-	}, [state, tictactoeGame.gameState])
-
-	useEffect(() => 
-	{
-		if ((username === tictactoeGame.oPlayerName && !tictactoeGame.oPlayerReady)
-			|| (username === tictactoeGame.xPlayerName && !tictactoeGame.xPlayerReady))
+	// set game over messages
+	useEffect(() => {
+		if (gameOver)
 		{
-			sendCheckIn();
+			let endMessage = "";
+
+			if (gameBuffer.gameState === "GAME_OVER_X_WINS")
+			{
+				setWinningPlayer("Winning Player: " + gameBuffer.xPlayerName);
+				if (username === gameBuffer.xPlayerName)
+				{
+					endMessage = "You Win!";
+				}
+				else
+				{
+					endMessage = "You Lose!";
+				}
+				//endMessage = "Player '" + gameBuffer.xPlayerName + "' Wins!";
+			}
+			else if (gameBuffer.gameState === "GAME_OVER_O_WINS")
+			{
+				setWinningPlayer("Winning Player: " + gameBuffer.oPlayerName);
+				if (username === gameBuffer.oPlayerName)
+				{
+					endMessage = "You Win!";
+				}
+				else
+				{
+					endMessage = "You Lose!";
+				}
+				//endMessage = "Player '" + gameBuffer.oPlayerName + "' Wins!";
+			}
+			else if (gameBuffer.gameState === "GAME_OVER_DRAW")
+			{
+				setWinningPlayer("DRAW!");
+				endMessage = "Draw Game!";
+			}
+			else if (gameBuffer.gameState === "GAME_OVER_ERROR")
+			{
+				if (!gameBuffer.oPlayerReady && gameBuffer.xPlayerReady)
+				{
+					endMessage = "Player '" + gameBuffer.oPlayerName + "' failed to join game";
+				}
+				else if (!gameBuffer.xPlayerReady && gameBuffer.oPlayerReady)
+				{
+					endMessage = "Player '" + gameBuffer.xPlayerName + "' failed to join game";
+				}
+				else
+				{
+					endMessage = "Players failed to join game";
+				}
+				//endMessage = "Failed to start game"
+			}
+
+			setGameOverMessage(endMessage); 
 		}
-	}, [username, tictactoeGame.xPlayerReady, tictactoeGame.oPlayerReady])
+	}, [username, gameOver, sendGameCheckIn, gameBuffer])
 
-		//{
-		//	return game.xPlayerReady;
-		//}
-		//else if (game.oPlayerName === username)
-		//{
-		//	return game.oPlayerReady;
-		//}
-		//if (tictactoeGame.gameState === "X_PLAYER_MOVING")
-		//{
-		//	setMovingPlayer(tictactoeGame.xPlayerName);
-		//}
+	// set status messages
+	useEffect(() => {
+		if (!gameOver)
+		{
+			let gameStatus = "";
+			if (gameBuffer.gameState === "STARTING")
+			{
+				// check in if this player has not yet
+				if ((username === gameBuffer.oPlayerName && !gameBuffer.oPlayerReady)
+					|| (username === gameBuffer.xPlayerName && !gameBuffer.xPlayerReady))
+				{
+					sendGameCheckIn();
+				}
 
-		//if (tictactoeGame.gameState === "O_PLAYER_MOVING")
-		//{
+				if (!gameBuffer.oPlayerReady && gameBuffer.xPlayerReady)
+				{
+					gameStatus = "Waiting for '" + gameBuffer.oPlayerName + "' to join game";
+				}
+				else if (!gameBuffer.xPlayerReady && gameBuffer.oPlayerReady)
+				{
+					gameStatus = "Waiting for '" + gameBuffer.xPlayerName + "' to join game";
+				}
+				else
+				{
+					gameStatus = "Players failed to join game";
+				}
+			}
+			else if (gameBuffer.gameState === "X_PLAYER_MOVING")
+			{
+				
+				setMovingPlayer("Moving Player: " + gameBuffer.xPlayerName);
+				if (username === gameBuffer.xPlayerName)
+				{
+					gameStatus = "Waiting for your move";
+				}
+				else
+				{
+					gameStatus = "Waiting for other player";
+				}
+			}
+			else if (gameBuffer.gameState === "O_PLAYER_MOVING")
+			{
+				setMovingPlayer("Moving Player: " + gameBuffer.oPlayerName);
+				if (username === gameBuffer.oPlayerName)
+				{
+					gameStatus = "Waiting for your move";
+				}
+				else
+				{
+					gameStatus = "Waiting for other player";
+				}
+			}
+			else 
+			{
+				gameStatus = "Waiting for players to join";
+			}
 
-	const sendCheckIn = () => 
-	{
-		let stompSession = getStompSession();
-		const data = {requestType: 2, requestedUser: username, moveLocation: -1}
-		console.log("send request: " + JSON.stringify(data))
+			setStatusMessage(gameStatus); 
+		}
+	}, [gameOver, setMovingPlayer, username, sendGameCheckIn, gameBuffer])
 
-		let pass = token.split(' ')[1]
-		const msg_destination = "/topic/from.user." + username
-		stompSession.publish({
-		  destination: msg_destination,
-		  body: JSON.stringify(data),
-		  headers: {
-			  login: username, 
-			  passcode: pass, 
-			  "content-type":"application/json", 
-			  "content-encoding":"UTF-8", 
-			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
-		  }
-		});
-	};
-
-	const sendMove = (index) => 
-	{
-		console.log("requesting move index: " + index);
-		let stompSession = getStompSession();
-		const data = {requestType: 3, requestedUser: username, moveLocation: index}
-		console.log("send request: " + JSON.stringify(data))
-
-		let pass = token.split(' ')[1]
-		const msg_destination = "/topic/from.user." + username
-		stompSession.publish({
-		  destination: msg_destination,
-		  body: JSON.stringify(data),
-		  headers: {
-			  login: username, 
-			  passcode: pass, 
-			  "content-type":"application/json", 
-			  "content-encoding":"UTF-8", 
-			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
-		  }
-		});
-	};
-
-	const sendForfeit = () => 
-	{
-		console.log("requesting forfeit for user: " + username);
-		let stompSession = getStompSession();
-		const data = {requestType: 5, requestedUser: username, moveLocation: -1}
-		console.log("send request: " + JSON.stringify(data))
-
-		let pass = token.split(' ')[1]
-		const msg_destination = "/topic/from.user." + username
-		stompSession.publish({
-		  destination: msg_destination,
-		  body: JSON.stringify(data),
-		  headers: {
-			  login: username, 
-			  passcode: pass, 
-			  "content-type":"application/json", 
-			  "content-encoding":"UTF-8", 
-			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
-		  }
-		});
-
-		// return to player list
-		navigate("/tictactoe/amqp");
-	};
-
-	const sendRefreshGame = () => 
-	{
-		console.log("requesting refresh");
-		let stompSession = getStompSession();
-		const data = {requestType: 4, requestedUser: username, moveLocation: -1}
-		console.log("send request: " + JSON.stringify(data))
-
-		let pass = token.split(' ')[1]
-		const msg_destination = "/topic/from.user." + username
-		stompSession.publish({
-		  destination: msg_destination,
-		  body: JSON.stringify(data),
-		  headers: {
-			  login: username, 
-			  passcode: pass, 
-			  "content-type":"application/json", 
-			  "content-encoding":"UTF-8", 
-			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
-		  }
-		});
-	};
+	const handleGameMove = useCallback((index) => {
+		if ((gameBuffer.gameState === "X_PLAYER_MOVING" && username === gameBuffer.xPlayerName)
+			|| (gameBuffer.gameState === "O_PLAYER_MOVING" && username === gameBuffer.oPlayerName))
+		{
+			sendGameMove(index);
+		}
+	},[username, sendGameMove, gameBuffer.gameState, gameBuffer.xPlayerName, gameBuffer.oPlayerName]);
 
 	const displaySquare = (index) => {
-		return (<div className="col-4 tic-box" onClick={() => sendMove(index)}>{boardSquares[index]}</div>);
+		return (<div className="col-4 tic-box" onClick={() => handleGameMove(index)}>{boardSquares[index]}</div>);
 	}
 
-	const handleExitGame = () => {
-		navigate("/tictactoe/amqp");
-	}
+	const handleRefreshGame = useCallback(() => {
+		sendGameRefresh();
+	}, [sendGameRefresh]);
 
-	if (boardSquares && tictactoeGame)
+	const handleExitGame = useCallback(() => {
+		if (!gameOver)
+		{
+			sendGameForfeit();
+		}
+		navigate("/tictactoe/playerlist");
+	}, [navigate, gameOver, sendGameForfeit])
+
+	// update game state from server until game is over
+	useEffect(() => {
+		if (!gameOver)
+		{
+			const refreshInterval = setInterval(handleRefreshGame, 5000)
+			return () => {
+				clearInterval(refreshInterval);
+			}
+		}
+	}, [gameOver, handleRefreshGame]);
+	
+	if (boardSquares && gameBuffer)
 	{
 		return (
 			<div className="container-fluid">
 				<div className="justify-content-center row">
 					<div className="col-12 col-sm-6 content">
 						<h1>Online Tic-Tac-Toe Game</h1>
-						<h2>X Player: {tictactoeGame.xPlayerName}</h2>
-						<h2>O Player: {tictactoeGame.oPlayerName}</h2>
+						<p />
+						<h2 className="gamestate">{gameOver && gameOverMessage}</h2>
+						<h2 className="gamestate">{gameOver===false && statusMessage}</h2>
+						<p />
 						<div className="container-fluid tic-container">
 							<div className="row tic-row">
 								{displaySquare(0)}
@@ -229,11 +234,13 @@ export default function OnlineGame () {
 								{displaySquare(8)}
 							</div>
 						</div>
-						<div className="status">Moving Player: {state.movingPlayer}</div>
-						<div className="gameoverstate">{state.gameOver && tictactoeGame.gameState}</div>
-						<button className="forfeit" onClick={state.gameOver && sendForfeit}>Forfeit Game</button>
-						<button className="exit" onClick={state.gameOver && handleExitGame}>Exit Game</button>
-						<button className="refresh" onClick={sendRefreshGame}>Refresh Game</button>
+						<div className="playerName">X Player Name: {gameBuffer.xPlayerName}</div>
+						<div className="playerName">O Player Name: {gameBuffer.oPlayerName}</div>
+						<p />
+						<div className="status">{gameOver===false && movingPlayer}</div>
+						<div className="status">{gameOver && winningPlayer}</div>
+						<p />
+						<button className="exit" onClick={handleExitGame}>Leave Game</button>
 					</div>
 				</div>
 			</div>
@@ -247,128 +254,5 @@ export default function OnlineGame () {
 			</div>
 		);
 	}
-	//<div className="Winner">Winning Player: {winner}</div>
-	//<button className="restart" onClick={handleRestart}>Restart Game</button>
+	//<button className="refresh" onClick={handleRefreshGame}>Refresh Game</button>
 }
-//	const [boardSquares, setBoardSquares] = useState(Array(9).fill('_'));
-//	const [winner, setWinner] = useState(false)
-//	const [moveCount, setMoveCount] = useState(0)
-//
-//	const displaySquare = (index) => {
-//		return (<div className="col-4 tic-box" onClick={() => handleClick(index)}>{boardSquares[index]}</div>);
-//	}
-//
-//	// reset game state
-//	const handleRestart = () => {
-//		setWinner(false);
-//		setMoveCount(0);
-//
-//		setBoardSquares(Array(9).fill('_'));
-//	}
-//
-//	// add player's move and check if won
-//	const handleClick = useCallback((index) => {
-//		const currentBoard = [...boardSquares]
-//		const currentPlayer = (moveCount % 2 === 0) ? 'X' : 'O'
-//		if (currentBoard[index] !== '_' || winner)
-//			return
-//
-//		// update board state
-//		currentBoard[index] = currentPlayer;
-//		setBoardSquares(currentBoard)
-//	}, [moveCount, boardSquares, winner]);
-//
-//	// update winner
-//	useEffect(() => 
-//		{
-//			let tempCount = 0;
-//
-//			for (let i = 0; i < 9; i++)
-//			{
-//				if (boardSquares[i] !== '_')
-//					tempCount += 1;
-//			}
-//
-//			// check 3 columns to see if either player won
-//			for (let i = 0; i < 3; i++)
-//			{
-//				if (boardSquares[i] !== '_'
-//					&& boardSquares[i] === boardSquares[i+3]
-//					&& boardSquares[i] === boardSquares[i+6]
-//				)
-//				{
-//					setWinner(boardSquares[i])
-//					return
-//				}
-//			}
-//
-//			// player won by filling entire row
-//			for (let i = 0; i <= 6; i+=3)
-//			{
-//				if (boardSquares[i] !== '_'
-//					&& boardSquares[i] === boardSquares[i+1]
-//					&& boardSquares[i] === boardSquares[i+2]
-//				)
-//				{
-//					setWinner(boardSquares[i])
-//					return;
-//				}
-//			}
-//
-//			// player won diagonally
-//			if (boardSquares[0] !== '_'
-//				&& boardSquares[0] === boardSquares[4]
-//				&& boardSquares[0] === boardSquares[8]
-//			)
-//			{
-//				setWinner(boardSquares[0])
-//				return;
-//			}
-//			if (boardSquares[2] !== '_'
-//				&& boardSquares[2] === boardSquares[4]
-//				&& boardSquares[2] === boardSquares[6]
-//			)
-//			{
-//				setWinner(boardSquares[2])
-//				return;
-//			}
-//
-//			if (tempCount === 9)
-//				setWinner("none")
-//
-//			// update move count
-//			setMoveCount(tempCount);
-//
-//		}, [winner, moveCount, boardSquares]);
-//
-//	return (
-//		<div className="container-fluid">
-//			<div className="justify-content-center row">
-//				<div className="col-12 col-sm-6 content">
-//					<h1>Tic-Tac-Toe</h1>
-//					<div className="container-fluid tic-container">
-//						<div className="row tic-row">
-//							{displaySquare(0)}
-//							{displaySquare(1)}
-//							{displaySquare(2)}
-//						</div>
-//						<div className="row tic-row">
-//							{displaySquare(3)}
-//							{displaySquare(4)}
-//							{displaySquare(5)}
-//						</div>
-//						<div className="row tic-row">
-//							{displaySquare(6)}
-//							{displaySquare(7)}
-//							{displaySquare(8)}
-//						</div>
-//					</div>
-//					<div className="status">Current Player: {(moveCount % 2 === 0) ? 'X' : 'O'}</div>
-//					<div className="Winner">Winning Player: {winner}</div>
-//					<button className="restart" onClick={handleRestart}>Restart Game</button>
-//				</div>
-//			</div>
-//		</div>
-//	);
-//}
-
