@@ -45,7 +45,7 @@ export default function TictactoePlayerList()
 	{
 		return (
 			<div>
-				Player List
+				<h1>Tic Tac Toe Player List</h1>
 				<p />
 				<div className="container">
 					<table className="table">
@@ -76,7 +76,7 @@ export default function TictactoePlayerList()
 	{
 		return (
 			<div>
-				Player List
+				<h1>Tic Tac Toe Player List</h1>
 				<p />
 				<div className="container">
 					<p />No other players are online.

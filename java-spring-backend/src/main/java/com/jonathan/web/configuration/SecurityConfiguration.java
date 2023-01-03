@@ -78,12 +78,13 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import com.jonathan.web.controllers.RSender;
-import com.jonathan.web.controllers.TReceiver;
+//import com.jonathan.web.controllers.RSender;
+//import com.jonathan.web.controllers.TReceiver;
 import com.jonathan.web.service.TictactoePlayerListService;
 import com.jonathan.web.service.TictactoePlayerListServiceImpl;
 import com.jonathan.web.service.TictactoeGameService;
 import com.jonathan.web.service.TictactoeGameServiceImpl;
+import com.jonathan.web.controllers.TictactoeController;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
@@ -156,14 +157,18 @@ public class SecurityConfiguration
 	//	return BindingBuilder.bind(queue).to(exchange).with("user.#");
 	//}
 
-	@Bean
-	public RSender sender() {
-        return new RSender();
-    }
+	////@Bean
+	////public RSender sender() {
+    ////    return new RSender();
+    ////}
+	////@Bean
+	////public TReceiver receiver() {
+    ////    return new TReceiver();
+    ////}
 
 	@Bean
-	public TReceiver receiver() {
-        return new TReceiver();
+	public TictactoeController receiver() {
+        return new TictactoeController();
     }
 
 	@Autowired

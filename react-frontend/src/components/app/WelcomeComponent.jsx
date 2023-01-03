@@ -17,14 +17,6 @@ export default function WelcomeComponent(...props)
 					<h1>Welcome!</h1>
 					<div className="container">
 						Welcome {username}.
-						<div className="container">
-							<h2><p />Test: </h2>
-								{<NavLink className="nav-link" to="/welcome">Home</NavLink>}
-								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
-								{<NavLink className="nav-link" to="/login">Login</NavLink>}
-								{<NavLink className="nav-link" to="/tictactoe/playerlist">tictactoeplayers</NavLink>}
-							
-						</div>
 					</div>
 				</>
 			)        
@@ -34,14 +26,6 @@ export default function WelcomeComponent(...props)
 			return (
 				<>
 					<h1>Welcome!</h1>
-					<div className="container">
-						<div className="container">
-							<h2><p />Test: </h2>
-								{<NavLink className="nav-link" to="/welcome">Home</NavLink>}
-								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
-								{<NavLink className="nav-link" to="/login">Login</NavLink>}
-						</div>
-					</div>
 				</>
 			)        
 		}
@@ -59,3 +43,20 @@ export default function WelcomeComponent(...props)
 	}
 }
 
+//						<div className="container">
+//							<h2><p />Test: </h2>
+//								{<NavLink className="nav-link" to="/welcome">Home</NavLink>}
+//								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
+//								{<NavLink className="nav-link" to="/login">Login</NavLink>}
+//								{<NavLink className="nav-link" to="/tictactoe/playerlist">tictactoeplayers</NavLink>}
+//							
+//						</div>
+
+//					<div className="container">
+//						<div className="container">
+//							<h2><p />Test: </h2>
+//								{<NavLink className="nav-link" to="/welcome">Home</NavLink>}
+//								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
+//								{<NavLink className="nav-link" to="/login">Login</NavLink>}
+//						</div>
+//					</div>
