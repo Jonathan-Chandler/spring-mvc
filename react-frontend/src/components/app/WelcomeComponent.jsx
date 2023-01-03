@@ -20,7 +20,6 @@ export default function WelcomeComponent(...props)
 						<div className="container">
 							<h2><p />Test: </h2>
 								{<NavLink className="nav-link" to="/welcome">Home</NavLink>}
-								{<NavLink className="nav-link" to="/todos">Todos</NavLink>}
 								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
 								{<NavLink className="nav-link" to="/login">Login</NavLink>}
 								{<NavLink className="nav-link" to="/tictactoe/playerlist">tictactoeplayers</NavLink>}
@@ -39,7 +38,6 @@ export default function WelcomeComponent(...props)
 						<div className="container">
 							<h2><p />Test: </h2>
 								{<NavLink className="nav-link" to="/welcome">Home</NavLink>}
-								{<NavLink className="nav-link" to="/todos">Todos</NavLink>}
 								{<NavLink className="nav-link" to="/logout">Logout</NavLink>}
 								{<NavLink className="nav-link" to="/login">Login</NavLink>}
 						</div>

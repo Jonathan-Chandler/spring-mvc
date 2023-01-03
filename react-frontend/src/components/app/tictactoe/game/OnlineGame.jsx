@@ -14,6 +14,7 @@ export default function OnlineGame () {
 	const [statusMessage, setStatusMessage] = useState("");
 	const [gameOver, setGameOver] = useState(false);
 	const [gameOverMessage, setGameOverMessage] = useState("");
+	const [playerIsExiting, setPlayerIsExiting] = useState(false);
 
 	const [gameBufferIsValid, setGameBufferIsValid] = useState(false)
 	const [gameBuffer, setGameBuffer] = useState({
@@ -26,6 +27,15 @@ export default function OnlineGame () {
 		gameOverMessage: ""
 	});
     const navigate = useNavigate();
+
+	// navigate to welcome if not logged in
+	useEffect(() => 
+	{
+        if (!isAuthenticated())
+        {
+            navigate("/welcome");
+        }
+	}, [isAuthenticated, navigate]);
 
 	// copy to buffer
 	useEffect(() => {
@@ -188,12 +198,23 @@ export default function OnlineGame () {
 	}, [sendGameRefresh]);
 
 	const handleExitGame = useCallback(() => {
+		// player wants to leave before end of game
 		if (!gameOver)
 		{
 			sendGameForfeit();
 		}
-		navigate("/tictactoe/playerlist");
+
+		// navigate back to playerlist after server receives forfeit message
+		setPlayerIsExiting(true);
 	}, [navigate, gameOver, sendGameForfeit])
+
+	useEffect(() => 
+	{
+		if (playerIsExiting && gameOver)
+		{
+			navigate("/tictactoe/playerlist");
+		}
+	},[navigate, playerIsExiting, gameOver]);
 
 	// update game state from server until game is over
 	useEffect(() => {
@@ -254,5 +275,4 @@ export default function OnlineGame () {
 			</div>
 		);
 	}
-	//<button className="refresh" onClick={handleRefreshGame}>Refresh Game</button>
 }

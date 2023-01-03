@@ -36,6 +36,7 @@ interface AuthContextType {
 	getSession: () => Axios;
 	getStompSession: () => Client;
 	playerList: PlayerListEntry[];
+	sendGameRequest: (name: String) => void;
 	tictactoeGame: TictactoeGame;
 	sendGameCheckIn: () => void;
 	sendGameRefresh: () => void;
@@ -107,7 +108,7 @@ export function AuthProvider({
 					// if returned valid auth token then update context with new token/username
 					if (response.data.Authorization)
 					{
-						console.log("success login; token=" + response.data.Authorization)
+						//console.log("success login; token=" + response.data.Authorization)
 						setToken(response.data.Authorization)
 
 						// set username and login success
@@ -230,50 +231,48 @@ export function AuthProvider({
 			// update token from response headers with updated auth tokens and handle failed authentication
 			axiosSession.interceptors.response.use(handleResponseHeaders, handleResponseAuthFailure);
 
-			console.log("using auth header token: " + token)
+			//console.log("using auth header token: " + token)
 
 			return axiosSession;
 		}, [handleResponseAuthFailure, token]);
 
 	const handlePlayerlistRx = useCallback(async (message: IMessage) => {
-		console.log("handleplayerlistrx: " + message);
+		//console.log("handleplayerlistrx: " + message);
 		let messageBody = JSON.parse(message.body);
-		let stringMessageBody = JSON.stringify(messageBody);
-		let newPlayerListParse = JSON.parse(stringMessageBody);
-		let newStringPlayerListParse = JSON.stringify(newPlayerListParse);
-		console.log("newPlayerListParse: " + newPlayerListParse)
-		console.log("newStringPlayerListParse: " + newStringPlayerListParse)
+		//let stringMessageBody = JSON.stringify(messageBody);
+		//let newPlayerListParse = JSON.parse(stringMessageBody);
+		//let newStringPlayerListParse = JSON.stringify(newPlayerListParse);
+		//console.log("newPlayerListParse: " + newPlayerListParse)
+		//console.log("newStringPlayerListParse: " + newStringPlayerListParse)
 
 		//let newPlayerList = JSON.parse(message.body.usernames);
 		let newPlayerList = messageBody.usernames;
-		console.log("messageBody: " + messageBody);
-		console.log("stringMessageBody: " + stringMessageBody);
-		console.log("newPlayerList: " + newPlayerList);
-		console.log("stringNewPlayerList: " + JSON.stringify(newPlayerList));
-		const regularArray = ["abc", "def", "ghi"];
-		console.log("regular array: " + regularArray);
+		//console.log("messageBody: " + messageBody);
+		//console.log("stringMessageBody: " + stringMessageBody);
+		//console.log("newPlayerList: " + newPlayerList);
+		//console.log("stringNewPlayerList: " + JSON.stringify(newPlayerList));
 
 		// don't return this username in playerlist
 		const index = newPlayerList.indexOf(username)
 		if (index > -1)
 		{
 			newPlayerList.splice(index, 1); // 2nd parameter means remove one item only
-			console.log("new player list: " + newPlayerList)
+			//console.log("new player list: " + newPlayerList)
 		}
 
 	},[username]);
 
 	const handleUserRx = useCallback(async (message: IMessage) => {
-		console.log("receive message");
-		const loginHeader = message.headers["login"];
+		//console.log("receive message");
+		//const loginHeader = message.headers["login"];
 		const messageType = message.headers["__TypeId__"];
-		console.log("loginHeader: " + loginHeader);
-		console.log("handleUserRx: message: " + message);
-		console.log("messageType: " + messageType);
+		//console.log("loginHeader: " + loginHeader);
+		//console.log("handleUserRx: message: " + message);
+		//console.log("messageType: " + messageType);
 
 		if (messageType === "com.jonathan.web.resources.TictactoePlayerListDto")
 		{
-			console.log("get player list");
+			//console.log("get player list");
 			let newPlayerList = [];
 			let messageBody = JSON.parse(message.body);
 
@@ -294,18 +293,18 @@ export function AuthProvider({
 					currentPlayer.theirRequest = true;
 				}
 
-				console.log("currentPlayer: " + JSON.stringify(currentPlayer));
+				//console.log("currentPlayer: " + JSON.stringify(currentPlayer));
 				newPlayerList.push(currentPlayer)
 			}
 
-			console.log("newPlayerList: " + JSON.stringify(newPlayerList));
+			//console.log("newPlayerList: " + JSON.stringify(newPlayerList));
 			setPlayerList(newPlayerList);
-			console.log("Message body: " + JSON.stringify(messageBody));
+			//console.log("Message body: " + JSON.stringify(messageBody));
 		}
 		else if (messageType === "com.jonathan.web.resources.TictactoeGameDto")
 		{
 			// server sent game information
-			console.log("get game state");
+			//console.log("get game state");
 			let messageBody = JSON.parse(message.body);
 
 			if (messageBody)
@@ -323,30 +322,14 @@ export function AuthProvider({
 
 				// converted information
 				setTictactoeGame(currentGame);
-				console.log("converted game information: " + JSON.stringify(currentGame));
+				//console.log("converted game information: " + JSON.stringify(currentGame));
 			}
 
 			// message information
-			console.log("receive game information: " + JSON.stringify(messageBody));
+			//console.log("receive game information: " + JSON.stringify(messageBody));
 		}
 
 	},[]);
-
-//interface TictactoeGame
-//{
-//	xPlayer: String;
-//	oPlayer: String;
-//	gameBoard: String;
-//	joinGame: boolean
-//}
-
-//interface PlayerListEntry
-//{
-//	username: String;
-//	myRequest: boolean;
-//	theirRequest: boolean;
-//}
-
 
 	useEffect(() =>
 	{
@@ -355,43 +338,24 @@ export function AuthProvider({
 			return;
 		}
 
+
 		// deactivate every time login/password change if active
 		if (stompClientSession.state === ActivationState.ACTIVE)
 		{
 			// wait until deactivate finishes before continuing
 			const deactivateStomp = async () => {
 				await stompClientSession.deactivate();
+				//await stompClientSession.forceDisconnect();
 			}
+
 			deactivateStomp().catch(console.error);
 		}
 
-		//// wait until transition is done
-		//function waitForDeactivate(stompClient, callback){
-		//	setTimeout(
-		//		function () {
-		//			if (stompClient.state !== ActivationState.DEACTIVATING) {
-		//				console.log("Done deactivating")
-		//				if (callback != null){
-		//					callback();
-		//				}
-		//			} else {
-		//				console.log("wait for connection...")
-		//				waitForDeactivate(stompClient, callback);
-		//			}
-
-		//		}, 500); // wait 500ms
-		//}
-		//
-		//if (stompClientSession.state === ActivationState.DEACTIVATING)
-		//{
-		//	waitForDeactivate(stompClientSession, null);
-		//}
 
 		if (username && token)
 		{
 			const pass = token.split(' ')[1]
 			const stompHeaders = {login: username, passcode: pass};
-			//const stompHeaders2 = {login: username, passcode: pass, ack: 'client'};
 			const usernameTopic = '/topic/user.' + username;
 			const toUsernameTopic = '/topic/to.user.' + username;
 
@@ -407,9 +371,9 @@ export function AuthProvider({
 						stompHeaders,
 					)
 				},
-				onStompError: (frame) => {
-					console.log("stompError: " + frame);
-				},
+				//onStompError: (frame) => {
+				//	console.log("stompError: " + frame);
+				//},
 				//debug: (frame) => {
 				//	console.log("stompDebug: " + frame);
 				//},
@@ -436,24 +400,44 @@ export function AuthProvider({
 						  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
 					  }
 					});
-					console.log("send playerlist refresh to '" + msg_destination + "' - body: " + JSON.stringify(data))
+					//console.log("send playerlist refresh to '" + msg_destination + "' - body: " + JSON.stringify(data))
 				}, 5000);
 			return () => {
 				clearInterval(interval);
+				//stompClientSession.deactivate();
 			};
-			//return () => {
-			//  stompClientSession.deactivate();
-			//}
 		}
 	},[stompClientSession, username, token, loading, loadingInitial, handleUserRx, handlePlayerlistRx]);
 
+	const sendGameRequest = useCallback((name) => 
+	{
+			let stompSession = stompClientSession;
+			const data = {requestType: 1, requestedUser: name, moveLocation: -1}
+			//console.log("send request: " + JSON.stringify(data))
+
+			// Additional headers
+			let pass = token.split(' ')[1]
+			const msg_destination = "/topic/from.user." + username
+			stompSession.publish({
+			  destination: msg_destination,
+			  body: JSON.stringify(data),
+			  headers: {
+				  login: username, 
+				  passcode: pass, 
+				  "content-type":"application/json", 
+				  "content-encoding":"UTF-8", 
+				  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
+			  }
+			});
+	}, [stompClientSession, username, token]);
+
 	const sendGameRefresh = useCallback(() => 
 	{
-		console.log("requesting refresh");
+		//console.log("requesting refresh");
 		let stompSession = stompClientSession
 		//let stompSession = getStompSession();
 		const data = {requestType: 4, requestedUser: username, moveLocation: -1}
-		console.log("send request: " + JSON.stringify(data))
+		//console.log("send request: " + JSON.stringify(data))
 
 		let pass = token.split(' ')[1]
 		const msg_destination = "/topic/from.user." + username
@@ -474,7 +458,7 @@ export function AuthProvider({
 	{
 		let stompSession = stompClientSession
 		const data = {requestType: 2, requestedUser: username, moveLocation: -1}
-		console.log("send request: " + JSON.stringify(data))
+		//console.log("send request: " + JSON.stringify(data))
 
 		let pass = token.split(' ')[1]
 		const msg_destination = "/topic/from.user." + username
@@ -493,11 +477,11 @@ export function AuthProvider({
 
 	const sendGameMove = useCallback((index) => 
 	{
-		console.log("requesting move index: " + index);
+		//console.log("requesting move index: " + index);
 		//let stompSession = getStompSession();
 		let stompSession = stompClientSession;
 		const data = {requestType: 3, requestedUser: username, moveLocation: index}
-		console.log("send request: " + JSON.stringify(data))
+		//console.log("send request: " + JSON.stringify(data))
 
 		let pass = token.split(' ')[1]
 		const msg_destination = "/topic/from.user." + username
@@ -512,15 +496,13 @@ export function AuthProvider({
 			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
 		  }
 		});
-	},[stompClientSession, token, username]);
+	}, [stompClientSession, username, token]);
 
 	const sendGameForfeit = useCallback(() => 
 	{
-		console.log("requesting forfeit for user: " + username);
-		//let stompSession = getStompSession();
+		//console.log("requesting forfeit for user: " + username);
 		let stompSession = stompClientSession;
 		const data = {requestType: 5, requestedUser: username, moveLocation: -1}
-		console.log("send request: " + JSON.stringify(data))
 
 		let pass = token.split(' ')[1]
 		const msg_destination = "/topic/from.user." + username
@@ -535,27 +517,11 @@ export function AuthProvider({
 			  "__TypeId__":"com.jonathan.web.frontend.RequestDto"
 		  }
 		});
-	},[stompClientSession, token, username]);
+
+	}, [stompClientSession, username, token]);
 
 	const getStompSession = useCallback(() =>
 	{
-		//// wait until transition is done
-		//function waitForActivation(stompClient, callback){
-		//	setTimeout(
-		//		function () {
-		//			if (stompClient.state !== ActivationState.DEACTIVATING) {
-		//				console.log("Done deactivating")
-		//				if (callback != null){
-		//					callback();
-		//				}
-		//			} else {
-		//				console.log("wait for connection...")
-		//				waitForActivation(stompClient, callback);
-		//			}
-
-		//		}, 500); // wait 500ms
-		//}
-
 		return stompClientSession;
 	},[stompClientSession])
 
@@ -572,6 +538,7 @@ export function AuthProvider({
 			getSession,
 			getStompSession,
 			playerList,
+			sendGameRequest,
 			tictactoeGame,
 			sendGameCheckIn,
 			sendGameRefresh,
@@ -579,7 +546,7 @@ export function AuthProvider({
 			sendGameForfeit,
 			error,
 		}),
-		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, tictactoeGame, sendGameCheckIn, sendGameRefresh, sendGameMove, sendGameForfeit, error ]
+		[ username, token, loading, isAuthenticated, login, register, logout, getSession, getStompSession, playerList, sendGameRequest, tictactoeGame, sendGameCheckIn, sendGameRefresh, sendGameMove, sendGameForfeit, error ]
 	);
 
 	// render components after initialization

@@ -5,7 +5,6 @@ import HeaderComponent from '../static/HeaderComponent.jsx'
 import FooterComponent from '../static/FooterComponent.jsx'
 import LoginComponent from '../authentication/LoginComponent.jsx'
 import LogoutComponent from '../authentication/LogoutComponent.jsx'
-import ListTodosComponent from './ListTodosComponent.jsx'
 import WelcomeComponent from './WelcomeComponent.jsx'
 import TictactoeGameSelect from './tictactoe/TictactoeGameSelect.jsx'
 import LocalGame from './tictactoe/game/LocalGame.jsx'
@@ -36,7 +35,6 @@ export default function AppMain(...props)
 						<Route exact path="/register" element={<RegisterComponent />} />
 						<Route exact path="/login" element={<LoginComponent />} />
 						<Route exact path="/logout" element={<LogoutComponent />} />
-						<Route exact path="/todos" element={<ListTodosComponent />} />
 					</Routes>
 					<FooterComponent/>
 				</Router>
@@ -62,7 +60,6 @@ export default function AppMain(...props)
 //						<Route exact path="/register" element={<RegisterComponent />} />
 //						<Route exact path="/login" element={<LoginComponent />} />
 //						<Route exact path="/logout" element={<LogoutComponent />} />
-//						<Route exact path="/todos" element={<ListTodosComponent />} />
 //					</Routes>
 //					<FooterComponent/>
 //				</Router>
