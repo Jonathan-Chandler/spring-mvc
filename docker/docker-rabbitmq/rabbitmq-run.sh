@@ -44,12 +44,16 @@
 #	-p 61613:61613	\
 #	tls stomp
 #	-p 61614:61614	\
+
+#sudo docker network create -d bridge --subnet=172.18.0.0/16 web_server_network
 sudo docker run		\
-	--ip 172.17.0.2	\
+	--network web_server_network \
+	--ip 172.18.0.2	\
 	-p 5672:5672	\
 	-p 15672:15672	\
 	-p 61611:61611	\
 	-p 61612:61612	\
+	--name rabbitmq-server \
 	-v $(pwd):/backup rabbitmq-custom
 
 #docker run -d -p 5672:5672 -p 15672:15672 -p 61613:61613 --name rabbitmq-broker rabbitmq:3-management

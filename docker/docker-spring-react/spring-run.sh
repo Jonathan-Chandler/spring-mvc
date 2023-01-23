@@ -45,15 +45,31 @@
 
 # 3000 - react
 # 8080 - java spring
+sudo docker container kill java-spring-backend
+sudo docker container rm java-spring-backend
 sudo docker run -i -t		\
-	--user mysql:mysql		\
-	--ip 172.17.0.3			\
+	--user user:user		\
+	--network web_server_network \
+	--ip 172.18.0.3			\
 	-p 3000:3000			\
 	-p 8080:8080			\
-	-v $(pwd)/../..:/home/user \
-	-v $(pwd)/../../../mysql-database/mysql:/var/lib/mysql \
+	-v $(pwd)/home/user:/home/user \
+	-v $(pwd)/../../java-spring-backend:/home/user/java-spring-backend \
+	-v $(pwd)/../../react-frontend:/home/user/react-frontend \
 	-w /home/user			\
-	spring-mvc ./startup-spring.sh
+	--name java-spring-backend \
+	spring-react-container
+# sudo docker run -i -t		\
+# 	--user mysql:mysql		\
+# 	--network web_server_network \
+# 	--ip 172.18.0.3			\
+# 	-p 3000:3000			\
+# 	-p 8080:8080			\
+# 	-v $(pwd)/../..:/home/user \
+# 	-v $(pwd)/../../../mysql-database/mysql:/var/lib/mysql \
+# 	-w /home/user			\
+# 	--name java-spring-backend \
+# 	spring-mvc
 
 #	-p 3306:3306			\
 #	-p 8080:8080 			\

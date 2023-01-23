@@ -31,8 +31,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class User implements UserDetails
 {
 	@Id
-	@NotEmpty
-	@Column(unique=true, name="id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//@Column(unique=true, name="id")
 	//@Size(min=8, max=50)
 	private int id;
 
