@@ -15,5 +15,3 @@ sudo docker run      		\
 	--name sql-backend		\
 	sql-server-container
 	
-#sudo docker container ls
-

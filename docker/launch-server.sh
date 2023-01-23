@@ -1,16 +1,16 @@
 #!/bin/bash
 
-## remove containers and network if exist
-#sudo docker container kill java-spring-backend
-#sudo docker container kill rabbitmq-server
-#sudo docker container kill sql-backend
-#sudo docker container rm java-spring-backend
-#sudo docker container rm rabbitmq-server
-#sudo docker container rm sql-backend
-#sudo docker network rm web_server_network
-#
-## create docker network bridge subnet 172.18.0.1
-#sudo docker network create --driver=bridge --subnet=172.18.0.0/24 web_server_network
+# remove containers and network if exist
+sudo docker container kill java-spring-backend
+sudo docker container kill rabbitmq-server
+sudo docker container kill sql-backend
+sudo docker container rm java-spring-backend
+sudo docker container rm rabbitmq-server
+sudo docker container rm sql-backend
+sudo docker network rm web_server_network
+
+# create docker network bridge subnet 172.18.0.1
+sudo docker network create --driver=bridge --subnet=172.18.0.0/24 web_server_network
 
 # build rabbitmq server
 cd ./docker-rabbitmq
