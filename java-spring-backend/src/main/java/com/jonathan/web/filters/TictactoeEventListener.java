@@ -31,8 +31,6 @@
 //  @Autowired
 //  private UserRepository userRepository;
 //
-//  // don't autowire because of cyclic dependency
-//  //private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 //  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 //
 //  @Override

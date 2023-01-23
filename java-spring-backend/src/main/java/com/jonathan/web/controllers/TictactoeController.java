@@ -18,12 +18,10 @@ import com.jonathan.web.service.UserService;
 
 import org.springframework.security.core.AuthenticationException;
 import com.jonathan.web.resources.UserLoginDto;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,9 +69,6 @@ import com.jonathan.web.resources.TictactoeGameDto;
 import org.springframework.stereotype.Component;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-//import Java.lang.System;
-
-//import org.springframework.amqp.core.ExchangeTypes.*;
 
 import org.springframework.context.annotation.Profile;
 
@@ -81,8 +76,6 @@ import org.springframework.context.annotation.Profile;
 @Component
 public class TictactoeController 
 {
-	//@Autowired
-	//Logger logger;
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -114,7 +107,6 @@ public class TictactoeController
 		}
 
 		RequestDto.Type requestType = request.getRequestType();
-		logger.error("getRequestType = " + requestType);
 
 		// call response functions based on request type
 		switch (requestType)

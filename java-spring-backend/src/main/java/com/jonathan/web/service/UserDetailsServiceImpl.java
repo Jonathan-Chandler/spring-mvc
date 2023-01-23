@@ -17,7 +17,6 @@ public class UserDetailsServiceImpl implements UserDetailsService
   @Autowired
   UserRepository userRepository;
 
-  //private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException

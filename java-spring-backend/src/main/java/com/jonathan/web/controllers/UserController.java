@@ -18,7 +18,6 @@ import com.jonathan.web.service.UserService;
 
 import org.springframework.security.core.AuthenticationException;
 import com.jonathan.web.resources.UserLoginDto;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -59,8 +58,6 @@ public class UserController
 	@Autowired
 	private JwtService jwtService;
 
-	//@Autowired
-	//Logger logger;
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@RequestMapping

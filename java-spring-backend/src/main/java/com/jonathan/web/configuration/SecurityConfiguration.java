@@ -94,6 +94,9 @@ public class SecurityConfiguration
 	static final String topicExchangeName = "amq.topic";
 	static final String queueName = "spring-boot";
 
+	@Autowired
+	private UserDetailsService userDetailsService;
+
 	@Bean
 	@Scope("singleton")
 	public TictactoeGameService tictactoeGameService() {
@@ -120,39 +123,17 @@ public class SecurityConfiguration
 	}
 
 	@Bean
-	public TictactoeController receiver() {
-        return new TictactoeController();
-    }
-
-	@Autowired
-	private UserDetailsService userDetailsService;
-
-	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring()
-			//      .antMatchers("/todos/**")
 			// don't filter login or register api
 			.antMatchers("/login")
+			.antMatchers("/register")
 			.antMatchers("/rabbitmq/user")
 			.antMatchers("/rabbitmq/vhost")
 			.antMatchers("/rabbitmq/resource")
 			.antMatchers("/rabbitmq/topic")
 			.antMatchers("/tictactoe/*")
-			.antMatchers("/tictactoe/playerlist")
-			.antMatchers("/tictactoe/playerlist/*")
-			.antMatchers("/tictactoe/playerlist/info")
-			.antMatchers("/topic/greeting")
-			.antMatchers("/app/greeting")
-			.antMatchers("/gs-guide-websocket")
-			.antMatchers("/topic/gs-guide-websocket")
-			.antMatchers("/app/gs-guide-websocket")
-			.antMatchers("/topic")
-			.antMatchers("/chat")
-			.antMatchers("/topic/chat")
-			.antMatchers("/topic/messages")
-			.antMatchers("/stomp")
-			.antMatchers("/stomp/**")
-			.antMatchers("/register");
+			.antMatchers("/tictactoe/playerlist");
 	}
 
 	@Bean

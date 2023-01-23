@@ -53,7 +53,7 @@ sudo docker run -i -t		\
 	-v $(pwd)/../..:/home/user \
 	-v $(pwd)/../../../mysql-database/mysql:/var/lib/mysql \
 	-w /home/user			\
-	spring-mvc 
+	spring-mvc ./startup-spring.sh
 
 #	-p 3306:3306			\
 #	-p 8080:8080 			\

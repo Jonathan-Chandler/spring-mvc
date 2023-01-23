@@ -55,9 +55,6 @@ public class UserServiceImpl implements UserService
 {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	// @Autowired
-	// Logger logger;
-
 	@Autowired
 	UserRepository userRepository;
 
@@ -161,22 +158,5 @@ public class UserServiceImpl implements UserService
 	{
 		userRepository.deleteById(id);
 	}
-
-	//public List<OnlineUserDto> getOnlineUsers()
-	//{
-	//	List<User> userList = userRepository.findAllByEnabled(true);
-	//	List<OnlineUserDto> onlineUsers = new ArrayList<OnlineUserDto>();
-	//	if (userList.size() == 0)
-	//	{
-	//		logger.info("Returned null userList");
-	//	}
-	//	else
-	//	{
-	//		for (int i = 0; i < userList.size(); i++) {
-	//			onlineUsers.add(new OnlineUserDto(userList.get(i).getUsername()));
-	//		}
-	//	}
-	//	return onlineUsers;
-	//}
 }
 

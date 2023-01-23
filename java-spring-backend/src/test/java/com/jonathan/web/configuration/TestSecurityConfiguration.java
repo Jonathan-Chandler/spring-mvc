@@ -79,8 +79,6 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import com.jonathan.web.controllers.RSender;
-import com.jonathan.web.controllers.TReceiver;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -107,16 +105,6 @@ public class TestSecurityConfiguration
 	//static final String topicExchangeName = "hello";
 	static final String topicExchangeName = "amq.topic";
 	static final String queueName = "spring-boot";
-
-	//@Bean
-	//public RSender sender() {
-    //    return new RSender();
-    //}
-
-	//@Bean
-	//public TReceiver receiver() {
-    //    return new TReceiver();
-    //}
 
 	//@Bean
 	//public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory)
@@ -162,7 +150,6 @@ public class TestSecurityConfiguration
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring()
-			//      .antMatchers("/todos/**")
 			// don't filter login or register api
 			.antMatchers("/login")
 			.antMatchers("/rabbitmq/user")
