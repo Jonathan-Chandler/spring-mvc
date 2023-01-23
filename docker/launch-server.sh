@@ -1,24 +1,45 @@
 #!/bin/bash
 
-# remove containers and network if exist
-sudo docker container kill java-spring-backend
-sudo docker container kill rabbitmq-server
-sudo docker container rm java-spring-backend
-sudo docker container rm rabbitmq-server
-sudo docker network rm web_server_network
+## remove containers and network if exist
+#sudo docker container kill java-spring-backend
+#sudo docker container kill rabbitmq-server
+#sudo docker container kill sql-backend
+#sudo docker container rm java-spring-backend
+#sudo docker container rm rabbitmq-server
+#sudo docker container rm sql-backend
+#sudo docker network rm web_server_network
+#
+## create docker network bridge subnet 172.18.0.1
+#sudo docker network create --driver=bridge --subnet=172.18.0.0/24 web_server_network
 
-sudo docker network create --driver=bridge --subnet=172.18.0.0/24 web_server_network
-
-# build and run rabbitmq server
-cd ./docker-rabbitmq 
+# build rabbitmq server
+cd ./docker-rabbitmq
 ./build.sh
+cd ..
+
+# build mysql server
+cd ./docker-mysql 
+./build.sh
+cd ..
+
+# build spring/react server
+cd ./docker-spring-react
+./build.sh
+cd ..
+
+# run rabbitmq and wait for initialize
+cd ./docker-rabbitmq
 ./rabbitmq-run.sh &
 cd ..
+sleep 10
 
-# build and run spring/react/mysql server
-cd ./docker-spring-react-sql && ./build.sh
-./build.sh
-./spring-run.sh
+# run mariadbd and wait for initialize
+cd ./docker-mysql
+./mariadb-run.sh &
 cd ..
+sleep 15
 
-#./docker-spring-react-sql/spring-run.sh
+# run spring/react
+cd ./docker-spring-react
+./spring-run.sh &
+cd ..

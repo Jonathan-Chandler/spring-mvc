@@ -1,4 +1,26 @@
 #!/bin/bash
+
+# ip addr 172.18.0.3
+# 3000 - react
+# 8080 - java spring
+sudo docker container kill java-spring-backend
+sudo docker container rm java-spring-backend
+# sudo docker run -i -t		\
+sudo docker run      		\
+	--user user:user		\
+	--network web_server_network \
+	--ip 172.18.0.3			\
+	-p 3000:3000			\
+	-p 8080:8080			\
+	-v $(pwd)/home/user:/home/user \
+	-v $(pwd)/../../java-spring-backend:/home/user/java-spring-backend \
+	-v $(pwd)/../../react-frontend:/home/user/react-frontend \
+	-v $(pwd)/../docker-spring-react:/home/user/docker-spring-react \
+	-w /home/user			\
+	--name java-spring-backend \
+	spring-react-container
+sudo docker container ls
+
 # -d detach
 # -e ENV_VAR=value -> environment variable
 # --hostname container_host_name
@@ -43,22 +65,6 @@
 # expose ports for react / mariadb / spring, also mount the volume that contains web app binaries
 # 	--user user:user		\
 
-# 3000 - react
-# 8080 - java spring
-sudo docker container kill java-spring-backend
-sudo docker container rm java-spring-backend
-sudo docker run -i -t		\
-	--user user:user		\
-	--network web_server_network \
-	--ip 172.18.0.3			\
-	-p 3000:3000			\
-	-p 8080:8080			\
-	-v $(pwd)/home/user:/home/user \
-	-v $(pwd)/../../java-spring-backend:/home/user/java-spring-backend \
-	-v $(pwd)/../../react-frontend:/home/user/react-frontend \
-	-w /home/user			\
-	--name java-spring-backend \
-	spring-react-container
 # sudo docker run -i -t		\
 # 	--user mysql:mysql		\
 # 	--network web_server_network \
@@ -77,3 +83,4 @@ sudo docker run -i -t		\
 # mariadbd as root
 
 #docker run -d -p 5672:5672 -p 15672:15672 -p 61613:61613 --name rabbitmq-broker rabbitmq:3-management
+

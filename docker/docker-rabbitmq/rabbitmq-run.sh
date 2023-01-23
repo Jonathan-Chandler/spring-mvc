@@ -46,6 +46,8 @@
 #	-p 61614:61614	\
 
 #sudo docker network create -d bridge --subnet=172.18.0.0/16 web_server_network
+sudo docker container kill rabbitmq-server
+sudo docker container rm rabbitmq-server
 sudo docker run		\
 	--network web_server_network \
 	--ip 172.18.0.2	\

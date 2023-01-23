@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# 3000 - react
-# 8080 - java spring
+# 172.18.0.4 port 3306 - mysql
 sudo docker container kill sql-backend
 sudo docker container rm sql-backend
-sudo docker run -i -t		\
+# sudo docker run -i -t		\
+sudo docker run      		\
 	--user mysql:mysql		\
 	--network web_server_network \
 	--ip 172.18.0.4			\
@@ -15,11 +15,5 @@ sudo docker run -i -t		\
 	--name sql-backend		\
 	sql-server-container
 	
-sudo docker container ls
+#sudo docker container ls
 
-#	-p 3306:3306			\
-#	-p 8080:8080 			\
-
-# mariadbd as root
-
-#docker run -d -p 5672:5672 -p 15672:15672 -p 61613:61613 --name rabbitmq-broker rabbitmq:3-management

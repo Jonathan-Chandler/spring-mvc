@@ -31,5 +31,6 @@ RUN echo "user:pass" | chpasswd
 RUN pacman -Sy --noconfirm \
 	expect
 
-# CMD ["bash", "-c", "/home/user/docker/docker-spring-react-sql/startup-mariadb.sh"]
+# CMD ["bash", "-c", "/home/user/docker-spring-react/startup-spring.sh"]
+ENTRYPOINT ["bash", "-c", "/home/user/docker-spring-react/startup-spring.sh"]
 
