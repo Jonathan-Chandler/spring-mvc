@@ -19,5 +19,4 @@ sudo docker run      		\
 	-w /home/user			\
 	--name java-spring-backend \
 	spring-react-container
-sudo docker container ls
 

@@ -5,7 +5,6 @@ import useAuth from "../authentication/AuthProvider.tsx";
 export default function HeaderComponent(...params) {
     const { isAuthenticated } = useAuth();
 
-//					<div className="collapse navbar-collapse">
     if (isAuthenticated())
 	{
 		return (
@@ -14,13 +13,13 @@ export default function HeaderComponent(...params) {
 					<div className="navbar-collapse">
 						<ul className="navbar-nav mr-auto">
 							<li className="nav-item active">
-								<NavLink className="nav-link" href="/welcome">Something</NavLink>
+								<NavLink className="nav-link navbar-brand" href="/welcome">TIC TAC TOE DEMO</NavLink>
 							</li>
 							<li className="nav-item">
 								<NavLink className="nav-link" to="/welcome">Home</NavLink>
 							</li>
 							<li className="nav-item">
-								<NavLink className="nav-link" to="/tictactoe">Tic-Tac-Toe</NavLink>
+								<NavLink className="nav-link" to="/tictactoe">Tic Tac Toe</NavLink>
 							</li>
 						</ul>
 					</div>
@@ -43,13 +42,13 @@ export default function HeaderComponent(...params) {
 					<div className="navbar-collapse">
 						<ul className="navbar-nav mr-auto">
 							<li className="nav-item active">
-								<NavLink className="nav-link" href="/welcome">Something</NavLink>
+								<NavLink className="nav-link navbar-brand" href="/welcome">TIC TAC TOE DEMO</NavLink>
 							</li>
 							<li className="nav-item">
 								<NavLink className="nav-link" to="/welcome">Home</NavLink>
 							</li>
 							<li className="nav-item">
-								<NavLink className="nav-link" to="/tictactoe">Tic-Tac-Toe</NavLink>
+								<NavLink className="nav-link" to="/tictactoe">Tic Tac Toe</NavLink>
 							</li>
 						</ul>
 					</div>

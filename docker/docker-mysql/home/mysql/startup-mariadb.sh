@@ -8,7 +8,7 @@ set -m
 mariadbd &
 
 # wait for service to start
-sleep 10
+sleep 5
 
 cd sql && mariadb < all.sql
 #spawn "mariadbd &"
