@@ -18,7 +18,7 @@ This application uses Docker containers running Spring Boot, ReactJS, RabbitMQ, 
 ## Installation
 <strong>This application was tested on an Arch Linux installation running [Docker](https://www.docker.com/) daemon version 20.10.22.</strong>
 
-The application runs in three docker containers which run on subnet 172.18.0.0/16.<br>
+The application runs in three docker containers which run on subnet 172.19.0.0/16.<br>
 The launch-server script in the root project directory will automatically set up the required network bridge and build the containers<br>
 
 ```console
@@ -29,7 +29,7 @@ running
 <img src="readme-images/launch-server-example.png" alt="Successful Server Launch" width=1280>  
 
 ## Connecting
-The React.JS server uses a bridge to the host local network and can be accessed through the host web browser at [http://localhost:3000](http://localhost:3000) or [http://127.0.0.1:3000](http://127.0.0.1:3000).<br><br>
+The React.JS server uses a bridge to the host local network and can be accessed through the host web browser at [http://127.0.0.1:3000](http://127.0.0.1:3000).<br><br>
 The React frontend will display the welcome page:  
 
 <img src="readme-images/server-welcome.png" alt="Server Welcome Image" width=1280>  

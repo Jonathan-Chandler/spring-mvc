@@ -9,8 +9,8 @@ sudo docker container rm rabbitmq-server
 sudo docker container rm sql-backend
 sudo docker network rm web_server_network
 
-# create docker network bridge subnet 172.18.0.1
-sudo docker network create --driver=bridge --subnet=172.18.0.0/24 web_server_network
+# create docker network bridge subnet 172.19.0.1
+sudo docker network create --driver=bridge --subnet=172.19.0.0/24 web_server_network
 cd ./docker
 
 # build rabbitmq server

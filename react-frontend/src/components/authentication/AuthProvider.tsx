@@ -360,7 +360,7 @@ export function AuthProvider({
 			const toUsernameTopic = '/topic/to.user.' + username;
 
 			stompClientSession.configure({
-				brokerURL: "ws://172.18.0.2:61611/ws",
+				brokerURL: "ws://172.19.0.2:61611/ws",
 				connectHeaders: stompHeaders,
 				onConnect: () => 
 				{

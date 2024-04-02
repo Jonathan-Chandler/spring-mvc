@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ip addr 172.18.0.3
+# ip addr 172.19.0.3
 # 3000 - react
 # 8080 - java spring
 sudo docker container kill java-spring-backend
@@ -9,7 +9,7 @@ sudo docker container rm java-spring-backend
 sudo docker run      		\
 	--user user:user		\
 	--network web_server_network \
-	--ip 172.18.0.3			\
+	--ip 172.19.0.3			\
 	-p 3000:3000			\
 	-p 8080:8080			\
 	-v $(pwd)/home/user:/home/user \

@@ -11,6 +11,7 @@
 
 --- DROP TABLE IF EXISTS `tictactoe`;
 --- PRIMARY KEY (`player1`,`player2`)
+--- show tables;
 
 DROP TABLE IF EXISTS `tictactoe`;
 CREATE TABLE `tictactoe` (
